@@ -1,0 +1,21 @@
+services:  
+  broker:
+    image: rabbitmq:${RABBITMQ_VERSION}
+    container_name: broker
+    profiles:
+      - broker
+    tty: true
+    stdin_open: true
+    # volumes:
+    #   - ${RABBITMQ_VOLUME}:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 15692:15692
+    networks:
+      - ${NETWORK_APPLICATION}
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 5
+      timeout: 2s

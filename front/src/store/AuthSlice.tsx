@@ -1,0 +1,55 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { AuthType } from "@/types"
+
+type User = {
+    userId: string
+    nombre: string
+    scopes: string[]
+    isAuthenticated: boolean
+    avatar: string
+    loginChallenge: string
+    state: string
+}
+
+const initialState:User = {
+    userId: '',
+    nombre: '',
+    scopes: [],
+    isAuthenticated: false,
+    avatar: '',
+    loginChallenge: '',
+    state: ''
+}
+
+export const authSlice = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        setToken: (_, action:PayloadAction<string>) => {
+            sessionStorage.setItem("Access_Token", action.payload)
+        },
+        logout: (state) => {
+            sessionStorage.removeItem("Access_Token")
+            sessionStorage.removeItem("Refresh_Token")
+            sessionStorage.removeItem("login_challenge")
+            state.userId = ''
+            state.nombre = ''
+            state.scopes = []
+            state.avatar = ''
+            state.loginChallenge = ''
+            state.state = ''
+        },
+        fetchLoginChallenge: (state, action: PayloadAction<{ loginChallenge: string; state: string }>) => {
+            sessionStorage.setItem("login_challenge", action.payload.loginChallenge);
+            sessionStorage.setItem("state", action.payload.state);
+            state.loginChallenge = action.payload.loginChallenge;
+            state.state = action.payload.state;
+        }
+    }
+})
+
+export const { 
+    setToken,
+    logout,
+    fetchLoginChallenge
+} = authSlice.actions;

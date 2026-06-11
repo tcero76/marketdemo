@@ -1,0 +1,94 @@
+import { useState } from 'react'
+import { TOAST_TYPES } from '@/types';
+import ModalHtml from '@/components/modal/ModalHtml';
+import { useUIContext } from '@/context/UIContext';
+import { Button } from '@/components/ui/button';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useGetPosteosDemoQuery, useSendPostDemoMutation } from '@/http/api';
+import Editor from './textEditor/Editor';
+import { type PosteoCreate } from '@/types/demo';
+import { v4 as uuidv4 } from "uuid";
+
+type CreatePostProps = {
+  id: string
+}
+const CreatePost = ({ id }:CreatePostProps) => {
+    const [modal, setModal] = useState<boolean>(false);
+    const [posteo, setPosteo] = useState<PosteoCreate | null>(null);
+    const { data:posteos } = useGetPosteosDemoQuery(id)
+    const [ trigger ] = useSendPostDemoMutation()
+    const uiContext = useUIContext();
+    const onClickPosteo = () => {
+        if(!posteo) return;
+        const posteoActualizado = {
+            ...posteo,
+            productId: id
+        };
+        uiContext.showSpinner()
+        trigger(posteoActualizado).unwrap()
+        .then(() => {
+            uiContext.showToast({msg:"Enviado", type:TOAST_TYPES.SUCCESS})
+            setModal(false)
+        })
+        .finally(() => {
+            uiContext.hideSpinner()
+        })
+    }
+    const onClickAbrirPost = () => {
+        const emptyPost:PosteoCreate = {
+            id: uuidv4(),
+            texto: '',
+            meta:  {
+                hashtags: []
+                },
+            productId: id
+            };
+        setPosteo(emptyPost);
+        setModal(true)
+    }
+    const onEditar = (posteo:PosteoCreate) => {
+        setPosteo({ ...posteo });
+        setModal(true)
+    }
+    if(!posteos) return <div>Sin posteos....</div>
+    return (
+        <>
+            <ModalHtml onClickModal={onClickPosteo}
+                open={modal}
+                setOpen={setModal}
+                iconBtnAccept='send'>
+                <Editor
+                    onChangePosteo={setPosteo}
+                    posteo={posteo}/>
+            </ModalHtml>
+            <Button onClick={onClickAbrirPost}>Postear</Button>
+            <div className="w-full space-y-4">
+                {posteos.map((p,idx) => {
+                    return (
+                        <Item variant="outline" key={idx}>
+                            <ItemMedia>
+                            <Avatar className="size-10">
+                                <AvatarImage src="https://github.com/evilrabbit.png" />
+                                <AvatarFallback>ER</AvatarFallback>
+                            </Avatar>
+                            </ItemMedia>
+                            <ItemContent>
+                                <ItemTitle>Entrar</ItemTitle>
+                                <ItemDescription>{p.texto}</ItemDescription>
+                            </ItemContent>
+                            <ItemActions>
+                                <Button size="sm"
+                                    variant="outline"
+                                    onClick={() => onEditar(p)}>
+                                    Editar
+                                </Button>
+                            </ItemActions>
+                        </Item>
+                    )
+                })}
+            </div>
+        </>
+    )
+}
+export default CreatePost

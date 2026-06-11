@@ -1,0 +1,47 @@
+services:
+  db:
+    image: timescale/timescaledb:${TIMESCALEDB_VERSION:-2.20.1-pg17}
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+     POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+     POSTGRES_USER: ${POSTGRES_USER}
+     POSTGRES_DB: ${POSTGRES_DB}
+     PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - postgres_password
+    networks:
+      - ${NETWORK_APPLICATION:-application}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-manager
+      restart_policy:
+        condition: on-failure
+  flyway:
+    environment:
+     POSTGRES_USER: ${POSTGRES_USER}
+     POSTGRES_DB: ${POSTGRES_DB}
+     POSTGRES_HOST: ${POSTGRES_HOST}
+     POSTGRES_PORT: ${POSTGRES_PORT_WRITE}
+    secrets:
+      - postgres_password
+    deploy:
+      mode: replicated-job
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.hostname == swarm-manager
+    networks:
+      - ${NETWORK_APPLICATION:-application}
+volumes:
+  postgres:
+secrets:
+  postgres_password:
+    external: true
+      

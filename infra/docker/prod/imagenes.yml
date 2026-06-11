@@ -1,0 +1,13 @@
+services:
+  bff-service:
+    image: tcero76/bff-service:873ade66e05ff28417561a373fe8f8910811fd6f
+  front:
+    image: tcero76/front:eac6670d15fc0d99f2fb3d7205726da4751290ca
+  scrap-service:
+    image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
+  beat-service:
+    image: tcero76/beat-service:${TAG}
+  flyway:
+    image: tcero76/flyway:4ea48a2edff92518f7d9652879474ce3be9f125f
+  rabbitmq-init:
+    image: tcero76/rabbitmq-init:${TAG}

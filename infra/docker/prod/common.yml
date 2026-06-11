@@ -1,0 +1,19 @@
+networks:
+  application:
+    name: ${TF_VAR_overlay_network:-application}
+    driver: overlay
+    attachable: true
+    external: true
+volumes:
+  timescaledb_data:
+    name: timescaledb_data
+    driver_opts:
+      type: none
+      device: ${POSTGRES_VOLUME}/data
+      o: bind
+  redis_data:
+    name: redis_data
+    driver_opts:
+      type: none
+      device: ${REDIS_VOLUME}/data
+      o: bind
