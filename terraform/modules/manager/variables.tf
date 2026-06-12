@@ -9,4 +9,3 @@ variable "ssh_private_key" {
   type      = string
   sensitive = true
 }
-variable "project_id" {}

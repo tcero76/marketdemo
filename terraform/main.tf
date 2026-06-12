@@ -35,7 +35,6 @@ resource "tls_private_key" "swarm_internal" {
 }
 
 module "manager" {
-  project_id      = digitalocean_project.demo.id
   source          = "./modules/manager"
   region          = var.region
   size            = var.size
@@ -59,6 +58,15 @@ module "worker" {
   ssh_keys  = [data.digitalocean_ssh_key.default.id]
   vpc = data.digitalocean_vpc.default.id
   depends = module.manager.swarm_manager
+}
+
+resource "digitalocean_project_resources" "swarm" {
+  project = digitalocean_project.demo.id
+
+  resources = concat(
+    [module.manager.manager_urn],
+    module.worker.worker_urns
+  )
 }
 
 # # -----------------------------

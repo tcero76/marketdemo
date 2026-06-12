@@ -5,3 +5,7 @@ output "manager_ip" {
 output "swarm_manager" {
   value = digitalocean_droplet.swarm_manager
 }
+
+output "manager_urn" {
+  value = digitalocean_droplet.swarm_manager.urn
+}
