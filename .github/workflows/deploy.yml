@@ -165,7 +165,13 @@ jobs:
           # Obtener lista de archivos modificados
           cd "$GITHUB_WORKSPACE"
           git fetch --tags
-          LAST_DEPLOYED=$(git rev-parse deploy-prod)
+          if git rev-parse deploy-prod >/dev/null 2>&1; then
+              LAST_DEPLOYED=$(git rev-parse deploy-prod)
+              CHANGED=$(git diff --name-only "$LAST_DEPLOYED" HEAD)
+          else
+              echo "Tag deploy-prod no existe. Primer despliegue."
+              CHANGED=$(git ls-files)
+          fi
           CURRENT=$(git rev-parse HEAD)
 
           echo "Último deploy: $LAST_DEPLOYED"
