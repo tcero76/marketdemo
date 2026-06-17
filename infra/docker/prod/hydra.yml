@@ -27,8 +27,10 @@ services:
       - traefik.http.middlewares.hydra-strip.stripprefix.prefixes=/hydra
       - traefik.http.routers.hydra.middlewares=hydra-strip
       - traefik.http.services.hydra.loadbalancer.server.port=4444
-    volumes:
-      - infra/dockere/config/hydra/entrypoint.sh:/entrypoint.sh
+    configs:
+      - source: hydra_entrypoint
+        target: /entrypoint.sh
+        mode: 0555
     deploy:
       mode: replicated
       replicas: 1

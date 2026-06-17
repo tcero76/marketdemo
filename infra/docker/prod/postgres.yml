@@ -39,9 +39,4 @@ services:
           - node.hostname == swarm-manager
     networks:
       - ${NETWORK_APPLICATION:-application}
-volumes:
-  postgres:
-secrets:
-  postgres_password:
-    external: true
       

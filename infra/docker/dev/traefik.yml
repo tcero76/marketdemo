@@ -15,7 +15,7 @@ services:
       # - "--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
       # - "--certificatesresolvers.le.acme.email=admin@${HOST_EXTERNAL}"
       # - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
-      # - "--certificatesresolvers.le.acme.tlschallenge=true"  \=] 
+      # - "--certificatesresolvers.le.acme.tlschallenge=true"
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
 

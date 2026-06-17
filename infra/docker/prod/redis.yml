@@ -17,6 +17,3 @@ services:
           - node.hostname == swarm-manager
       restart_policy:
         condition: on-failure
-configs:
-  redis_config:
-    external: true

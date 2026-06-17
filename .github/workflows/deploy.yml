@@ -378,8 +378,23 @@ jobs:
           "
           ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
             cat infra/docker/config/hydra/entrypoint.sh | docker config create hydra_entrypoint - \
-                && echo '✅ Config redis_config creado' \
-                || echo 'ℹ️ Config redis_config ya existe, continuando...'
+                && echo '✅ Config hydra_entrypoint creado' \
+                || echo 'ℹ️ Config hydra_entrypoint ya existe, continuando...'
+          "
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
+            cat infra/docker/config/traefik/dynamic/tls.yml | docker config create traefik_tls - \
+                && echo '✅ Config trafik_tls creado' \
+                || echo 'ℹ️ Config trafik_tls ya existe, continuando...'
+          "
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
+            cat infra/docker/config/traefik/server.crt | docker config create traefik_server_crt - \
+                && echo '✅ Config traefik_server_crt creado' \
+                || echo 'ℹ️ Config traefik_server_crt ya existe, continuando...'
+          "
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
+            cat infra/docker/config/traefik/server.key | docker config create traefik_server_key - \
+                && echo '✅ Config traefik_server_key creado' \
+                || echo 'ℹ️ Config traefik_server_key ya existe, continuando...'
           "
 
       - name: Crear secrets en Docker Swarm
@@ -409,21 +424,6 @@ jobs:
             echo '${{ secrets.PATRONI_ADMIN_PASSWORD }}' | docker secret create patroni_admin_password - \
               && echo '✅ Secret patroni_admin_password creado' \
               || echo 'ℹ️ Secret patroni_admin_password ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.PATRONI_SUPERUSER_PASSWORD }}' | docker secret create patroni_superuser_password - \
-              && echo '✅ Secret patroni_superuser_password creado' \
-              || echo 'ℹ️ Secret patroni_superuser_password ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.PATRONI_RESTAPI_PASSWORD }}' | docker secret create patroni_restapi_password - \
-              && echo '✅ Secret patroni_restapi_password creado' \
-              || echo 'ℹ️ Secret patroni_restapi_password ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.PATRONI_REPLICATION_PASSWORD }}' | docker secret create patroni_replication_password - \
-              && echo '✅ Secret patroni_replication_password creado' \
-              || echo 'ℹ️ Secret patroni_replication_password ya existe, continuando...'
           "
           ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
             echo '${{ secrets.CLIENT_SECRET }}' | docker secret create client_secret - \

@@ -17,8 +17,6 @@ services:
       - GOOGLE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI}
       - PROFILE=${PROFILE}
       - REDIS_HOST=${REDIS_HOST}
-      - GOOGLE_OAUTH2_CLIENT_SECRET_FILE=/run/secrets/google_oauth2_client_secret
-      - CLIENT_SECRET_FILE=/run/secrets/client_secret
       - POSTGRES_PASSWORD_FILE=/run/secrets/patroni_admin_password
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -110,14 +108,3 @@ services:
       - SCRAPY_QUEUE=${SCRAPY_QUEUE}
     networks:
       - ${NETWORK_APPLICATION:-application}
-secrets:
-  google_oauth2_client_secret:
-    external: true
-  client_secret:
-    external: true
-  postgres_password:
-    external: true
-  password_insta:
-    external: true
-  patroni_admin_password:
-    external: true

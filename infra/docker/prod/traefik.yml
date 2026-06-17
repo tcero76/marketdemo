@@ -9,20 +9,27 @@ services:
       - "--entrypoints.rtmp.address=:1935"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-
 #      - "--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.le.acme.email=admin@${HOST_EXTERNAL}"
-      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      # - "--certificatesresolvers.le.acme.email=admin@${HOST_EXTERNAL}"
+      # - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      # - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
 
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+    configs:
+      - source: traefik_tls
+        target: /etc/traefik/dynamic/tls.yml
+      - source: traefik_server_crt
+        target: /certs/server.crt
+      - source: traefik_server_key
+        target: /certs/server.key
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /root/docker/acme.json:/letsencrypt/acme.json
     networks:
       - ${NETWORK_APPLICATION:-application}
     labels:
