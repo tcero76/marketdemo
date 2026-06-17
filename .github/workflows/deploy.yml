@@ -385,7 +385,7 @@ jobs:
             "docker config create traefik_server_crt -"
           cat infra/docker/config/traefik/server.key | \
             ssh root@${{ vars.MANAGER_IP }} \
-            "docker config create  traefik_server_key-"
+            "docker config create traefik_server_key -"
 
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
