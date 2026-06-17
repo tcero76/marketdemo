@@ -13,7 +13,7 @@ FROM base AS builder
 RUN npm ci --only=production
 COPY . .
 RUN npm run build
-FROM node:20-alpine AS production
+FROM node:20-alpine AS prod
 WORKDIR /app
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/public ./public
