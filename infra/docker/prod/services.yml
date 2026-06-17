@@ -10,14 +10,10 @@ services:
       - REDIRECT_URL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}:${PORT_EXTERNAL}/bff/callback
       - HYDRA_ADMIN_URL=http://hydra:4445
       - HYDRA_PUBLIC_URL=http://hydra:4444
-      - CLIENT_ID=${CLIENT_ID}
-      - CLIENT_SECRET=${CLIENT_SECRET}
-      - CLICKHOUSE_HOST=clickhouse
-      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
-      - CLICKHOUSE_PORT=9000
-      - GOOGLE_OAUTH2_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
-      - GOOGLE_OAUTH2_CLIENT_SECRET=${GOOGLE_OAUTH2_CLIENT_SECRET}
+      - GOOGLE_OAUTH2_CLIENT_SECRET_FILE=/run/secrets/google_oauth2_client_secret
+      - GOOGLE_OAUTH2_CLIENT_ID_FILE=/run/secrets/google_oauth2_client_id
+      - CLIENT_ID_FILE=/run/secrets/client_id
+      - CLIENT_SECRET_FILE=/run/secrets/client_secret
       - GOOGLE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI}
       - PROFILE=${PROFILE}
       - REDIS_HOST=${REDIS_HOST}
@@ -33,10 +29,12 @@ services:
       - ${NETWORK_APPLICATION:-application}
     secrets:
       - google_oauth2_client_secret
+      - google_oauth2_client_id
+      - client_id
       - client_secret
       - patroni_admin_password
     depends_on:
-      - haproxy
+      - db
       - broker
       - hydra
     healthcheck:

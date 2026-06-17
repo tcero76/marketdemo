@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:${TRAEFIK_VERSION}
     container_name: traefik
     profiles:
       - traefik
@@ -15,7 +15,7 @@ services:
       # - "--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
       # - "--certificatesresolvers.le.acme.email=admin@${HOST_EXTERNAL}"
       # - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
-      # - "--certificatesresolvers.le.acme.tlschallenge=true"
+      # - "--certificatesresolvers.le.acme.tlschallenge=true"  \=] 
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
 
@@ -35,7 +35,7 @@ services:
     labels:
       - traefik.enable=true
 
-      - traefik.http.routers.traefik.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/traefik`)
+      - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
       - traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/traefik
       - traefik.http.routers.traefik.middlewares=traefik-strip
       - traefik.http.routers.traefik.entrypoints=websecure

@@ -1,21 +1,22 @@
 services:
   hydra:
-    image: tcero76/hydra:v0.0.0
-    command: hydra serve all --dev
+    image: oryd/hydra:${HYDRA_VERSION}
+    entrypoint: ["/entrypoint.sh"]
     environment:
       - URLS_SELF_ISSUER=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/hydra
       - URLS_LOGIN=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/login
       - URLS_CONSENT=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/bff/consent
-      - SECRETS_SYSTEM=some_secret_key_system
       - TTL_ACCESS_TOKEN=1h
       - TTL_REFRESH_TOKEN=720h
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT_WRITE}
+      - SECRETS_SYSTEM_FILE=/run/secrets/hydra_secret
       - POSTGRES_PASSWORD_FILE=/run/secrets/patroni_admin_password
     secrets:
       - patroni_admin_password
+      - hydra_secret
     networks:
       - ${NETWORK_APPLICATION:-application}
     labels:
@@ -26,6 +27,8 @@ services:
       - traefik.http.middlewares.hydra-strip.stripprefix.prefixes=/hydra
       - traefik.http.routers.hydra.middlewares=hydra-strip
       - traefik.http.services.hydra.loadbalancer.server.port=4444
+    volumes:
+      - infra/dockere/config/hydra/entrypoint.sh:/entrypoint.sh
     deploy:
       mode: replicated
       replicas: 1
@@ -37,4 +40,4 @@ services:
     healthcheck:
       disable: true
     depends_on:
-      - haproxy
+      - db
