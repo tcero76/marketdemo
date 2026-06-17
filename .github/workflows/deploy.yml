@@ -371,31 +371,21 @@ jobs:
       - name: Crear config de Redis en Docker Swarm
         continue-on-error: true
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            cat infra/docker/config/redis/redis.conf | docker config create redis_config - \
-                && echo '✅ Config redis_config creado' \
-                || echo 'ℹ️ Config redis_config ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            cat infra/docker/config/hydra/entrypoint.sh | docker config create hydra_entrypoint - \
-                && echo '✅ Config hydra_entrypoint creado' \
-                || echo 'ℹ️ Config hydra_entrypoint ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            cat infra/docker/config/traefik/dynamic/tls.yml | docker config create traefik_tls - \
-                && echo '✅ Config trafik_tls creado' \
-                || echo 'ℹ️ Config trafik_tls ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            cat infra/docker/config/traefik/server.crt | docker config create traefik_server_crt - \
-                && echo '✅ Config traefik_server_crt creado' \
-                || echo 'ℹ️ Config traefik_server_crt ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            cat infra/docker/config/traefik/server.key | docker config create traefik_server_key - \
-                && echo '✅ Config traefik_server_key creado' \
-                || echo 'ℹ️ Config traefik_server_key ya existe, continuando...'
-          "
+          cat infra/docker/config/redis/redis.conf | \
+            ssh root@${{ vars.MANAGER_IP }} \
+            "docker config create redis_config -"
+          cat infra/docker/config/hydra/entrypoint.sh | \
+            ssh root@${{ vars.MANAGER_IP }} \
+            "docker config create hydra_entrypoint -"
+          cat infra/docker/config/traefik/dynamic/tls.yml | \
+            ssh root@${{ vars.MANAGER_IP }} \
+            "docker config create traefik_tls -"
+          cat infra/docker/config/traefik/server.crt | \
+            ssh root@${{ vars.MANAGER_IP }} \
+            "docker config create traefik_server_crt -"
+          cat infra/docker/config/traefik/server.key | \
+            ssh root@${{ vars.MANAGER_IP }} \
+            "docker config create  traefik_server_key-"
 
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
