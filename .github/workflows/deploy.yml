@@ -237,7 +237,7 @@ jobs:
         if: ${{ needs.detect_changed_services.outputs[matrix.service.flag] == 'true' }}
         run: |
           export COMPOSE_FILE=infra/docker/prod/build.yml:infra/docker/prod/imagenes.yml
-          export HOST_EXTERNAL=${{ env.MANAGER_IP }}
+          export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
           docker compose \
             --project-directory ${PWD} \
             --project-name marketplace \
@@ -317,7 +317,7 @@ jobs:
 
       - name: Crear archivo .env
         run: |
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "bash -c 'cat > /root/.env <<EOF
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "bash -c 'cat > /root/.env <<EOF
           POSTGRES_USER=$POSTGRES_USER
           POSTGRES_HOST=$POSTGRES_HOST
           POSTGRES_PORT_WRITE=$POSTGRES_PORT_WRITE
@@ -328,7 +328,7 @@ jobs:
           RABBITMQ_VOLUME=$RABBITMQ_VOLUME
           HYDRA_VERSION=$HYDRA_VERSION
           REDIS_VERSION=$REDIS_VERSION
-          HOST_EXTERNAL=$${{ env.MANAGER_IP }}
+          HOST_EXTERNAL=$${{ vars.MANAGER_IP }}
           PORT_EXTERNAL=$PORT_EXTERNAL
           NETWORK_APPLICATION=$NETWORK_APPLICATION
           BROKER=${BROKER}
@@ -369,62 +369,62 @@ jobs:
       - name: Crear config de Redis en Docker Swarm
         continue-on-error: true
         run: |
-          cat infra/docker/config/redis/redis.conf | ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "docker config create redis_config - && echo '✅ Config redis_config creado' || echo 'ℹ️ Config redis_config ya existe, continuando...'"
+          cat infra/docker/config/redis/redis.conf | ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "docker config create redis_config - && echo '✅ Config redis_config creado' || echo 'ℹ️ Config redis_config ya existe, continuando...'"
 
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
         run: |
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.POSTGRES_PASSWORD }}' | docker secret create postgres_password - \
               && echo '✅ Secret postgres_password creado' \
               || echo 'ℹ️ Secret postgres_password ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.CLIENT_ID }}' | docker secret create client_id - \
               && echo '✅ Secret client_id creado' \
               || echo 'ℹ️ Secret client_id ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}' | docker secret create google_oauth2_client_id - \
               && echo '✅ Secret google_oauth2_client_id creado' \
               || echo 'ℹ️ Secret google_oauth2_client_id ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.HYDRA_SECRET }}' | docker secret create hydra_secret - \
               && echo '✅ Secret hydra_secret creado' \
               || echo 'ℹ️ Secret hydra_secret ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.PATRONI_ADMIN_PASSWORD }}' | docker secret create patroni_admin_password - \
               && echo '✅ Secret patroni_admin_password creado' \
               || echo 'ℹ️ Secret patroni_admin_password ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.PATRONI_SUPERUSER_PASSWORD }}' | docker secret create patroni_superuser_password - \
               && echo '✅ Secret patroni_superuser_password creado' \
               || echo 'ℹ️ Secret patroni_superuser_password ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.PATRONI_RESTAPI_PASSWORD }}' | docker secret create patroni_restapi_password - \
               && echo '✅ Secret patroni_restapi_password creado' \
               || echo 'ℹ️ Secret patroni_restapi_password ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.PATRONI_REPLICATION_PASSWORD }}' | docker secret create patroni_replication_password - \
               && echo '✅ Secret patroni_replication_password creado' \
               || echo 'ℹ️ Secret patroni_replication_password ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.CLIENT_SECRET }}' | docker secret create client_secret - \
               && echo '✅ Secret client_secret creado' \
               || echo 'ℹ️ Secret client_secret ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}' | docker secret create google_oauth2_client_secret - \
               && echo '✅ Secret google_oauth2_client_secret creado' \
               || echo 'ℹ️ Secret google_oauth2_client_secret ya existe, continuando...'
           "
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             echo '${{ secrets.PASSWORD_INSTA }}' | docker secret create password_insta - \
               && echo '✅ Secret password_insta creado' \
               || echo 'ℹ️ Secret password_insta ya existe, continuando...'
@@ -435,13 +435,13 @@ jobs:
         run: |
           git fetch origin
           git reset --hard ${{ github.sha }}
-          ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             mkdir -p docker
           "
           scp -o StrictHostKeyChecking=no infra/docker/prod/* \
-            root@$${{ env.MANAGER_IP }}:/root/docker/
+            root@$${{ vars.MANAGER_IP }}:/root/docker/
       - name: deploy
-        run: ssh -o StrictHostKeyChecking=no root@$${{ env.MANAGER_IP }} "
+        run: ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
             /root/deploy_stack.sh
           "
           echo "Desplegado"
