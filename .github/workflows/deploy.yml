@@ -369,12 +369,12 @@ jobs:
       - name: Crear config de Redis en Docker Swarm
         continue-on-error: true
         run: |
-          cat infra/docker/config/redis/redis.conf | ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "docker config create redis_config - && echo '✅ Config redis_config creado' || echo 'ℹ️ Config redis_config ya existe, continuando...'"
+          cat infra/docker/config/redis/redis.conf | ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "docker config create redis_config - && echo '✅ Config redis_config creado' || echo 'ℹ️ Config redis_config ya existe, continuando...'"
 
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
         run: |
-          ssh -o StrictHostKeyChecking=no root@$${{ vars.MANAGER_IP }} "
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
             echo '${{ secrets.POSTGRES_PASSWORD }}' | docker secret create postgres_password - \
               && echo '✅ Secret postgres_password creado' \
               || echo 'ℹ️ Secret postgres_password ya existe, continuando...'
