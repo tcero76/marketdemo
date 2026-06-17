@@ -94,6 +94,7 @@ func (b *InternalAuth) Consent(ctx context.Context, consentChallenge string) (st
 }
 
 func (b *InternalAuth) Callback(code string, ctx context.Context) *oauth2.Token {
+	log.Println("Callback Internal")
 	conf := &oauth2.Config{
 		ClientID:     os.Getenv("CLIENT_ID"),
 		ClientSecret: os.Getenv("CLIENT_SECRET"),
@@ -104,10 +105,10 @@ func (b *InternalAuth) Callback(code string, ctx context.Context) *oauth2.Token 
 		},
 		Scopes: []string{"openid", "offline", "mediamtx:stream"},
 	}
-
+	log.Println("Conf.ClientID: ", conf.ClientID)
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
-		log.Println("Error intercambiando código por token: %v", err)
+		log.Println("Error intercambiando código por token: ", err)
 	}
 	return token
 }
