@@ -5,36 +5,12 @@ services:
       dockerfile: ./bff-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
-  cache-updater-service:
-    build:
-      dockerfile: ./cache-updater/Dockerfile
-      context: .
-  broker-email-service:
-    build:
-      dockerfile: Dockerfile
-      context: ./broker-email-service
-  db-updater-service:
-    build:
-      dockerfile: Dockerfile
-      context: ./db-updater
-  db-broker-service:
-    build:
-      dockerfile: Dockerfile
-      context: ./db-broker-service
-  ws-service:
-    build:
-      dockerfile: Dockerfile
-      context: ./ws-service
   front:
     image: tcero76/front:eac6670d15fc0d99f2fb3d7205726da4751290ca
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
       target: ${PROFILE}
-  solana-service:
-    build:
-      dockerfile: ./solana-service/Dockerfile
-      context: .
   scrap-service:
     image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
     build:
@@ -47,15 +23,6 @@ services:
       dockerfile: beat-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
-  recomender-service:
-    build:
-      dockerfile: recomender-service/deploy/Dockerfile
-      context: .
-      target: ${PROFILE}
-  mediamtx-service:
-    build:
-      dockerfile: ./mediamtx-service/Dockerfile
-      context: .
   rabbitmq-init:
     image: tcero76/rabbitmq-init:${TAG}
     build:
