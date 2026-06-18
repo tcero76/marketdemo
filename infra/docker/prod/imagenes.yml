@@ -1,13 +1,74 @@
 services:
   bff-service:
     image: tcero76/bff-service:873ade66e05ff28417561a373fe8f8910811fd6f
+    build:
+      dockerfile: ./bff-service/deploy/Dockerfile
+      context: .
+      target: ${PROFILE}
+  cache-updater-service:
+    build:
+      dockerfile: ./cache-updater/Dockerfile
+      context: .
+  broker-email-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./broker-email-service
+  db-updater-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./db-updater
+  db-broker-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./db-broker-service
+  ws-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./ws-service
   front:
     image: tcero76/front:eac6670d15fc0d99f2fb3d7205726da4751290ca
+    build:
+      dockerfile: deploy/Dockerfile
+      context: ./front
+      target: ${PROFILE}
+  solana-service:
+    build:
+      dockerfile: ./solana-service/Dockerfile
+      context: .
   scrap-service:
     image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
+    build:
+      dockerfile: ./scrap-service/deploy/Dockerfile
+      context: .
+      target: ${PROFILE}
   beat-service:
     image: tcero76/beat-service:${TAG}
-  flyway:
-    image: tcero76/flyway:4ea48a2edff92518f7d9652879474ce3be9f125f
+    build:
+      dockerfile: beat-service/deploy/Dockerfile
+      context: .
+      target: ${PROFILE}
+  recomender-service:
+    build:
+      dockerfile: recomender-service/deploy/Dockerfile
+      context: .
+      target: ${PROFILE}
+  mediamtx-service:
+    build:
+      dockerfile: ./mediamtx-service/Dockerfile
+      context: .
   rabbitmq-init:
     image: tcero76/rabbitmq-init:${TAG}
+    build:
+      dockerfile: Dockerfile
+      context: infra/docker/config/rabbitmq/
+  hydra:
+    build:
+      dockerfile: Dockerfile
+      context: infra/docker/config/hydra/
+      target: ${PROFILE}
+  flyway:
+    image: tcero76/flyway:4ea48a2edff92518f7d9652879474ce3be9f125f
+    build:
+      dockerfile: deploy/Dockerfile
+      context: flyway/
+      target: ${PROFILE}

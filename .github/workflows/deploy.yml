@@ -237,7 +237,7 @@ jobs:
       - name: Build image and update tag in manifests
         if: ${{ needs.detect_changed_services.outputs[matrix.service.flag] == 'true' }}
         run: |
-          export COMPOSE_FILE=infra/docker/prod/build.yml:infra/docker/prod/imagenes.yml
+          export COMPOSE_FILE=infra/docker/prod/imagenes.yml
           export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
           docker compose \
             --project-directory ${PWD} \
