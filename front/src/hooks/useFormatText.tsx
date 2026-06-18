@@ -48,13 +48,10 @@ const useFormatText = <T extends PosteoCreateBase,>({onChangePosteo, editorRef, 
     restoreCaretPosition(editor, pos);
     onChangePosteo({
       id: posteo?.id,
-      userId: posteo?.userId,
       texto: editor.innerText ?? "",
       metaRaw:{
-        urls: metaRaw.urls,
         mentions: metaRaw.mentions,
         hashtags: metaRaw.hashtags } } as PosteoRaw)
-    if (metaRaw.urls) setUrlEmbeded(metaRaw.urls[0]);
   }
   const Embeded = <EmbededComponent imageUrl={imageUrl} urlEmbeded={urlEmbeded}/>
     return {

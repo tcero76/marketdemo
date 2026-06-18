@@ -120,16 +120,24 @@ export const demo = createApi({
     return (
       {
         getProductsIdx: builder.query<number[], void>({
-          query: () => `/usuario/product/getRecommendations`
+          query: () => ({
+            url: `/usuario/product/getRecommendations`
+          })
         }),
         getProduct: builder.query<Product, number>({
-          query: (id:number) => `/usuario/getProduct?product=${id}`
+          query: (id:number) => ({ 
+            url:`/usuario/getProduct?product=${id}`
+          })
         }),
         getProducts: builder.query<Product[], void>({
-          query: () => `/usuario/getProducts`
+          query: () => ({
+            url: `/usuario/getProducts`
+          })
         }),
         getCategories: builder.query<string[], void>({
-          query: () => `/usuario/getCategories`
+          query: () => ({
+            url: `/usuario/getCategories`
+          })
         }),
         searchProducts: builder.query<SearchPosts[],SearchType>({
           query: (search:SearchType) => ({ 

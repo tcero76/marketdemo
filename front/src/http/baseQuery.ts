@@ -1,4 +1,4 @@
-import { fetchBaseQuery } from "@reduxjs/toolkit/query"
+import { BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from "@reduxjs/toolkit/query"
 import type { RootState } from "@/store/store"
 
 export const baseQuery = fetchBaseQuery({
@@ -14,7 +14,11 @@ export const baseHydraQuery = fetchBaseQuery({
   credentials: "include",
 })
 
-export const fakeBaseQueryWithRefresh = async (args, api, extraOptions) => {
+export const fakeBaseQueryWithRefresh: BaseQueryFn<
+  FetchArgs,
+  unknown,
+  FetchBaseQueryError
+>  = async (args, api, extraOptions) => {
   const url = typeof args === 'string' ? args : args.url
   if(url === '/getAuthentication') {
       return { data: authentication }

@@ -14,8 +14,7 @@ import { Servicios } from "@/types/servicios";
       ),
       hashtags: servicios.filter(s =>
         metaRaw.hashtags?.some(h => normalize(h) === normalizeNombre(s.nombre))
-      ),
-      urls: metaRaw.urls
+      )
     };
   }
 

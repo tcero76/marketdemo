@@ -60,7 +60,8 @@ const CreatePost = ({ id }:CreatePostProps) => {
                 iconBtnAccept='send'>
                 <Editor
                     onChangePosteo={setPosteo}
-                    posteo={posteo}/>
+                    posteo={posteo}
+                    productId={id}/>
             </ModalHtml>
             <Button onClick={onClickAbrirPost}>Postear</Button>
             <div className="w-full space-y-4">

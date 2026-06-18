@@ -42,7 +42,7 @@ export default function GoogleOneTap() {
           type: "standard",
           size: "large",
           theme: "outline",
-          text: "sign_in_with",
+          text: "signin_with",
           shape: "rectangular",
           logo_alignment: "left",
         }

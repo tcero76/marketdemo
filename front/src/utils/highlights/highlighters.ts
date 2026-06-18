@@ -1,4 +1,4 @@
-import { Highlighter, HighlightResult } from "@/types/highlight";
+import { type Highlighter, type HighlightResult } from "@/types/";
 
 export const hashtagHighlighter: Highlighter = (texto:string):HighlightResult => {
     const regex = /#[\p{L}\p{N}_]+/gu;
@@ -36,7 +36,6 @@ export const arrobaHighlighter: Highlighter = (texto:string):HighlightResult => 
 
 export const httpsHighlighter: Highlighter = (texto:string):HighlightResult => {
     const regex = /https?:\/\/[^\s<>"']+/gu;
-    const urls = texto.match(regex) ?? [];
     const html = texto.replace(regex, (palabra) => {
         const safe = palabra
             .replace(/&/g, "&amp;")
@@ -46,7 +45,5 @@ export const httpsHighlighter: Highlighter = (texto:string):HighlightResult => {
         return `<span class="font-bold text-blue-500" contenteditable="true">${safe}</span>`;
     });
     return {html,
-        metaRaw: {
-            urls
-        }, cleanText: '' };
+        metaRaw: {}, cleanText: '' };
 }

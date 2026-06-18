@@ -5,7 +5,7 @@ import Search from './Search'
 import name from '@/app/assets/name.svg';
 import Icon from '../../components/icons/Icon';
 import Link from "next/link"
-import { useMediaQuery } from "@/hooks/use-media-query.ts"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import {
   NavigationMenu,
   NavigationMenuContent,

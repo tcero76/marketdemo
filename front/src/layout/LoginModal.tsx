@@ -19,11 +19,9 @@ import {
 import { cn } from '@/lib/utils';
 
 type LoginModalProps = {
-  challenge:string
 } & React.ComponentProps<"div">
 
 const LoginModal: React.FC<LoginModalProps> = ({
-  challenge,
   className,
   ...props
 }:LoginModalProps) => {
@@ -40,11 +38,13 @@ const LoginModal: React.FC<LoginModalProps> = ({
     }
   }, [])
     useEffect(() => {
-      setLoginUrl(`/bff/login?` +
-          `login_challenge=${challenge}` +
-          `&state=${sessionStorage.getItem("state")}` +
-          `&idp=internal`)
-    },[challenge]);
+      const url = new URL(window.location.href);
+      const challenge = url.searchParams.get("login_challenge");
+        setLoginUrl(`/bff/login?` +
+            `login_challenge=${challenge}` +
+            `&state=${sessionStorage.getItem("state")}` +
+            `&idp=internal`)
+    },[]);
     return (
       <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>

@@ -8,7 +8,7 @@ export type Recomendations = {
 
 export type RowProps = {
   key: number
-  row: IdxProps[]
+  row: number[]
 }
 
 export type IdxProps = {

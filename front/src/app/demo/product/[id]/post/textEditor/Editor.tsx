@@ -1,7 +1,7 @@
 'use client'
 
 import { FC, useRef } from "react";
-import { PosteoRaw } from "@/types";
+import { type PosteoRaw } from "@/types";
 import { usePasteImage } from "@/hooks/usePasteImage";
 import useFormatText from "@/hooks/useFormatText";
 import { useAutocomplete } from '@/hooks/useAutocomplete';
@@ -9,7 +9,7 @@ import { useGetCategoriesQuery } from '@/http/api';
 import { matchBy } from "@/lib/meta/enrichMeta";
 import { PosteoCreate, type EditorProps } from "@/types/demo";
 
-const Editor:FC<EditorProps> = ({ onChangePosteo, posteo, ...props }) => {
+const Editor:FC<EditorProps> = ({ onChangePosteo, posteo, productId, ...props }) => {
   const { data:categories } = useGetCategoriesQuery()
   const handleChangePosteo = (posteoRaw: PosteoRaw) => {
     const meta = matchBy(
@@ -19,11 +19,11 @@ const Editor:FC<EditorProps> = ({ onChangePosteo, posteo, ...props }) => {
     );
     onChangePosteo({
       id: posteoRaw.id,
+      texto: posteoRaw.texto,
+      productId: productId,
       meta: { 
         hashtags: meta.map(m => ({ nombre: m }))
-      },
-      texto: posteoRaw.texto,
-      productId: posteoRaw.userId
+      }
     });
   };
   const editorRef = useRef<HTMLDivElement>(null);

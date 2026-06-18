@@ -10,7 +10,7 @@ import { logout } from "@/store/AuthSlice"
 
 const mutex = new Mutex()
 
-export const baseQueryWithRefresh: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
+export const baseQueryWithRefresh: BaseQueryFn<FetchArgs, unknown, FetchBaseQueryError> =
  async (args, api, extraOptions) => {
   await mutex.waitForUnlock()
   let result = await (process.env.NEXT_PUBLIC_MOCK === 'true'? fakeBaseQueryWithRefresh(args, api, extraOptions) : baseQuery(args, api, extraOptions))

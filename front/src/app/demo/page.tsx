@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAuthDispatch } from '@/store/hooks';
 import { Virtuoso } from 'react-virtuoso';
 import {
   useGetAuthenticatedQuery,
   useGetProductsIdxQuery,
  } from '@/http/api';
-import { useSearchParams } from 'next/navigation';
 import { setToken } from '@/store/AuthSlice';
 import { skipToken } from '@reduxjs/toolkit/query';
 import Row from './search/Row';
@@ -16,16 +15,15 @@ export default function Home() {
   const dispatch = useAuthDispatch()
   const { data:user } = useGetAuthenticatedQuery()
   const { data, isLoading:isLoadingRecomendations } = useGetProductsIdxQuery(user?.sub ? undefined : skipToken);
-  const searchParams = useSearchParams();
   useEffect(() => {
-    const at = searchParams.get('accessToken');
-    if (at) {
-      dispatch(setToken(at))
-      const url = new URL(window.location.href)
+    const url = new URL(window.location.href)
+    const accessToken = url.searchParams.get('accessToken');
+    if (accessToken) {
+      dispatch(setToken(accessToken))
       url.searchParams.delete('accessToken')
       window.history.replaceState({}, '', url.toString())
     }
-  }, [searchParams]);
+  }, [dispatch]);
   const rows = useMemo(() => {
   if (!data?.length) return [];
   return Array.from(

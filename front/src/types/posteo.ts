@@ -5,10 +5,9 @@ import { Servicios } from './servicios'
   type PosteoBase = {
       id:string
       texto:string
-      userId:string
   }
 
-  export type Posteo = PosteoBase &{
+  export type Posteo = PosteoBase & {
     meta:Meta
   }
   
@@ -19,13 +18,11 @@ import { Servicios } from './servicios'
 export type MetaRaw = {
   mentions?: string[]
   hashtags?: string[]
-  urls: string[]
 }
 
 export type Meta = {
   mentions: Tses[]
   hashtags: Servicios[]
-  urls: string[]
 }
 
 export type HighlightResult = {

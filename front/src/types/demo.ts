@@ -52,5 +52,6 @@ export type Categories = {
 
 export type EditorProps = {
   posteo:PosteoCreate | null
+  productId:string
   onChangePosteo:(posteo:PosteoCreate) => void
 } & ComponentPropsWithoutRef<'div'>
