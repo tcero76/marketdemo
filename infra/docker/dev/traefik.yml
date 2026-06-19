@@ -27,7 +27,7 @@ services:
       - "1935:1935"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./infra/docker/config/traefik/dynamic:/etc/traefik/dynamic
+      - ./infra/docker/config/traefik/dynamic/tls.yml:/etc/traefik/dynamic/tls.yml
       # - ./infra/docker/config/traefik/acme.json:/letsencrypt/acme.json
       - ~/.environments/certs:/certs
     networks:
