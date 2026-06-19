@@ -6,7 +6,7 @@ services:
       context: .
       target: ${PROFILE}
   front:
-    image: tcero76/front:ed94bd6ede14a807c00f8b4c43d9a38582eeecb0
+    image: tcero76/front:d9a1ce18004256788407fb06f8c7a05ee608aa7e
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
