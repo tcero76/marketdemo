@@ -80,7 +80,6 @@ services:
     command: [ "celery", "-A", "main", "worker", "--loglevel=debug"]
     secrets:
       - postgres_password
-      - password_insta
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -90,8 +89,6 @@ services:
       - BROKER=${BROKER}
       - PORT=8000
       - TOTAL_POSTS=${TOTAL_POSTS}
-      - USERNAME_INSTA=${USERNAME_INSTA}
-      - PASSWORD_INSTA_FILE=/run/secrets/password_insta
       - CMD_SCRAPY_START_QUEUE=${CMD_SCRAPY_START_QUEUE}
       - CMD_SCRAPY_START_EXCHANGE=${CMD_SCRAPY_START_EXCHANGE}
     networks:
