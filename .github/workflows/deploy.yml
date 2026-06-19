@@ -79,7 +79,7 @@ env:
   REDIS_HOST: cache
   # postgres
   POSTGRES_USER: tcero
-  POSTGRES_DB: marketdemo
+  POSTGRES_DB: marketplace
   POSTGRES_PORT_WRITE: 5432
   POSTGRES_PORT_READ: 5432
   POSTGRES_HOST: db
