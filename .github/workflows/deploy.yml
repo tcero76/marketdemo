@@ -371,70 +371,43 @@ jobs:
       - name: Crear config de Redis en Docker Swarm
         continue-on-error: true
         run: |
-          cat infra/docker/config/redis/redis.conf | \
-            ssh root@${{ vars.MANAGER_IP }} \
-            "docker config create redis_config -"
-          cat infra/docker/config/hydra/entrypoint.sh | \
-            ssh root@${{ vars.MANAGER_IP }} \
-            "docker config create hydra_entrypoint -"
-          cat infra/docker/config/traefik/dynamic/tls_prod.yml | \
-            ssh root@${{ vars.MANAGER_IP }} \
-            "docker config create traefik_tls -"
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-config.sh redis_config
+          ' < infra/docker/config/redis/redis.conf
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-config.sh hydra_entrypoint
+          ' < infra/docker/config/hydra/entrypoint.sh
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-config.sh traefik_tls
+          ' < infra/docker/config/traefik/dynamic/tls_prod.yml
 
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.POSTGRES_PASSWORD }}' | docker secret create postgres_password - \
-              && echo '✅ Secret postgres_password creado' \
-              || echo 'ℹ️ Secret postgres_password ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.CLIENT_ID }}' | docker secret create client_id - \
-              && echo '✅ Secret client_id creado' \
-              || echo 'ℹ️ Secret client_id ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}' | docker secret create google_oauth2_client_id - \
-              && echo '✅ Secret google_oauth2_client_id creado' \
-              || echo 'ℹ️ Secret google_oauth2_client_id ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.HYDRA_SECRET }}' | docker secret create hydra_secret - \
-              && echo '✅ Secret hydra_secret creado' \
-              || echo 'ℹ️ Secret hydra_secret ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.PATRONI_ADMIN_PASSWORD }}' | docker secret create patroni_admin_password - \
-              && echo '✅ Secret patroni_admin_password creado' \
-              || echo 'ℹ️ Secret patroni_admin_password ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.CLIENT_SECRET }}' | docker secret create client_secret - \
-              && echo '✅ Secret client_secret creado' \
-              || echo 'ℹ️ Secret client_secret ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}' | docker secret create google_oauth2_client_secret - \
-              && echo '✅ Secret google_oauth2_client_secret creado' \
-              || echo 'ℹ️ Secret google_oauth2_client_secret ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.PASSWORD_INSTA }}' | docker secret create password_insta - \
-              && echo '✅ Secret password_insta creado' \
-              || echo 'ℹ️ Secret password_insta ya existe, continuando...'
-          "
-
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.TRAEFIK_SERVER_CRT }}' | docker secret create traefik_server_crt - \
-              && echo '✅ Secret traefik_server_crt creado' \
-              || echo 'ℹ️ Secret traefik_server_crt ya existe, continuando...'
-          "
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            echo '${{ secrets.TRAEFIK_SERVER_KEY }}' | docker secret create traefik_server_key - \
-              && echo '✅ Secret traefik_server_key creado' \
-              || echo 'ℹ️ Secret traefik_server_key ya existe, continuando...'
-          "
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh postgres_password
+          ' < <(printf "%s" "${{ secrets.POSTGRES_PASSWORD }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh client_id
+          ' < <(printf "%s" "${{ secrets.CLIENT_ID }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh google_oauth2_client_id
+          ' < <(printf "%s" "${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh hydra_secret
+          ' < <(printf "%s" "${{ secrets.HYDRA_SECRET }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh client_secret
+          ' < <(printf "%s" "${{ secrets.CLIENT_SECRET }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh google_oauth2_client_secret
+          ' < <(printf "%s" "${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh traefik_server_crt
+          ' < <(printf "%s" "${{ secrets.TRAEFIK_SERVER_CRT }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh traefik_server_key
+          ' < <(printf "%s" "${{ secrets.TRAEFIK_SERVER_KEY }}")
         shell: bash
 
       - name: Copy docker-compose.yml to manager

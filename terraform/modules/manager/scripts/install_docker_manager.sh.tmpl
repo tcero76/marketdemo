@@ -27,7 +27,6 @@ docker swarm join-token -q worker > /root/worker_token.txt
 cat > /root/deploy_stack.sh <<'EOF'
 #!/bin/bash
 set -e
-
 echo "Cargando variables de entorno desde .env..."
 if [ -f /root/.env ]; then
     # Forma robusta de exportar variables
@@ -37,7 +36,6 @@ if [ -f /root/.env ]; then
 else
     echo ".env no encontrado, continuando sin variables"
 fi
-
 echo "Desplegando stack..."
 docker stack deploy \
   -c /root/docker/postgres.yml \
@@ -50,9 +48,34 @@ docker stack deploy \
   -c /root/docker/imagenes.yml \
   mystack \
   --with-registry-auth
-
 echo "Despliegue completado."
-
 EOF
 
+cat > /root/deploy-secret.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+NAME="$1"
+if [ -z "$NAME" ]; then
+  echo "Usage: deploy-secret.sh <name>"
+  exit 1
+fi
+docker secret rm "$NAME" 2>/dev/null || true
+docker secret create "$NAME" -
+EOF
+
+cat > /root/deploy-config.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+NAME="$1"
+if [ -z "$NAME" ]; then
+  echo "Usage: deploy-config.sh <name>"
+  exit 1
+fi
+# eliminar si existe
+docker config rm "$NAME" 2>/dev/null || true
+# crear desde stdin
+docker config create "$NAME" -
+EOF
 chmod +x /root/deploy_stack.sh
+chmod +x /root/deploy-secret.sh
+chmod +x /root/deploy-config.sh
