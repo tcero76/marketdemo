@@ -35,7 +35,7 @@ const Login = () => {
         state,
         redirect_uri: `${process.env.NEXT_PUBLIC_HOST}/bff/callback`,
         });
-        window.location.href = `${process.env.NEXT_PUBLIC_HOST}/hydra/oauth2/auth?${params.toString()}`;
+        window.location.href = `${process.env.NEXT_PUBLIC_HYDRA}/oauth2/auth?${params.toString()}`;
     }
     const onClickLogout = async ( e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
