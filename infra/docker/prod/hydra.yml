@@ -11,7 +11,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT_WRITE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
       - SECRETS_SYSTEM_FILE=/run/secrets/hydra_secret
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
     secrets:
