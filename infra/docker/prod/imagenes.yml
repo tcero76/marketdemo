@@ -6,7 +6,7 @@ services:
       context: .
       target: ${PROFILE}
   front:
-    image: tcero76/front:8811a40cab8fea1bf973dc75ded2c99f871f525e
+    image: tcero76/front:668687e2b19faa67cf6356ff6e49c1bb9f06c1c6
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
@@ -34,7 +34,7 @@ services:
       context: infra/docker/config/hydra/
       target: ${PROFILE}
   flyway:
-    image: tcero76/flyway:4ea48a2edff92518f7d9652879474ce3be9f125f
+    image: tcero76/flyway:668687e2b19faa67cf6356ff6e49c1bb9f06c1c6
     build:
       dockerfile: deploy/Dockerfile
       context: flyway/
