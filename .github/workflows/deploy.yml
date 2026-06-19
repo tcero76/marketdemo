@@ -79,10 +79,10 @@ env:
   REDIS_HOST: cache
   # postgres
   POSTGRES_USER: tcero
-  POSTGRES_DB: marketplace
-  POSTGRES_PORT_WRITE: 5000
-  POSTGRES_PORT_READ: 5001
-  POSTGRES_HOST: haproxy
+  POSTGRES_DB: marketdemo
+  POSTGRES_PORT_WRITE: 5432
+  POSTGRES_PORT_READ: 5432
+  POSTGRES_HOST: db
 
   #OAuth google
   GOOGLE_OAUTH2_REDIRECT_URI: http://localhost:8080/bff/callback
