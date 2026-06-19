@@ -21,6 +21,9 @@ services:
     configs:
       - source: traefik_tls
         target: /etc/traefik/dynamic/tls.yml
+    secrets:
+     - traefik_server_crt
+     - traefik_server_key
     ports:
       - "80:80"
       - "443:443"
@@ -34,3 +37,11 @@ services:
       - traefik.http.routers.traefik.entrypoints=websecure
       # - traefik.http.routers.traefik.tls.certresolver=le
       - traefik.http.routers.traefik.service=api@internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-manager
+      restart_policy:
+        condition: on-failure

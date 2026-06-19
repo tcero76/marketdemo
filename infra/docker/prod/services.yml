@@ -4,7 +4,7 @@ services:
     command: ["/app/main"]
     environment:
       - PORT=3000
-      - POSTGRES_PORT_WRITE=${POSTGRES_PORT_WRITE}
+      - POSTGRES_PORT_WRITE=${POSTGRES_PORT}
       - POSTGRES_PORT_READ=${POSTGRES_PORT_READ}
       - HOST_EXTERNAL=${HOST_EXTERNAL}
       - REDIRECT_URL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}:${PORT_EXTERNAL}/bff/callback
@@ -45,7 +45,7 @@ services:
       - traefik.http.middlewares.bff-strip.stripprefix.prefixes=/bff
       - traefik.http.routers.bff.rule=PathPrefix(`/bff`)
       - traefik.http.routers.bff.entrypoints=websecure
-      - traefik.http.routers.front.tls.certresolver=le
+      # - traefik.http.routers.front.tls.certresolver=le
       - traefik.http.services.bff.loadbalancer.server.port=3000
       - traefik.http.routers.bff.middlewares=bff-strip
     deploy:
@@ -60,6 +60,13 @@ services:
     working_dir: /app
     networks:
       - ${NETWORK_APPLICATION:-application}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.front.rule=Host(`${HOST_EXTERNAL}`)
+      - traefik.http.routers.front.entrypoints=websecure
+      - traefik.http.routers.front.tls=true
+      # - traefik.http.routers.front.tls.certresolver=le
+      - traefik.http.services.front.loadbalancer.server.port=3000
     deploy:
       mode: replicated
       replicas: 1
@@ -68,13 +75,6 @@ services:
           - node.hostname == swarm-manager
       restart_policy:
         condition: on-failure
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.front.rule=Host(`${HOST_EXTERNAL}`)
-      - traefik.http.routers.front.entrypoints=websecure
-      - traefik.http.routers.front.tls=true
-      - traefik.http.routers.front.tls.certresolver=le
-      - traefik.http.services.front.loadbalancer.server.port=80
   scrap-service:
     working_dir: /app/scrap-service
     command: [ "celery", "-A", "main", "worker", "--loglevel=debug"]
@@ -93,6 +93,14 @@ services:
       - CMD_SCRAPY_START_EXCHANGE=${CMD_SCRAPY_START_EXCHANGE}
     networks:
       - ${NETWORK_APPLICATION:-application}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-manager
+      restart_policy:
+        condition: on-failure
   beat-service:
     working_dir: /app/beat-service
     user: app
@@ -105,3 +113,11 @@ services:
       - SCRAPY_QUEUE=${SCRAPY_QUEUE}
     networks:
       - ${NETWORK_APPLICATION:-application}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-manager
+      restart_policy:
+        condition: on-failure

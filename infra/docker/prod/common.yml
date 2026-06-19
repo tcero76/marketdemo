@@ -24,10 +24,6 @@ configs:
     external: true
   traefik_tls:
     external: true
-  traefik_server_crt:
-    external: true
-  traefik_server_key:
-    external: true
 secrets:
   hydra_secret:
     external: true
@@ -42,4 +38,8 @@ secrets:
   google_oauth2_client_id:
     external: true
   client_id:
+    external: true
+  traefik_server_crt:
+    external: true
+  traefik_server_key:
     external: true

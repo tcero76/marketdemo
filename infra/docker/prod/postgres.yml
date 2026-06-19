@@ -19,7 +19,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == swarm-manager
+          - node.hostname == swarm-worker
       restart_policy:
         condition: on-failure
   flyway:
@@ -36,7 +36,7 @@ services:
         condition: none
       placement:
         constraints:
-          - node.hostname == swarm-manager
+          - node.hostname == swarm-worker-0
     networks:
       - ${NETWORK_APPLICATION:-application}
       
