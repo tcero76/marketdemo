@@ -377,15 +377,9 @@ jobs:
           cat infra/docker/config/hydra/entrypoint.sh | \
             ssh root@${{ vars.MANAGER_IP }} \
             "docker config create hydra_entrypoint -"
-          cat infra/docker/config/traefik/dynamic/tls.yml | \
+          cat infra/docker/config/traefik/dynamic/tls_prod.yml | \
             ssh root@${{ vars.MANAGER_IP }} \
             "docker config create traefik_tls -"
-          cat infra/docker/config/traefik/server.crt | \
-            ssh root@${{ vars.MANAGER_IP }} \
-            "docker config create traefik_server_crt -"
-          cat infra/docker/config/traefik/server.key | \
-            ssh root@${{ vars.MANAGER_IP }} \
-            "docker config create traefik_server_key -"
 
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
@@ -429,6 +423,17 @@ jobs:
             echo '${{ secrets.PASSWORD_INSTA }}' | docker secret create password_insta - \
               && echo '✅ Secret password_insta creado' \
               || echo 'ℹ️ Secret password_insta ya existe, continuando...'
+          "
+
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
+            echo '${{ secrets.TRAEFIK_SERVER_CRT }}' | docker secret create traefik_server_crt - \
+              && echo '✅ Secret traefik_server_crt creado' \
+              || echo 'ℹ️ Secret traefik_server_crt ya existe, continuando...'
+          "
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
+            echo '${{ secrets.TRAEFIK_SERVER_KEY }}' | docker secret create traefik_server_key - \
+              && echo '✅ Secret traefik_server_key creado' \
+              || echo 'ℹ️ Secret traefik_server_key ya existe, continuando...'
           "
         shell: bash
 
