@@ -6,13 +6,13 @@ services:
       context: .
       target: ${PROFILE}
   front:
-    image: tcero76/front:b263955d6be16f0d959a67d9c5064bdfb9cf64ad
+    image: tcero76/front:b47455e824884168b6221a290e38b029d76f4454
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
       target: ${PROFILE}
   scrap-service:
-    image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
+    image: tcero76/scrap-service:b47455e824884168b6221a290e38b029d76f4454
     build:
       dockerfile: ./scrap-service/deploy/Dockerfile
       context: .
