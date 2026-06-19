@@ -6,11 +6,25 @@ apt-get install -y docker.io
 systemctl enable docker
 systemctl start docker
 
+# Configurar almacenamiento persistente para PostgreSQL
+DEVICE=/dev/disk/by-id/scsi-0DO_Volume_swarm-postgres-data
+if ! blkid "$DEVICE" >/dev/null 2>&1; then
+    mkfs.ext4 "$DEVICE"
+fi
+
+mkdir -p /mnt/data
+
+mount /dev/disk/by-id/scsi-0DO_Volume_swarm-postgres-data /mnt/data
+echo "/dev/disk/by-id/scsi-0DO_Volume_swarm-postgres-data /mnt/data ext4 defaults,nofail 0 2" >> /etc/fstab
+
+mkdir -p /mnt/data/{timescaleDB/data,redis/data,prometheus,mediamtx,grafana,clickhouse/data,rabbitmq}
+
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
 echo "${internal_privkey}" > /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
 ssh-keyscan -H ${manager_ip} >> /root/.ssh/known_hosts
+
 # Esperar hasta que el token esté disponible en el manager
 for i in {1..30}; do
   if ssh -o StrictHostKeyChecking=no root@${manager_ip} "[ -f /root/worker_token.txt ]"; then

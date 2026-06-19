@@ -26,3 +26,14 @@ resource "digitalocean_droplet" "swarm_worker" {
     network = ""
   })
 }
+
+resource "digitalocean_volume" "postgres_data" {
+  name   = "swarm-postgres-data"
+  region = var.region
+  size   = 10
+}
+
+resource "digitalocean_volume_attachment" "postgres_data_attachment" {
+  droplet_id = digitalocean_droplet.swarm_worker[0].id
+  volume_id  = digitalocean_volume.postgres_data.id
+}

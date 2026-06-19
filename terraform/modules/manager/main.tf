@@ -24,14 +24,3 @@ resource "digitalocean_droplet" "swarm_manager" {
     network = var.overlay_network
   })
 }
-
-resource "digitalocean_volume" "postgres_data" {
-  name   = "swarm-postgres-data"
-  region = var.region
-  size   = 10
-}
-
-resource "digitalocean_volume_attachment" "postgres_data_attachment" {
-  droplet_id = digitalocean_droplet.swarm_manager.id
-  volume_id  = digitalocean_volume.postgres_data.id
-}
