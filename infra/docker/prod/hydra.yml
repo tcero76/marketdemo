@@ -3,7 +3,7 @@ services:
     image: oryd/hydra:${HYDRA_VERSION}
     entrypoint: ["/entrypoint.sh"]
     environment:
-      - URLS_SELF_ISSUER=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/hydra
+      - URLS_SELF_ISSUER=${PROTOCOL_EXTERNAL}://auth.${HOST_EXTERNAL}
       - URLS_LOGIN=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/login
       - URLS_CONSENT=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/bff/consent
       - TTL_ACCESS_TOKEN=1h
@@ -21,11 +21,10 @@ services:
       - ${NETWORK_APPLICATION:-application}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.hydra.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/hydra`)
+      - traefik.http.routers.hydra.rule=Host(`auth.${HOST_EXTERNAL}`)
       - traefik.http.routers.hydra.entrypoints=websecure
+      - traefik.http.routers.hydra.tls=true
       - traefik.http.routers.hydra.tls.certresolver=le
-      - traefik.http.middlewares.hydra-strip.stripprefix.prefixes=/hydra
-      - traefik.http.routers.hydra.middlewares=hydra-strip
       - traefik.http.services.hydra.loadbalancer.server.port=4444
     configs:
       - source: hydra_entrypoint

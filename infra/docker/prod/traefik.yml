@@ -21,10 +21,6 @@ services:
     configs:
       - source: traefik_tls
         target: /etc/traefik/dynamic/tls.yml
-      - source: traefik_server_crt
-        target: /certs/server.crt
-      - source: traefik_server_key
-        target: /certs/server.key
     ports:
       - "80:80"
       - "443:443"
@@ -34,7 +30,7 @@ services:
       - ${NETWORK_APPLICATION:-application}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.traefik.rule=Host(`${HOST_EXTERNAL}`)
+      - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
       - traefik.http.routers.traefik.entrypoints=websecure
-      - traefik.http.routers.traefik.tls.certresolver=le
+      # - traefik.http.routers.traefik.tls.certresolver=le
       - traefik.http.routers.traefik.service=api@internal

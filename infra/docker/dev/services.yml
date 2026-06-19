@@ -87,6 +87,7 @@ services:
     environment:
       - NEXT_PUBLIC_HOST=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
       - NEXT_PUBLIC_WS=${PROTOCOL_WS_EXTERNAL}://${HOST_EXTERNAL}
+      - NEXT_PUBLIC_HYDRA=${PROTOCOL_EXTERNAL}://auth.${HOST_EXTERNAL}
       - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
       - NEXT_PUBLIC_MOCK=${VITE_MOCK}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
@@ -103,12 +104,7 @@ services:
       - traefik.http.routers.front.entrypoints=websecure
       # - traefik.http.routers.front.tls.certresolver=le
       - traefik.http.routers.front.tls=true
-      - traefik.http.middlewares.front-headers.headers.customrequestheaders.X-Forwarded-Proto=https
-      - traefik.http.middlewares.front-headers.headers.customrequestheaders.X-Forwarded-Host=`${HOST_EXTERNAL}`
-      - traefik.http.routers.front.middlewares=front-headers
-
       - traefik.http.services.front.loadbalancer.server.port=3000
-      - traefik.http.routers.front.priority=10
   scrap-service:
     working_dir: /app/scrap-service/
     profiles:

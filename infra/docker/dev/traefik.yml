@@ -29,15 +29,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./infra/docker/config/traefik/dynamic:/etc/traefik/dynamic
       # - ./infra/docker/config/traefik/acme.json:/letsencrypt/acme.json
-      - ./infra/docker/config/traefik:/certs
+      - ~/.environments/certs:/certs
     networks:
       - ${NETWORK_APPLICATION:-application}
     labels:
       - traefik.enable=true
 
       - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
-      - traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/traefik
-      - traefik.http.routers.traefik.middlewares=traefik-strip
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.tls=true
       # - traefik.http.routers.traefik.tls.certresolver=le
