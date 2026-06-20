@@ -40,6 +40,7 @@ services:
         - traefik.enable=true
         - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
         - traefik.http.routers.traefik.entrypoints=websecure
+        - traefik.swarm.network=${NETWORK_APPLICATION:-application}
         # - traefik.http.routers.traefik.tls.certresolver=le
         - traefik.http.routers.traefik.tls=true
         - traefik.http.services.traefik.loadbalancer.server.port=8080

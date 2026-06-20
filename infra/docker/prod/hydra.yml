@@ -26,6 +26,7 @@ services:
     deploy:
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=${NETWORK_APPLICATION:-application}
         - traefik.http.routers.hydra.rule=Host(`auth.${HOST_EXTERNAL}`)
         - traefik.http.routers.hydra.entrypoints=websecure
         - traefik.http.routers.hydra.tls=true
