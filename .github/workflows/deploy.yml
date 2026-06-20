@@ -100,9 +100,9 @@ env:
 #   run: |
 #     cat infra/config/system.env >> $GITHUB_ENV
 
-
 jobs:
   terraform:
+    if: false
     name: Terraform Apply
     runs-on: ubuntu-22.04
     env:
@@ -133,27 +133,21 @@ jobs:
           curl -u "${{ secrets.DDNS_USERNAME }}:${{ secrets.DDNS_PASSWORD }}" \
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
-  detect_changed_services:
+  build_bff:
+    name: Build BFF
     runs-on: ubuntu-22.04
-    outputs:
-      front: ${{ steps.detect.outputs.front }}
-      bff: ${{ steps.detect.outputs.bff }}
-      scrap: ${{ steps.detect.outputs.scrap }}
-      flyway: ${{ steps.detect.outputs.flyway }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - id: detect
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: build_bff
         run: |
-          # Inicializar flags
-          echo "front=true" >> $GITHUB_OUTPUT
-          echo "bff=false" >> $GITHUB_OUTPUT
-          echo "scrap=false" >> $GITHUB_OUTPUT
-          echo "flyway=false" >> $GITHUB_OUTPUT
-          # Obtener lista de archivos modificados
-          cd "$GITHUB_WORKSPACE"
-          git fetch --tags
+          set -uo pipefail
           if git rev-parse deploy-prod >/dev/null 2>&1; then
               LAST_DEPLOYED=$(git rev-parse deploy-prod)
               CHANGED=$(git diff --name-only "$LAST_DEPLOYED" HEAD)
@@ -161,151 +155,50 @@ jobs:
               echo "Tag deploy-prod no existe. Primer despliegue."
               CHANGED=$(git ls-files)
           fi
-          CURRENT=$(git rev-parse HEAD)
-
-          echo "Último deploy: $LAST_DEPLOYED"
-          echo "Commit actual: $CURRENT"
-          CHANGED=$(git diff --name-only $LAST_DEPLOYED $CURRENT)
-
-          # echo "$CHANGED" | grep "^front/" && echo "front=true" >> $GITHUB_OUTPUT
-          if echo "$CHANGED" | grep -E "^(bff-service|postgres|clickhouse|redis|rabbitmq|config)/"; then
-            echo "bff=true" >> $GITHUB_OUTPUT
+          BFF_BUILD="SKIPPED"
+          if echo "$CHANGED" | grep -qE "^(bff-service|config)/"; then
+            echo "Building bff-service..."
+            export COMPOSE_FILE=infra/docker/prod/imagenes.yml
+            export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+            if docker compose --project-directory ${PWD} --project-name marketplace build bff-service --push; then
+              if docker manifest inspect tcero76/bff-service:${{ github.sha }} >/dev/null 2>&1; then
+                sed -i "s|image: tcero76/bff-service:.*|image: tcero76/bff-service:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
+                git config user.name "github-actions"
+                git config user.email "github-actions@github.com"
+                if git commit -am "Update images for changed services to ${{ github.sha }}" \
+                  && git push
+                then
+                    BFF_BUILD="SUCCESS"
+                else
+                    BFF_BUILD="GIT_COMMIT_ERROR"
+                fi
+              else
+                BFF_BUILD="VERIFY_FAILED"
+              fi
+            else
+                BFF_BUILD="FAILED"
+            fi
           fi
-          if echo "$CHANGED" | grep -E "^(scrap-service|rabbitmq)/"; then
-            echo "scrap=true" >> $GITHUB_OUTPUT
-          fi
-          echo "$CHANGED" | grep "^flyway/" && echo "flyway=true" >> $GITHUB_OUTPUT
-          echo "Step finalizado"
-      - name: Mostrar outputs detectados
+          echo "BFF_BUILD=$BFF_BUILD" >> $GITHUB_ENV
+          echo "CHANGED=$CHANGED" >> $GITHUB_ENV
+
+      - name: Debug git build
         run: |
-          echo "front = ${{ steps.detect.outputs.front }}"
-          echo "bff = ${{ steps.detect.outputs.bff }}"
-          echo "scrap = ${{ steps.detect.outputs.scrap }}"
-          echo "flyway = ${{ steps.detect.outputs.flyway }}"
-
-  build_services:
-    needs: [detect_changed_services,terraform]
-    if: >
-      success() &&
-      (
-        needs.detect_changed_services.outputs.front == 'true' ||
-        needs.detect_changed_services.outputs.bff == 'true' ||
-        needs.detect_changed_services.outputs.scrap == 'true' ||
-        needs.detect_changed_services.outputs.flyway == 'true'
-      )
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        service:
-          - name: front
-            path: front
-            image: tcero76/front
-            build_target: front
-            flag: front
-          - name: bff-service
-            path: bff-service
-            image: tcero76/bff-service
-            build_target: bff-service
-            flag: bff
-          - name: scrap-service
-            path: scrap-service
-            image: tcero76/scrap-service
-            build_target: scrap-service
-            flag: scrap
-          - name: flyway
-            path: flyway
-            image: tcero76/flyway
-            build_target: flyway
-            flag: flyway
-      max-parallel: 1
-      fail-fast: false
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Skip service (no changes)
-        if: ${{ needs.detect_changed_services.outputs[matrix.service.flag] != 'true' }}
-        run: echo "Service ${{ matrix.service.name }} did not change, skipping build"
-
-      - name: Build image and update tag in manifests
-        if: ${{ needs.detect_changed_services.outputs[matrix.service.flag] == 'true' }}
-        run: |
-          export COMPOSE_FILE=infra/docker/prod/imagenes.yml
-          export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
-          docker compose \
-            --project-directory ${PWD} \
-            --project-name marketplace \
-            build \
-            ${{ matrix.service.build_target }} \
-            --push
-          sed -i "s|image: ${{ matrix.service.image }}:.*|image: ${{ matrix.service.image }}:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-
-  commit_images:
-    needs: [build_services, detect_changed_services]
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Update only changed images
-        run: |
-          changed=false
-
-          if [ "${{ needs.detect_changed_services.outputs.front }}" = "true" ]; then
-            sed -i "s|image: tcero76/front:.*|image: tcero76/front:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-            changed=true
-          fi
-
-          if [ "${{ needs.detect_changed_services.outputs.bff }}" = "true" ]; then
-            sed -i "s|image: tcero76/bff-service:.*|image: tcero76/bff-service:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-            changed=true
-          fi
-
-          if [ "${{ needs.detect_changed_services.outputs.scrap }}" = "true" ]; then
-            sed -i "s|image: tcero76/scrap-service:.*|image: tcero76/scrap-service:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-            changed=true
-          fi
-
-          if [ "${{ needs.detect_changed_services.outputs.flyway }}" = "true" ]; then
-            sed -i "s|image: tcero76/flyway:.*|image: tcero76/flyway:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-            changed=true
-          fi
-
-          if [ "$changed" = "false" ]; then
-            echo "Ningún servicio cambió, no hay nada que commitear"
-            exit 0
-          fi
-
-      - name: Debug git diff
-        run: |
-          echo "==== git diff ===="
-          git diff infra/docker/prod/imagenes.yml
-
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git commit -am "Update images for changed services to ${{ github.sha }}"
-          git push
-
+            echo "================================"
+            echo "BUILD SUMMARY"
+            echo "================================"
+            echo "bff-service: $BFF_BUILD"
+            echo "changed: $(echo "$CHANGED" | grep -qE "^(bff-service|config)/" && echo yes || echo no)"
+            echo "================================"
+            
   environment:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
     needs: [commit_images,terraform]
     permissions:
       contents: write
-    if: ${{ always() }}
+    if: false
+    # if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4

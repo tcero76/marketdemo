@@ -1,6 +1,6 @@
 services:
   bff-service:
-    image: tcero76/bff-service:873ade66e05ff28417561a373fe8f8910811fd6f
+    image: tcero76/bff-service:68592bbe0a89b70ae1dfd39c4ff7edb657a9a4d5
     build:
       dockerfile: ./bff-service/deploy/Dockerfile
       context: .
@@ -12,7 +12,7 @@ services:
       context: ./front
       target: ${PROFILE}
   scrap-service:
-    image: tcero76/scrap-service:b47455e824884168b6221a290e38b029d76f4454
+    image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
     build:
       dockerfile: ./scrap-service/deploy/Dockerfile
       context: .
