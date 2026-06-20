@@ -180,7 +180,11 @@ jobs:
             fi
           fi
           echo "BFF_BUILD=$BFF_BUILD" >> $GITHUB_ENV
-          echo "CHANGED=$CHANGED" >> $GITHUB_ENV
+          {
+            echo "CHANGED<<EOF"
+            echo "$CHANGED"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
 
       - name: Debug git build
         run: |
