@@ -194,7 +194,7 @@ jobs:
   environment:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
-    needs: [commit_images,terraform]
+    needs: [terraform]
     permissions:
       contents: write
     if: false
