@@ -3,7 +3,9 @@ services:
     image: traefik:${TRAEFIK_VERSION}
     command:
       - "--api.dashboard=true"
+      - "--api.insecure=true"
 
+      - "--log.level=DEBUG"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.rtmp.address=:1935"
@@ -27,17 +29,19 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - ${NETWORK_APPLICATION:-application}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
-      - traefik.http.routers.traefik.entrypoints=websecure
-      # - traefik.http.routers.traefik.tls.certresolver=le
-      - traefik.http.routers.traefik.service=api@internal
     deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
+        - traefik.http.routers.traefik.entrypoints=websecure
+        # - traefik.http.routers.traefik.tls.certresolver=le
+        - traefik.http.routers.traefik.tls=true
+        - traefik.http.routers.traefik.service=api@internal
       mode: replicated
       replicas: 1
       placement:
