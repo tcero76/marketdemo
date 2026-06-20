@@ -19,18 +19,18 @@ services:
       - hydra_secret
     networks:
       - ${NETWORK_APPLICATION:-application}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.hydra.rule=Host(`auth.${HOST_EXTERNAL}`)
-      - traefik.http.routers.hydra.entrypoints=websecure
-      - traefik.http.routers.hydra.tls=true
-      # - traefik.http.routers.hydra.tls.certresolver=le
-      - traefik.http.services.hydra.loadbalancer.server.port=4444
     configs:
       - source: hydra_entrypoint
         target: /entrypoint.sh
         mode: 0555
     deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.hydra.rule=Host(`auth.${HOST_EXTERNAL}`)
+        - traefik.http.routers.hydra.entrypoints=websecure
+        - traefik.http.routers.hydra.tls=true
+        # - traefik.http.routers.hydra.tls.certresolver=le
+        - traefik.http.services.hydra.loadbalancer.server.port=4444
       mode: replicated
       replicas: 1
       placement:
