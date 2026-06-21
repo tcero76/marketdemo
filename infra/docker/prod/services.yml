@@ -4,8 +4,6 @@ services:
     command: ["/app/main"]
     environment:
       - PORT=3000
-      - POSTGRES_PORT_WRITE=${POSTGRES_PORT}
-      - POSTGRES_PORT_READ=${POSTGRES_PORT}
       - HOST_EXTERNAL=${HOST_EXTERNAL}
       - REDIRECT_URL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}:${PORT_EXTERNAL}/bff/callback
       - HYDRA_ADMIN_URL=http://hydra:4445
@@ -18,9 +16,10 @@ services:
       - PROFILE=${PROFILE}
       - REDIS_HOST=${REDIS_HOST}
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_PORT_WRITE=${POSTGRES_PORT}
+      - POSTGRES_PORT_READ=${POSTGRES_PORT}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT_WRITE}
       - POSTGRES_DB=${POSTGRES_DB}
       - MONITOREO=${MONITOREO}
     networks:
