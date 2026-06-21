@@ -12,7 +12,6 @@ infra/database/**
 infra/volumes/**                                                                      
 infra/monitoring/grafana/                                                                                            
 infra/monitoring/prometheus  
-infra/.env
 
 beat/celerybeat-schedule
 beat/celerybeat-schedule
