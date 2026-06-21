@@ -334,6 +334,74 @@ jobs:
             echo "flyway: $FLYWAY_BUILD"
             echo "changed: $(echo "$CHANGED" | grep -qE "^(flyway)/" && echo yes || echo no)"
             echo "================================"
+
+  build_scrap_service:
+    name: Build Scrap
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: build_scrap
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}"
+          echo "HEAD=$(git rev-parse HEAD)"
+          set -uo pipefail
+          if git rev-parse deploy-prod >/dev/null 2>&1; then
+              LAST_DEPLOYED=$(git rev-parse deploy-prod)
+              CHANGED=$(git diff --name-only "$LAST_DEPLOYED" HEAD)
+          else
+              echo "Tag deploy-prod no existe. Primer despliegue."
+              CHANGED=$(git ls-files)
+          fi
+          SCRAP_BUILD="SKIPPED"
+          if echo "$CHANGED" | grep -qE "^(scrap-service)/"; then
+            echo "Building scrap-service..."
+            export COMPOSE_FILE=infra/docker/prod/imagenes.yml
+            export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+            export VITE_MOCK=${{ vars.VITE_MOCK }}
+            export GOOGLE_OAUTH2_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
+            sed -i "s|image: tcero76/scrap-service:.*|image: tcero76/scrap-service:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
+            if docker compose --project-directory ${PWD} --project-name marketplace --env-file infra/.env build scrap-service --push; then
+              if docker manifest inspect tcero76/scrap-service:${{ github.sha }} >/dev/null 2>&1; then
+                git config user.name "github-actions"
+                git config user.email "github-actions@github.com"
+                if git commit -am "Update images for changed services to ${{ github.sha }}" \
+                  && git push
+                then
+                    SCRAP_BUILD="SUCCESS"
+                else
+                    SCRAP_BUILD="GIT_COMMIT_ERROR"
+                fi
+              else
+                SCRAP_BUILD="VERIFY_FAILED"
+              fi
+            else
+                SCRAP_BUILD="FAILED"
+            fi
+          fi
+          echo "SCRAP_BUILD=$SCRAP_BUILD" >> $GITHUB_ENV
+          {
+            echo "CHANGED<<EOF"
+            echo "$CHANGED"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Debug git build
+        run: |
+            echo "================================"
+            echo "BUILD SUMMARY"
+            echo "================================"
+            echo "scrap-service: $SCRAP_BUILD"
+            echo "changed: $(echo "$CHANGED" | grep -qE "^(scrap-service)/" && echo yes || echo no)"
+            echo "================================"
   
             
   environment:
