@@ -192,7 +192,7 @@ jobs:
             echo "BUILD SUMMARY"
             echo "================================"
             echo "bff-service: $BFF_BUILD"
-            echo "changed: $(echo "$CHANGED" | grep -qE "^(bff-service|config)/" && echo yes || echo no)"
+            echo "changed: $(echo "$CHANGED" | grep -qE "^(bff-service|config|postgres)/" && echo yes || echo no)"
             echo "================================"
             
   environment:
