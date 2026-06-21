@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-SERVICE="front"
-IMAGE="tcero76/front"
-TAG_NAME="push-front"
+
+SERVICE="$1"
+IMAGE="$2"
+TAG_NAME="$3"
+PREFIX="$4"
+
 echo "Building $SERVICE..."
 export HOST_EXTERNAL="${HOST_EXTERNAL:-}"
 export VITE_MOCK="${VITE_MOCK:-}"
@@ -24,5 +27,5 @@ if docker compose --project-directory "$PWD" --project-name marketplace --env-fi
 else
   STATUS="FAILED"
 fi
-echo "FRONT_BUILD=$STATUS" >> "$GITHUB_ENV"
-echo "Resultado build front: $STATUS"
+echo "${PREFIX}_BUILD=$STATUS" >> "$GITHUB_ENV"
+echo "Resultado build $SERVICE: $STATUS"

@@ -138,6 +138,34 @@ jobs:
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
   build_front:
+    needs: [terraform]
+    strategy:
+      max-parallel: 1
+      matrix:
+        include:
+          - service: front
+            tag: push-front
+            dir: front
+            image: tcero76/front
+            prefix: FRONT
+
+          - service: bff
+            tag: push-bff
+            dir: bff-service|postgres|clickhouse|redis|rabbitmq|config
+            image: tcero76/bff-service
+            prefix: BFF
+
+          - service: scrap
+            tag: push-scrap
+            dir: scrap-service|rabbitmq
+            image: tcero76/scrap-service
+            prefix: SCRAP
+
+          - service: flyway
+            tag: push-flyway
+            dir: flyway
+            image: tcero76/flyway
+            prefix: FLYWAY
     name: Build Front
     runs-on: ubuntu-22.04
     permissions:
@@ -153,28 +181,31 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
   
       - name: detecta cambios
-        run: scripts/workflow/detecta_cambios.sh push-front front FRONT
+        run: scripts/workflow/detecta_cambios.sh \
+          ${{ matrix.tag }} \
+          ${{ matrix.dir }} \
+          ${{ matrix.prefix }}
 
       - name: Build Front
-        if: env.FRONT_CHANGED == 'true'
+        if: env[format('{0}_CHANGED', matrix.prefix)] == 'true'
         env:
           HOST_EXTERNAL: ${{ vars.MANAGER_IP }}
           VITE_MOCK: ${{ vars.VITE_MOCK }}
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
           GITHUB_SHA: ${{ github.sha }}
-        run: scripts/workflow/build.sh
+        run: scripts/workflow/build.sh\
+          "${{ matrix.service }}" \
+          "${{ matrix.image }}" \
+          "${{ matrix.tag }}"\
+          ${{ matrix.prefix }}
 
-      - name: Debug git build
-        run: scripts/workflow/report.sh
-  
   environment:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
-    needs: [terraform]
+    needs: [build_front]
     permissions:
       contents: write
-    if: false
-    # if: ${{ always() }}
+    if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -299,3 +330,11 @@ jobs:
         run: |
           git tag -f deploy-prod HEAD
           git push origin deploy-prod --force
+
+  report:
+    name: Update environment variables on Manager
+    runs-on: ubuntu-22.04
+    needs: [environment]
+    steps:
+      - name: Debug git build
+        run: scripts/workflow/report.sh
