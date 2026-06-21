@@ -137,8 +137,8 @@ jobs:
           curl -u "${{ secrets.DDNS_USERNAME }}:${{ secrets.DDNS_PASSWORD }}" \
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
-  build_front:
-    needs: [terraform]
+  build_all:
+    # needs: [terraform]
     strategy:
       max-parallel: 1
       matrix:
@@ -202,10 +202,11 @@ jobs:
   environment:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
-    needs: [build_front]
+    needs: [build_all]
     permissions:
       contents: write
-    if: ${{ always() }}
+    if: false
+    # if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -334,7 +335,7 @@ jobs:
   report:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
-    needs: [environment]
+    needs: [build_all]
     steps:
       - name: Debug git build
         run: scripts/workflow/report.sh
