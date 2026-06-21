@@ -165,16 +165,7 @@ jobs:
         run: scripts/workflow/build.sh
 
       - name: Debug git build
-        env:
-          FRONT_CHANGED: ${{ env.FRONT_CHANGED }}
-          FRONT_BUILD: ${{ env.FRONT_BUILD }}
-        run: |
-            echo "================================"
-            echo "BUILD SUMMARY"
-            echo "================================"
-            echo "front: $FRONT_BUILD"
-            echo "front changed: $FRONT_CHANGED"
-            echo "================================"
+        run: scripts/workflow/report.sh
   
   environment:
     name: Update environment variables on Manager
@@ -308,4 +299,3 @@ jobs:
         run: |
           git tag -f deploy-prod HEAD
           git push origin deploy-prod --force
-
