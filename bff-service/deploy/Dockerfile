@@ -8,7 +8,6 @@ WORKDIR /app
 
 COPY ./bff-service ./bff-service
 COPY ./postgres ./postgres
-COPY ./clickhouse ./clickhouse
 COPY ./redis ./redis
 COPY ./rabbitmq ./rabbitmq
 COPY ./config ./config
