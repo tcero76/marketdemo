@@ -42,7 +42,7 @@ services:
       context: infra/docker/config/hydra/
       target: ${PROFILE}
   flyway:
-    image: tcero76/flyway:29e4a5e2a398230a495433b171d58dacb68ed192
+    image: tcero76/flyway:85cd3dfe9696a6294958af26d0d82578e726341b
     build:
       dockerfile: deploy/Dockerfile
       context: flyway/
