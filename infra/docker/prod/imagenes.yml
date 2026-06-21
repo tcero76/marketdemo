@@ -11,6 +11,14 @@ services:
       dockerfile: deploy/Dockerfile
       context: ./front
       target: ${PROFILE}
+    args:
+      NEXT_PUBLIC_HOST: ${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
+      NEXT_PUBLIC_WS: ${PROTOCOL_WS_EXTERNAL}://${HOST_EXTERNAL}
+      NEXT_PUBLIC_HYDRA: ${PROTOCOL_EXTERNAL}://auth.${HOST_EXTERNAL}
+      NEXT_PUBLIC_CLIENT_ID: ${CLIENT_ID}
+      NEXT_PUBLIC_MOCK: ${VITE_MOCK}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH2_CLIENT_ID}
+      NEXT_PUBLIC_HOME_PAGE_PATH: ${HOME_PAGE_PATH}
   scrap-service:
     image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
     build:

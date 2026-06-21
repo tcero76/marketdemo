@@ -198,6 +198,73 @@ jobs:
             echo "bff-service: $BFF_BUILD"
             echo "changed: $(echo "$CHANGED" | grep -qE "^(bff-service|config|postgres)/" && echo yes || echo no)"
             echo "================================"
+
+  build_front:
+    name: Build Front
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: build_front
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}"
+          echo "HEAD=$(git rev-parse HEAD)"
+          set -uo pipefail
+          if git rev-parse deploy-prod >/dev/null 2>&1; then
+              LAST_DEPLOYED=$(git rev-parse deploy-prod)
+              CHANGED=$(git diff --name-only "$LAST_DEPLOYED" HEAD)
+          else
+              echo "Tag deploy-prod no existe. Primer despliegue."
+              CHANGED=$(git ls-files)
+          fi
+          FRONT_BUILD="SKIPPED"
+          if echo "$CHANGED" | grep -qE "^(front)/"; then
+            echo "Building front..."
+            export COMPOSE_FILE=infra/docker/prod/imagenes.yml
+            export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+            sed -i "s|image: tcero76/front:.*|image: tcero76/front:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
+            if docker compose --project-directory ${PWD} --project-name marketplace build front --push; then
+              if docker manifest inspect tcero76/front:${{ github.sha }} >/dev/null 2>&1; then
+                git config user.name "github-actions"
+                git config user.email "github-actions@github.com"
+                if git commit -am "Update images for changed services to ${{ github.sha }}" \
+                  && git push
+                then
+                    FRONT_BUILD="SUCCESS"
+                else
+                    FRONT_BUILD="GIT_COMMIT_ERROR"
+                fi
+              else
+                FRONT_BUILD="VERIFY_FAILED"
+              fi
+            else
+                FRONT_BUILD="FAILED"
+            fi
+          fi
+          echo "FRONT_BUILD=$FRONT_BUILD" >> $GITHUB_ENV
+          {
+            echo "CHANGED<<EOF"
+            echo "$CHANGED"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Debug git build
+        run: |
+            echo "================================"
+            echo "BUILD SUMMARY"
+            echo "================================"
+            echo "front: $FRONT_BUILD"
+            echo "changed: $(echo "$CHANGED" | grep -qE "^(front)/" && echo yes || echo no)"
+            echo "================================"
+  
             
   environment:
     name: Update environment variables on Manager
