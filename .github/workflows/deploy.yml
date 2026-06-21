@@ -146,24 +146,28 @@ jobs:
           - service: front
             tag: push-front
             dir: front
+            pattern: front
             image: tcero76/front
             prefix: FRONT
 
           - service: bff
             tag: push-bff
             dir: bff-service
+            pattern: (bff-service|postgres|redis|rabbitmq|config)
             image: tcero76/bff-service
             prefix: BFF
 
           - service: scrap
             tag: push-scrap
             dir: scrap-service
+            pattern: (scrap-service|rabbitmq)
             image: tcero76/scrap-service
             prefix: SCRAP
 
           - service: flyway
             tag: push-flyway
             dir: flyway
+            pattern: flyway
             image: tcero76/flyway
             prefix: FLYWAY
     name: Build ${{ matrix.service }}
@@ -181,10 +185,33 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
   
       - name: detecta cambios
-        run: scripts/workflow/detecta_cambios.sh \
-          ${{ matrix.tag }} \
-          ${{ matrix.dir }} \
-          ${{ matrix.prefix }}
+        # run: scripts/workflow/detecta_cambios.sh \
+        #   ${{ matrix.tag }} \
+        #   ${{ matrix.dir }} \
+        #   ${{ matrix.prefix }}
+        run: |
+          git fetch --tags --force
+
+          if git rev-parse "${{ matrix.tag }}" >/dev/null 2>&1; then
+            LAST_PUSH=$(git rev-parse "${{ matrix.tag }}")
+            echo "Último push: $LAST_PUSH"
+            CHANGED_FILES=$(git diff --name-only "$LAST_PUSH" HEAD)
+          else
+            echo "Tag ${{ matrix.tag }} no existe. Primer build."
+            CHANGED_FILES=$(git ls-files)
+          fi
+
+          if echo "$CHANGED_FILES" | grep -qE "^${{ matrix.pattern }}/"; then
+            echo "${{ matrix.prefix }}_CHANGED=true" >> "$GITHUB_ENV"
+          else
+            echo "${{ matrix.prefix }}_CHANGED=false" >> "$GITHUB_ENV"
+          fi
+
+          echo "${{ matrix.prefix }}_BUILD=SKIPPED" >> "$GITHUB_ENV"
+
+          echo "Pattern: ^${{ matrix.pattern }}/"
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
 
       - name: Build ${{ matrix.service }}
         if: env[format('{0}_CHANGED', matrix.prefix)] == 'true'
@@ -193,11 +220,25 @@ jobs:
           VITE_MOCK: ${{ vars.VITE_MOCK }}
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
           GITHUB_SHA: ${{ github.sha }}
-        run: scripts/workflow/build.sh\
-          "${{ matrix.service }}" \
-          "${{ matrix.image }}" \
-          "${{ matrix.tag }}"\
-          ${{ matrix.prefix }}
+        run: |
+          sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${GITHUB_SHA}|g" infra/docker/prod/imagenes.yml
+          if docker compose --project-directory "$PWD" --project-name marketplace --env-file infra/.env build "${{ matrix.service }}" --push; then
+            if docker manifest inspect "${{ matrix.image }}:${GITHUB_SHA}" >/dev/null 2>&1; then
+              git fetch --tags --force
+              git tag -f "${{ matrix.tag }}" "$GITHUB_SHA"
+              if git push origin "refs/tags/${{ matrix.tag }}" --force; then
+                STATUS="SUCCESS"
+              else
+                STATUS="TAG_PUSH_ERROR"
+              fi
+            else
+              STATUS="VERIFY_FAILED"
+            fi
+          else
+            STATUS="FAILED"
+          fi
+          echo "${{ matrix.service }}_BUILD=$STATUS" >> "$GITHUB_ENV"
+          echo "Resultado build $SERVICE: $STATUS"
 
   environment:
     name: Update environment variables on Manager
