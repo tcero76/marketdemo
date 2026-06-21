@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TAG_NAME="push-front"
+TAG_NAME="$1"
+DIRECTORY="$2"
+PREFIX="$3"
 
 git fetch --tags --force
 
@@ -14,10 +16,10 @@ else
   CHANGED_FILES=$(git ls-files)
 fi
 
-if echo "$CHANGED_FILES" | grep -qE "^(front)/"; then
-  echo "FRONT_CHANGED=true" >> "$GITHUB_ENV"
+if echo "$CHANGED_FILES" | grep -qE "^($DIRECTORY)/"; then
+  echo "${PREFIX}_CHANGED=true" >> "$GITHUB_ENV"
 else
-  echo "FRONT_CHANGED=false" >> "$GITHUB_ENV"
+  echo "${PREFIX}_CHANGED=false" >> "$GITHUB_ENV"
 fi
 
-echo "FRONT_BUILD=SKIPPED" >> "$GITHUB_ENV"
+echo "${PREFIX}_BUILD=SKIPPED" >> "$GITHUB_ENV"
