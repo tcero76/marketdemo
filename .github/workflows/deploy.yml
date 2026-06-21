@@ -156,7 +156,7 @@ jobs:
               CHANGED=$(git ls-files)
           fi
           BFF_BUILD="SKIPPED"
-          if echo "$CHANGED" | grep -qE "^(bff-service|config)/"; then
+          if echo "$CHANGED" | grep -qE "^(bff-service|config|postgres)/"; then
             echo "Building bff-service..."
             export COMPOSE_FILE=infra/docker/prod/imagenes.yml
             export HOST_EXTERNAL=${{ vars.MANAGER_IP }}

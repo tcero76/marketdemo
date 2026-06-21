@@ -16,7 +16,7 @@ var onceWrite sync.Once
 var onceRead sync.Once
 
 func GetPostgresWrite(log *logger.LoggerLogstash) *gorm.DB {
-	log.Info("Config Postgres Write...")
+	log.Info("Config Postgres WRITE...")
 	onceWrite.Do(func() {
 		dsn := os.Getenv("DNS_WRITE")
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
