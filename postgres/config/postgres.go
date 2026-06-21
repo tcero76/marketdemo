@@ -31,7 +31,7 @@ func GetPostgresWrite(log *logger.LoggerLogstash) *gorm.DB {
 }
 
 func GetPostgresRead(log *logger.LoggerLogstash) *gorm.DB {
-	log.Info("Config Postgres Read...")
+	log.Info("Config Postgres READ...")
 	onceRead.Do(func() {
 		dsn := os.Getenv("DNS_READ")
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

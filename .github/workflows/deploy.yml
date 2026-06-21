@@ -147,6 +147,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - id: build_bff
         run: |
+          echo "GITHUB_SHA=${{ github.sha }}"
+          echo "HEAD=$(git rev-parse HEAD)"
           set -uo pipefail
           if git rev-parse deploy-prod >/dev/null 2>&1; then
               LAST_DEPLOYED=$(git rev-parse deploy-prod)
@@ -160,9 +162,9 @@ jobs:
             echo "Building bff-service..."
             export COMPOSE_FILE=infra/docker/prod/imagenes.yml
             export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+            sed -i "s|image: tcero76/bff-service:.*|image: tcero76/bff-service:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
             if docker compose --project-directory ${PWD} --project-name marketplace build bff-service --push; then
               if docker manifest inspect tcero76/bff-service:${{ github.sha }} >/dev/null 2>&1; then
-                sed -i "s|image: tcero76/bff-service:.*|image: tcero76/bff-service:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
                 git config user.name "github-actions"
                 git config user.email "github-actions@github.com"
                 if git commit -am "Update images for changed services to ${{ github.sha }}" \
