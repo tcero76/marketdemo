@@ -266,6 +266,74 @@ jobs:
             echo "front: $FRONT_BUILD"
             echo "changed: $(echo "$CHANGED" | grep -qE "^(front)/" && echo yes || echo no)"
             echo "================================"
+
+  build_flyway:
+    name: Build Flyway
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: build_flyway
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}"
+          echo "HEAD=$(git rev-parse HEAD)"
+          set -uo pipefail
+          if git rev-parse deploy-prod >/dev/null 2>&1; then
+              LAST_DEPLOYED=$(git rev-parse deploy-prod)
+              CHANGED=$(git diff --name-only "$LAST_DEPLOYED" HEAD)
+          else
+              echo "Tag deploy-prod no existe. Primer despliegue."
+              CHANGED=$(git ls-files)
+          fi
+          FLYWAY_BUILD="SKIPPED"
+          if echo "$CHANGED" | grep -qE "^(flyway)/"; then
+            echo "Building flyway..."
+            export COMPOSE_FILE=infra/docker/prod/imagenes.yml
+            export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+            export VITE_MOCK=${{ vars.VITE_MOCK }}
+            export GOOGLE_OAUTH2_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
+            sed -i "s|image: tcero76/flyway:.*|image: tcero76/flyway:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
+            if docker compose --project-directory ${PWD} --project-name marketplace --env-file infra/.env build flyway --push; then
+              if docker manifest inspect tcero76/flyway:${{ github.sha }} >/dev/null 2>&1; then
+                git config user.name "github-actions"
+                git config user.email "github-actions@github.com"
+                if git commit -am "Update images for changed services to ${{ github.sha }}" \
+                  && git push
+                then
+                    FLYWAY_BUILD="SUCCESS"
+                else
+                    FLYWAY_BUILD="GIT_COMMIT_ERROR"
+                fi
+              else
+                FLYWAY_BUILD="VERIFY_FAILED"
+              fi
+            else
+                FLYWAY_BUILD="FAILED"
+            fi
+          fi
+          echo "FLYWAY_BUILD=$FLYWAY_BUILD" >> $GITHUB_ENV
+          {
+            echo "CHANGED<<EOF"
+            echo "$CHANGED"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Debug git build
+        run: |
+            echo "================================"
+            echo "BUILD SUMMARY"
+            echo "================================"
+            echo "flyway: $FLYWAY_BUILD"
+            echo "changed: $(echo "$CHANGED" | grep -qE "^(flyway)/" && echo yes || echo no)"
+            echo "================================"
   
             
   environment:
