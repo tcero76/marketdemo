@@ -9,7 +9,7 @@ const Footer = () => {
                         <use xlinkHref="#bootstrap"></use>
                     </svg>
                 </a>
-                <span className="mb-3 mb-md-0 text-body-secondary">© 2026 Empresas tcero, Inc</span>
+                <span className="mb-3 mb-md-0 text-body-secondary">© 2026 Empresa tcero, Inc</span>
             </div>
             <ul className="nav col-md-4 justify-content-end list-unstyled d-flex">
                 <li className="ms-3">
