@@ -110,26 +110,30 @@ jobs:
       TF_VAR_ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.0
           terraform_wrapper: false
       - name: Terraform Init
-        run: terraform -chdir=terraform init
+        working-directory: terraform
+        run: terraform init
 
       - name: Terraform Apply
-        run: terraform -chdir=terraform apply -auto-approve
+        working-directory: terraform
+        run: terraform apply -auto-approve
         env:
           DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
         
       - name: Get Swarm Manager IP
+        working-directory: terraform
         id: get_ip
         run: |
-          manager_ip=$(terraform -chdir=terraform output -raw manager_public_ip)
+          set -euo pipefail
+          manager_ip=$(terraform output -raw manager_public_ip)
           curl -u "${{ secrets.DDNS_USERNAME }}:${{ secrets.DDNS_PASSWORD }}" \
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
@@ -149,23 +153,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
   
       - name: detecta cambios
-        run: |
-          set -euo pipefail
-          git fetch --tags --force
-          if git rev-parse push-front >/dev/null 2>&1; then
-            LAST_PUSH=$(git rev-parse push-front)
-            echo "Último push: $LAST_PUSH"
-            CHANGED_FILES=$(git diff --name-only "$LAST_PUSH" HEAD)
-          else
-            echo "Tag push-front no existe. Primer build."
-            CHANGED_FILES=$(git ls-files)
-          fi
-          if echo "$CHANGED_FILES" | grep -qE "^(front)/"; then
-            echo "FRONT_CHANGED=true" >> "$GITHUB_ENV"
-          else
-            echo "FRONT_CHANGED=false" >> "$GITHUB_ENV"
-          fi
-          echo "FRONT_BUILD=SKIPPED" >> "$GITHUB_ENV"
+        run: scripts/workflow/detect-front-changes.sh
 
       - name: Build Front
         if: env.FRONT_CHANGED == 'true'
