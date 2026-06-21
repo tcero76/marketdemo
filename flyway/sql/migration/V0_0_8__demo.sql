@@ -145,9 +145,6 @@ CREATE TABLE IF NOT EXISTS marketplacedemo.posts (
         ON DELETE SET NULL
 );
 
-CREATE INDEX idx_posts_product_id
-ON marketplacedemo.posts(product_id);
+CREATE INDEX idx_posts_product_id ON marketplacedemo.posts(product_id);
 
-CREATE INDEX idx_posts_content_tsv
-ON marketplacedemo.posts
-USING GIN(content_tsv);
+CREATE INDEX idx_posts_content_tsv ON marketplacedemo.posts USING GIN(content_tsv);
