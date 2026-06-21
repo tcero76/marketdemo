@@ -1,6 +1,6 @@
 services:
   bff-service:
-    image: tcero76/bff-service:439388ef34e5df1dd3f692057b36266d4a492954
+    image: tcero76/bff-service:ea52c7b111565e78f7b907aabb00cce81c9d438f
     build:
       dockerfile: ./bff-service/deploy/Dockerfile
       context: .
