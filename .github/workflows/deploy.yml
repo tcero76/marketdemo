@@ -230,8 +230,10 @@ jobs:
             echo "Building front..."
             export COMPOSE_FILE=infra/docker/prod/imagenes.yml
             export HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+            export VITE_MOCK=${{ vars.VITE_MOCK }}
+            export GOOGLE_OAUTH2_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
             sed -i "s|image: tcero76/front:.*|image: tcero76/front:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-            if docker compose --project-directory ${PWD} --project-name marketplace build front --push; then
+            if docker compose --project-directory ${PWD} --project-name marketplace --env-file infra/.env build front --push; then
               if docker manifest inspect tcero76/front:${{ github.sha }} >/dev/null 2>&1; then
                 git config user.name "github-actions"
                 git config user.email "github-actions@github.com"
