@@ -5,6 +5,7 @@ TAG_NAME="$1"
 DIRECTORY="$2"
 PREFIX="$3"
 WATCH="$3"
+PATTERN=""
 
 case "$TAG_NAME" in
   bff)
@@ -32,7 +33,7 @@ else
   CHANGED_FILES=$(git ls-files)
 fi
 
-if echo "$CHANGED_FILES" | grep -qE "^($PATTERN)/"; then
+if echo "$CHANGED_FILES" | grep -qE "$PATTERN"; then
   echo "${PREFIX}_CHANGED=true" >> "$GITHUB_ENV"
 else
   echo "${PREFIX}_CHANGED=false" >> "$GITHUB_ENV"
