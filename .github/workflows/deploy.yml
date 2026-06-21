@@ -24,7 +24,7 @@ env:
   TAG: v0.0.0
   COMPOSE_PROFILE: bff
   MONITOREO: "false"
-  COMPOSE_FILE: infra/docker/prod/imagenes.yml:infra/docker/prod/services.yml:infra/docker/prod/monitoring.yml:infra/docker/prod/postgres.yml:infra/docker/prod/clickhouse.yml:infra/docker/prod/hydra.yml:infra/docker/prod/envoy.yml:infra/docker/prod/rabbitmq.yml:infra/docker/prod/mediamtx.yml:infra/docker/prod/redis.yml:infra/docker/prod/elastic.yml:infra/docker/prod/common.yml
+  COMPOSE_FILE: infra/docker/prod/imagenes.yml:infra/docker/prod/services.yml:infra/docker/prod/monitoring.yml:infra/docker/prod/postgres.yml:infra/docker/prod/hydra.yml:infra/docker/prod/envoy.yml:infra/docker/prod/rabbitmq.yml:infra/docker/prod/mediamtx.yml:infra/docker/prod/redis.yml:infra/docker/prod/elastic.yml:infra/docker/prod/common.yml
 
   #secrets
   # POSTGRES_CDC_PASSWORD: ${{ secrets.POSTGRES_CDC_PASSWORD}}
