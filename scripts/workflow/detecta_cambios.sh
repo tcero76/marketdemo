@@ -6,7 +6,7 @@ DIRECTORY="$2"
 PREFIX="$3"
 WATCH="$3"
 
-case "$SERVICE" in
+case "$TAG_NAME" in
   bff)
     PATTERN="^(bff-service|postgres|redis|rabbitmq|config)/"
     ;;

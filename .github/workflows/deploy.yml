@@ -166,7 +166,7 @@ jobs:
             dir: flyway
             image: tcero76/flyway
             prefix: FLYWAY
-    name: Build Front
+    name: Build ${{ matrix.service }}
     runs-on: ubuntu-22.04
     permissions:
       contents: write
