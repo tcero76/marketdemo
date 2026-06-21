@@ -4,6 +4,22 @@ set -euo pipefail
 TAG_NAME="$1"
 DIRECTORY="$2"
 PREFIX="$3"
+WATCH="$3"
+
+case "$SERVICE" in
+  bff)
+    PATTERN="^(bff-service|postgres|redis|rabbitmq|config)/"
+    ;;
+  scrap)
+    PATTERN="^(scrap-service|rabbitmq)/"
+    ;;
+  flyway)
+    PATTERN="^(flyway)/"
+    ;;
+  front)
+    PATTERN="^(front)/"
+    ;;
+esac
 
 git fetch --tags --force
 
@@ -16,7 +32,7 @@ else
   CHANGED_FILES=$(git ls-files)
 fi
 
-if echo "$CHANGED_FILES" | grep -qE "^($DIRECTORY)/"; then
+if echo "$CHANGED_FILES" | grep -qE "^($PATTERN)/"; then
   echo "${PREFIX}_CHANGED=true" >> "$GITHUB_ENV"
 else
   echo "${PREFIX}_CHANGED=false" >> "$GITHUB_ENV"

@@ -151,13 +151,13 @@ jobs:
 
           - service: bff
             tag: push-bff
-            dir: bff-service|postgres|clickhouse|redis|rabbitmq|config
+            dir: bff-service
             image: tcero76/bff-service
             prefix: BFF
 
           - service: scrap
             tag: push-scrap
-            dir: scrap-service|rabbitmq
+            dir: scrap-service
             image: tcero76/scrap-service
             prefix: SCRAP
 
@@ -186,7 +186,7 @@ jobs:
           ${{ matrix.dir }} \
           ${{ matrix.prefix }}
 
-      - name: Build Front
+      - name: Build ${{ matrix.service }}
         if: env[format('{0}_CHANGED', matrix.prefix)] == 'true'
         env:
           HOST_EXTERNAL: ${{ vars.MANAGER_IP }}
@@ -333,7 +333,7 @@ jobs:
           git push origin deploy-prod --force
 
   report:
-    name: Update environment variables on Manager
+    name: Reporte Variables
     runs-on: ubuntu-22.04
     needs: [build_all]
     steps:
