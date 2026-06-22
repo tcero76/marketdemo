@@ -65,14 +65,14 @@ jobs:
             image: tcero76/front
             prefix: FRONT
 
-          - service: bff
+          - service: bff-service
             tag: push-bff
             dir: bff-service
             pattern: (bff-service|postgres|redis|rabbitmq|config)
             image: tcero76/bff-service
             prefix: BFF
 
-          - service: scrap
+          - service: scrap-service
             tag: push-scrap
             dir: scrap-service
             pattern: (scrap-service|rabbitmq)
@@ -100,10 +100,6 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
   
       - name: detecta cambios
-        # run: scripts/workflow/detecta_cambios.sh \
-        #   ${{ matrix.tag }} \
-        #   ${{ matrix.dir }} \
-        #   ${{ matrix.prefix }}
         run: |
           git fetch --tags --force
 
@@ -134,11 +130,19 @@ jobs:
           HOST_EXTERNAL: ${{ vars.MANAGER_IP }}
           VITE_MOCK: ${{ vars.VITE_MOCK }}
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
-          GITHUB_SHA: ${{ github.sha }}
         run: |
-          sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${GITHUB_SHA}|g" infra/docker/prod/imagenes.yml
-          if docker compose --project-directory "$PWD" --project-name marketplace --env-file infra/.env build "${{ matrix.service }}" --push; then
-            if docker manifest inspect "${{ matrix.image }}:${GITHUB_SHA}" >/dev/null 2>&1; then
+          BUILD_ENV_KEYS=(
+            HOST_EXTERNAL
+            VITE_MOCK
+            GOOGLE_OAUTH2_CLIENT_ID
+          )
+          PATTERN=$(IFS='|'; echo "${BUILD_ENV_KEYS[*]}")
+          set -a
+            source <(grep -E "^(${PATTERN})=" infra/.env)
+          set +a
+          sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
+          if docker compose --project-directory "$PWD" --project-name marketplace build "${{ matrix.service }}" --push; then
+            if docker manifest inspect "${{ matrix.image }}:${{ github.sha }}" >/dev/null 2>&1; then
               git fetch --tags --force
               git tag -f "${{ matrix.tag }}" "$GITHUB_SHA"
               if git push origin "refs/tags/${{ matrix.tag }}" --force; then
@@ -231,6 +235,24 @@ jobs:
           ' < <(printf "%s" "${{ secrets.TRAEFIK_SERVER_KEY }}")
         shell: bash
 
+      - name: Generate image tags
+        run: |
+          git fetch --tags --force
+
+          FRONT_SHA=$(git rev-parse push-front)
+          BFF_SHA=$(git rev-parse push-bff)
+          SCRAP_SHA=$(git rev-parse push-scrap)
+          FLYWAY_SHA=$(git rev-parse push-flyway)
+          cp infra/docker/prod/imagenes.yml infra/docker/prod/imagenes.generated.yml
+          sed -i \
+            -e "s|image: tcero76/front:.*|image: tcero76/front:${FRONT_SHA}|g" \
+            -e "s|image: tcero76/bff-service:.*|image: tcero76/bff-service:${BFF_SHA}|g" \
+            -e "s|image: tcero76/scrap-service:.*|image: tcero76/scrap-service:${SCRAP_SHA}|g" \
+            -e "s|image: tcero76/flyway:.*|image: tcero76/flyway:${FLYWAY_SHA}|g" \
+            infra/docker/prod/imagenes.generated.yml
+          echo "===== imagenes.generated.yml ====="
+          cat infra/docker/prod/imagenes.generated.yml
+
       - name: Copy docker-compose.yml to manager
         run: |
           git fetch origin
@@ -240,7 +262,13 @@ jobs:
           "
           scp -o StrictHostKeyChecking=no infra/docker/prod/* \
             root@${{ vars.MANAGER_IP }}:/root/docker/
-      - name: deploy
+          
+          scp -o StrictHostKeyChecking=no \
+            infra/docker/prod/imagenes.generated.yml \
+            root@${{ vars.MANAGER_IP }}:/root/docker/imagenes.yml
+
+
+      - name: excecute deploy
         run: ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
             /root/deploy_stack.sh
           "
