@@ -129,7 +129,7 @@ jobs:
           HOST_EXTERNAL: ${{ vars.MANAGER_IP }}
           VITE_MOCK: ${{ vars.VITE_MOCK }}
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
-          export CLIENT_ID: ${{ secrets.CLIENT_ID}}
+          CLIENT_ID: ${{ secrets.CLIENT_ID}}
         run: |
           BUILD_ENV_KEYS=(
             PROTOCOL_EXTERNAL

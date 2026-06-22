@@ -29,7 +29,7 @@ const Login = () => {
         const state = uuidv4();
         sessionStorage.setItem('state', state);
         const params = new URLSearchParams({
-        client_id: process.env.NEXT_PUBLIC_CLIENT_ID || '',
+        client_id: process.env.NEXT_PUBLIC_CLIENT_ID || '#',
         response_type: 'code',
         scope: 'openid offline mediamtx:stream',
         state,
