@@ -17,7 +17,6 @@ on:
         default: "all"
 jobs:
   terraform:
-    if: false
     name: Terraform Apply
     runs-on: ubuntu-22.04
     env:
@@ -53,7 +52,7 @@ jobs:
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
   build_all:
-    # needs: [terraform]
+    needs: [terraform]
     strategy:
       max-parallel: 1
       matrix:
@@ -144,9 +143,8 @@ jobs:
           set -a
             source <(grep -E "^(${PATTERN})=" infra/.env)
           set +a
-          export COMPOSE_FILE=infra/docker/prod/imagenes.yml
           sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
-          if docker compose --project-directory "$PWD" --project-name marketplace build "${{ matrix.service }}" --push; then
+          if docker compose --project-directory "$PWD" --project-name marketplace -f infra/docker/prod/imagenes.yml build "${{ matrix.service }}" --push; then
             if docker manifest inspect "${{ matrix.image }}:${{ github.sha }}" >/dev/null 2>&1; then
               git fetch --tags --force
               git tag -f "${{ matrix.tag }}" "$GITHUB_SHA"
@@ -170,8 +168,7 @@ jobs:
     needs: [build_all]
     permissions:
       contents: write
-    if: false
-    # if: ${{ always() }}
+    if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
