@@ -129,6 +129,7 @@ jobs:
           HOST_EXTERNAL: ${{ vars.MANAGER_IP }}
           VITE_MOCK: ${{ vars.VITE_MOCK }}
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
+          export CLIENT_ID: ${{ secrets.CLIENT_ID}}
         run: |
           BUILD_ENV_KEYS=(
             PROTOCOL_EXTERNAL
@@ -141,8 +142,6 @@ jobs:
           set -a
             source <(grep -E "^(${PATTERN})=" infra/.env)
           set +a
-          export CLIENT_ID=${{ secrets.CLIENT_ID}}
-          GOOGLE_OAUTH2_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID}}
           sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
           if docker compose --project-directory "$PWD" --project-name marketplace -f infra/docker/prod/imagenes.yml build "${{ matrix.service }}" --push; then
             if docker manifest inspect "${{ matrix.image }}:${{ github.sha }}" >/dev/null 2>&1; then
