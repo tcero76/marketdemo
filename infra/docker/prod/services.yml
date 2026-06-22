@@ -5,7 +5,7 @@ services:
     environment:
       - PORT=3000
       - HOST_EXTERNAL=${HOST_EXTERNAL}
-      - REDIRECT_URL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}:${PORT_EXTERNAL}/bff/callback
+      - REDIRECT_URL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/bff/callback
       - HYDRA_ADMIN_URL=http://hydra:4445
       - HYDRA_PUBLIC_URL=http://hydra:4444
       - GOOGLE_OAUTH2_CLIENT_SECRET_FILE=/run/secrets/google_oauth2_client_secret

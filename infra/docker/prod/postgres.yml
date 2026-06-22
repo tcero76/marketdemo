@@ -28,7 +28,7 @@ services:
      POSTGRES_DB: ${POSTGRES_DB}
      POSTGRES_HOST: ${POSTGRES_HOST}
      POSTGRES_PORT: ${POSTGRES_PORT}
-     URL_EXTERNAL: ${HOST_EXTERNAL}
+     URL_EXTERNAL: ${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
     secrets:
       - postgres_password
     deploy:
