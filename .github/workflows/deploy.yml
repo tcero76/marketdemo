@@ -185,15 +185,15 @@ jobs:
       - name: Configurar variables de producción
         run: |
           ssh root@${{ vars.MANAGER_IP }} "
-            cat >> /root/.env <<EOF
-            PROFILE=${{ vars.PROFILE }}
-            HOST_EXTERNAL=${{ vars.MANAGER_IP }}
-            VITE_MOCK=${{ vars.VITE_MOCK }}
-            PORT_EXTERNAL=${{ vars.PORT_EXTERNAL }}
-            NETWORK_APPLICATION=${{ vars.NETWORK_APPLICATION }}
-            TAG=${{ vars.TAG }}
-            MONITOREO=${{ vars.MONITOREO }}
-            EOF
+          cat >> /root/.env <<EOF
+          PROFILE=${{ vars.PROFILE }}
+          HOST_EXTERNAL=${{ vars.MANAGER_IP }}
+          VITE_MOCK=${{ vars.VITE_MOCK }}
+          PORT_EXTERNAL=${{ vars.PORT_EXTERNAL }}
+          NETWORK_APPLICATION=${{ vars.NETWORK_APPLICATION }}
+          TAG=${{ vars.TAG }}
+          MONITOREO=${{ vars.MONITOREO }}
+          EOF
           "
       - name: Crear config de Redis en Docker Swarm
         continue-on-error: true
