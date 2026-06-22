@@ -144,6 +144,7 @@ jobs:
           set -a
             source <(grep -E "^(${PATTERN})=" infra/.env)
           set +a
+          export COMPOSE_FILE=infra/docker/prod/imagenes.yml
           sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${{ github.sha }}|g" infra/docker/prod/imagenes.yml
           if docker compose --project-directory "$PWD" --project-name marketplace build "${{ matrix.service }}" --push; then
             if docker manifest inspect "${{ matrix.image }}:${{ github.sha }}" >/dev/null 2>&1; then
