@@ -181,7 +181,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Copiar .env base
         run: |
-          scp infra/.env root@${{ vars.MANAGER_IP }}:/root/.env
+          scp -o StrictHostKeyChecking=no infra/.env root@${{ vars.MANAGER_IP }}:/root/.env
 
       - name: Configurar variables de producción
         run: |
