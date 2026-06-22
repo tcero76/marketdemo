@@ -132,9 +132,13 @@ jobs:
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
         run: |
           BUILD_ENV_KEYS=(
+            PROTOCOL_EXTERNAL
             HOST_EXTERNAL
+            PROTOCOL_WS_EXTERNAL
+            CLIENT_ID
             VITE_MOCK
             GOOGLE_OAUTH2_CLIENT_ID
+            HOME_PAGE_PATH
           )
           PATTERN=$(IFS='|'; echo "${BUILD_ENV_KEYS[*]}")
           set -a
