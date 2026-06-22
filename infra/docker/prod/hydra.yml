@@ -4,7 +4,7 @@ services:
     entrypoint: ["/entrypoint.sh"]
     environment:
       - URLS_SELF_ISSUER=${PROTOCOL_EXTERNAL}://auth.${HOST_EXTERNAL}
-      - URLS_LOGIN=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/login
+      - URLS_LOGIN=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/${HOME_PAGE_PATH}/login
       - URLS_CONSENT=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/bff/consent
       - TTL_ACCESS_TOKEN=1h
       - TTL_REFRESH_TOKEN=720h

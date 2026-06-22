@@ -5,7 +5,7 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=true"
 
-      - "--log.level=DEBUG"
+      - "--accesslog=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.rtmp.address=:1935"
