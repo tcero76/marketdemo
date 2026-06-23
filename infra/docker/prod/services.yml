@@ -22,6 +22,8 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_DB=${POSTGRES_DB}
       - MONITOREO=${MONITOREO}
+      - UploadImages=/app/bff-service/uploads
+      - HOME_PAGE_PATH=${HOME_PAGE_PATH}
     networks:
       - ${NETWORK_APPLICATION:-application}
     secrets:
@@ -92,7 +94,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT_WRITE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - BROKER=${BROKER}
