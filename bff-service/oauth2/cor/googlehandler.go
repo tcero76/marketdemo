@@ -88,7 +88,7 @@ func (h *CallbackGoogleHandler) Handle(c echo.Context) error {
 				}
 				err = h.GoogleAuth.userServices.CreateUser(&userDTO)
 			}
-			log.Error("Error retrieving user by email: ", err.Error)
+			log.Error("Error retrieving user by email: ", err.Error())
 		}
 		loginChallenge, err := h.AuthCacheService.LoadTokenFromRedis(c.Get("session_data").(map[string]string)["session_id"], "loginChallenge", c.Request().Context())
 		if err != nil {
