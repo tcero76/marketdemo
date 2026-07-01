@@ -119,3 +119,17 @@ services:
       - /etc/alloy/config.alloy
     networks:
       - ${NETWORK_APPLICATION}
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter
+    profiles:
+      - monitoring
+    restart: unless-stopped
+    command:
+      - --redis.addr=redis://cache:6379
+    networks:
+      - ${NETWORK_APPLICATION}
+    depends_on:
+      - cache
+    ports:
+      - "9121:9121"
