@@ -7,7 +7,7 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/go-redis/redis/v8"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/redis/config"
 	"github.com/tcero76/marketplace/redis/model"
 )

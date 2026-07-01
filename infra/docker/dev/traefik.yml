@@ -6,6 +6,9 @@ services:
       - traefik
     command:
       - "--api.dashboard=true"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=metrics"
+      - "--entrypoints.metrics.address=:8082"
 
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"

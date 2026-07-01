@@ -14,14 +14,25 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.monitoring.rule=Host(`monitoring.${HOST_EXTERNAL}`)
+        - traefik.http.routers.monitoring.entrypoints=websecure
+        - traefik.http.routers.monitoring.tls=true
+        - traefik.http.services.monitoring.loadbalancer.server.port=3000
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-worker-0
+      restart_policy:
+        condition: any
     networks:
       - ${NETWORK_APPLICATION}
   prometheus:
     image: prom/prometheus:v3.4.0
     hostname: prometheus
     container_name: prometheus
-    profiles:
-      - monitoring
     tty: true
     stdin_open: true
     ports:
@@ -29,16 +40,35 @@ services:
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ../../volumes/prometheus:/prometheus
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.prometheus.rule=Host(`prom.${HOST_EXTERNAL}`)
+        - traefik.http.routers.prometheus.entrypoints=websecure
+        - traefik.http.routers.prometheus.tls=true
+        - traefik.http.services.prometheus.loadbalancer.server.port=9090
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-worker-0
+      restart_policy:
+        condition: any
     networks:
       - ${NETWORK_APPLICATION}
   node_exporter:
     image: prom/node-exporter:v1.9.1
+    command:
+      - --path.rootfs=/host
     container_name: node_exporter
-    profiles:
-      - monitoring
     tty: true
     stdin_open: true
+    volumes:
+      - /:/host:ro,rslave
     ports:
       - "9100:9100"
+    deploy:
+      mode: global
+      restart_policy:
+      condition: any
     networks:
       - ${NETWORK_APPLICATION}

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	logConfig "github.com/tcero76/marketplace/config"
+	logConfig "github.com/tcero76/marketplace/config/log"
 )
 
 func InitRedis() *redis.Client {

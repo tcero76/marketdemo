@@ -6,7 +6,7 @@ services:
       context: .
       target: ${PROFILE}
   front:
-    image: tcero76/frontend:${TAG}
+    image: tcero76/front:${TAG}
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
