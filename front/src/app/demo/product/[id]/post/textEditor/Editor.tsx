@@ -20,7 +20,7 @@ const Editor:FC<EditorProps> = ({ onChangePosteo, posteo, productId, ...props })
     onChangePosteo({
       id: posteoRaw.id,
       texto: posteoRaw.texto,
-      productId: productId,
+      productId: parseInt(productId),
       meta: { 
         hashtags: meta.map(m => ({ nombre: m }))
       }

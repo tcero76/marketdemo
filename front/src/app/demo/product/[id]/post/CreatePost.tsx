@@ -21,12 +21,11 @@ const CreatePost = ({ id }:CreatePostProps) => {
     const uiContext = useUIContext();
     const onClickPosteo = () => {
         if(!posteo) return;
-        const posteoActualizado = {
-            ...posteo,
-            productId: id
-        };
         uiContext.showSpinner()
-        trigger(posteoActualizado).unwrap()
+        trigger({
+            ...posteo,
+            productId: parseInt(id)
+        }).unwrap()
         .then(() => {
             uiContext.showToast({msg:"Enviado", type:TOAST_TYPES.SUCCESS})
             setModal(false)
@@ -42,7 +41,7 @@ const CreatePost = ({ id }:CreatePostProps) => {
             meta:  {
                 hashtags: []
                 },
-            productId: id
+            productId: parseInt(id)
             };
         setPosteo(emptyPost);
         setModal(true)

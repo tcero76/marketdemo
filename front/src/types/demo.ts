@@ -36,7 +36,7 @@ export type PosteoBase = {
 export type PosteoCreateBase = {
   id:string
   texto:string
-  productId:string
+  productId:number
 }
 
 export type PosteoCreate = PosteoCreateBase & {

@@ -28,11 +28,11 @@ const Page = () => {
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {data?.title || 'Modelo'}
         </h1>
-        <p className="mt-3 text-lg text-gray-600 dark:text-gray-400">
-          {data?.description || 'Descripción del modelo...'}
+        <p className="mt-3 text-lg">
+          {data?.description || 'Descripción del Producto...'}
         </p>
       </div>
-        <div className="bg-gray-800/30 rounded-xl p-6 border border-gray-700 shadow-sm">
+        <div className="rounded-xl p-6 border shadow-sm">
           <CreatePost id={id ?? 0}/>
         </div>
     </div>
