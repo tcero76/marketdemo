@@ -7,20 +7,21 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	log "github.com/sirupsen/logrus"
+
+	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/bff-service/services"
 	"github.com/tcero76/marketplace/redis/model"
 )
 
 var ctx = context.Background()
 
-func RedisSessionMiddleware(authCacheService services.IAuthCacheService) echo.MiddlewareFunc {
+func RedisSessionMiddleware(authCacheService services.IAuthCacheService, log *logger.LoggerLogstash) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			log.Trace("Ip remota: ", c.Request().RemoteAddr)
-			log.Trace("User Agent: ", c.Request().Header.Get("User-Agent"))
+			log.Debug("Ip remota: ", c.Request().RemoteAddr)
+			log.Debug("User Agent: ", c.Request().Header.Get("User-Agent"))
 			cookie, err := c.Cookie("session_id")
-			log.Trace("Cookie session_id: ", cookie)
+			log.Debug("Cookie session_id: ", cookie)
 			var sessionID string
 			if err != nil || cookie.Value == "" {
 				sessionID = uuid.New().String()

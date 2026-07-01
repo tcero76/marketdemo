@@ -2,9 +2,8 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"time"
-
+	"errors"
 	"github.com/fatih/structs"
 	"github.com/go-redis/redis/v8"
 	logger "github.com/tcero76/marketplace/config/log"
@@ -49,7 +48,7 @@ func (h *AuthCacheService) GetSession(key string, ctx context.Context) (*model.S
 		return nil, err
 	}
 	if len(m) == 0 {
-		return nil, fmt.Errorf("no session found for key: %s", key)
+		return nil, errors.New("no session found for key: " + key)
 	}
 	s := &model.SessionData{
 		AccessToken:     m["access_token"],

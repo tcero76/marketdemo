@@ -54,7 +54,7 @@ func main() {
 	loginHandler, consentHandler, callbackHandler := oauth2.InitOauth2Handlers(authCacheService, userServices, internalAuth, googleAuth)
 
 
-	e.Use(config.RedisSessionMiddleware(authCacheService))
+	e.Use(config.RedisSessionMiddleware(authCacheService, log))
 	e.Use(config.LoggerMiddleware(log))
 
 	authController := controller.NewAuthController(log)
