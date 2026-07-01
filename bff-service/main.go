@@ -6,7 +6,8 @@ import (
 
 	"github.com/tcero76/marketplace/bff-service/config"
 	"github.com/tcero76/marketplace/bff-service/controller"
-	logConfig "github.com/tcero76/marketplace/config"
+	logConfig "github.com/tcero76/marketplace/config/log"
+	"github.com/tcero76/marketplace/config/metrics"
 
 	"github.com/tcero76/marketplace/bff-service/oauth2"
 	"github.com/tcero76/marketplace/bff-service/oauth2/cor"
@@ -21,9 +22,15 @@ import (
 
 var hydraAdminClient *hydra.APIClient
 
-var ctx = context.Background()
+var ctx = context.Background() 
 
 func main() {
+	e := echo.New()	
+
+	metrics.Register()
+	e.Use(metrics.Middleware())
+	metrics.RegisterEndpoint(e)
+
 	log := logConfig.NewLoggerLogstash("🗄️  BFF")
 	log.Info("Iniciando servidor...")
 
@@ -46,7 +53,6 @@ func main() {
 	googleAuth := cor.NewGoogleAuth(googleClient, userServices)
 	loginHandler, consentHandler, callbackHandler := oauth2.InitOauth2Handlers(authCacheService, userServices, internalAuth, googleAuth)
 
-	e := echo.New()
 
 	e.Use(config.RedisSessionMiddleware(authCacheService))
 	e.Use(config.LoggerMiddleware(log))

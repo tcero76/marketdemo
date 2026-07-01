@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/tcero76/marketplace/bff-service/dto"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
 
 	"github.com/tcero76/marketplace/postgres/model"

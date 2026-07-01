@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/lestrrat-go/jwx/jwk"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 	"gorm.io/gorm"
 )
 

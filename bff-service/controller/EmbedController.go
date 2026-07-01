@@ -11,7 +11,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/labstack/echo/v4"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 )
 
 type LinkPreview struct {

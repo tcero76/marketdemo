@@ -20,7 +20,7 @@ import (
 	"github.com/tcero76/marketplace/bff-service/oauth2/cor"
 	"github.com/tcero76/marketplace/bff-service/payload"
 	"github.com/tcero76/marketplace/bff-service/services"
-	logConfig "github.com/tcero76/marketplace/config"
+	logConfig "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/redis/model"
 
 	"golang.org/x/oauth2"
@@ -89,6 +89,9 @@ func verifyToken(tokenStr string, log *logConfig.LoggerLogstash) (jwt.MapClaims,
 		}
 		return getKeyFromJWKS(kid, log)
 	}
+	log.Debug("Token received: ", tokenStr)
+	log.Debug("Token length: ", len(tokenStr))
+	log.Debug("Token preview: ", tokenStr[:min(50, len(tokenStr))])
 	token, err := jwt.ParseWithClaims(tokenStr, jwt.MapClaims{}, keyFunc)
 	if err != nil {
 		log.Error("Error parsing token: ", err)

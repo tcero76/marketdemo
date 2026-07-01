@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
-	logConfig "github.com/tcero76/marketplace/config"
+	logConfig "github.com/tcero76/marketplace/config/log"
 )
 
 type FileController struct {

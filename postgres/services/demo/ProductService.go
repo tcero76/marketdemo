@@ -6,7 +6,7 @@ import (
 
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
 	"github.com/tcero76/marketplace/postgres/model"
 	"gorm.io/gorm"

@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	logConfig "github.com/tcero76/marketplace/config"
+	logConfig "github.com/tcero76/marketplace/config/log"
 )
 
 func LoggerMiddleware(log *logConfig.LoggerLogstash) echo.MiddlewareFunc {

@@ -8,7 +8,7 @@ import (
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
 	"github.com/tcero76/marketplace/bff-service/services"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 
 	"github.com/labstack/echo/v4"
 )

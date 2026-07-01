@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync"
 
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/labstack/echo/v4"
-	logConfig "github.com/tcero76/marketplace/config"
+	logConfig "github.com/tcero76/marketplace/config/log"
 )
 
 func HealthCheckHandler(log *logConfig.LoggerLogstash) echo.HandlerFunc {

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/lib/pq"
-	logger "github.com/tcero76/marketplace/config"
+	logger "github.com/tcero76/marketplace/config/log"
 	"gorm.io/gorm"
 )
 

@@ -1,4 +1,4 @@
-module github.com/tcero76/marketplace/config
+module github.com/tcero76/marketdemo/config/log
 
 go 1.25.2
 
