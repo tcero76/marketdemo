@@ -206,7 +206,7 @@ jobs:
           MONITOREO=${{ vars.MONITOREO }}
           EOF
           "
-      - name: Crear config de Redis en Docker Swarm
+      - name: Crear config en Docker Swarm
         continue-on-error: true
         run: |
           ssh root@${{ vars.MANAGER_IP }} '
@@ -278,7 +278,6 @@ jobs:
           scp -o StrictHostKeyChecking=no \
             infra/docker/prod/imagenes.generated.yml \
             root@${{ vars.MANAGER_IP }}:/root/docker/imagenes.yml
-
 
       - name: excecute deploy
         run: ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
