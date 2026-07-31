@@ -27,7 +27,11 @@ services:
 
       - GF_SMTP_SKIP_VERIFY=false
       - GF_SMTP_STARTTLS_POLICY=MandatoryStartTLS
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - ${NETWORK_APPLICATION}
     labels:
@@ -55,6 +59,18 @@ services:
     volumes:
       - ./infra/docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ${PROMETHEUS_VOLUME}:/prometheus
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:9090/-/healthy"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - ${NETWORK_APPLICATION:-application}
   node_exporter:
@@ -98,6 +114,15 @@ services:
     volumes:
       - ./infra/docker/config/loki:/etc/loki
       - ${LOKI_VOLUME}:/loki
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:3100/ready"
+        ]
     ports:
       - 3100:3100
     networks:
@@ -120,9 +145,9 @@ services:
       - "--server.http.listen-addr=0.0.0.0:12345"
     networks:
       - ${NETWORK_APPLICATION}
-  redis-exporter:
+  redis_exporter:
     image: oliver006/redis_exporter:latest
-    container_name: redis-exporter
+    container_name: redis_exporter
     profiles:
       - monitoring
     restart: unless-stopped

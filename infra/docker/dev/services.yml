@@ -48,39 +48,17 @@ services:
       - traefik.http.routers.bff.tls=true
       - traefik.http.services.bff.loadbalancer.server.port=3000
       - traefik.http.routers.bff.priority=100
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - ${NETWORK_APPLICATION:-application}
     depends_on:
       - db
       - cache
       - broker
-  ws-service:
-    container_name: ws
-    profiles:
-      - ws
-    tty: true
-    stdin_open: true
-    environment:
-      - MIX_ENV=dev
-      - CMD_CHAT_MESSAGE_DELIVERY_QUEUE=${CMD_CHAT_MESSAGE_DELIVERY_QUEUE}
-      - CMD_CHAT_MESSAGE_SEND_EXCHANGE=${CMD_CHAT_MESSAGE_SEND_EXCHANGE}
-      - RABBITMQ_HOST=broker
-      - HYDRA_JWKS_URL=http://hydra:4444/.well-known/jwks.json
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.ws.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/api`)
-      - traefik.http.middlewares.ws-strip.stripprefix.prefixes=/api
-      - traefik.http.routers.ws.middlewares=ws-strip
-      - traefik.http.routers.ws.entrypoints=websecure
-      - traefik.http.routers.ws.tls=true
-      - traefik.http.services.ws.loadbalancer.server.port=4000
-      - traefik.http.routers.ws.priority=100
-    volumes:
-      - ./ws-service:/ws-service
-    depends_on:
-      - broker
-    networks:
-      - ${NETWORK_APPLICATION:-application}
   front:
     container_name: front
     profiles:
@@ -101,6 +79,17 @@ services:
      - 3000:3000
     volumes:
       - ./front:/app
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - ${NETWORK_APPLICATION:-application}
     labels:

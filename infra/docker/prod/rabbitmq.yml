@@ -29,7 +29,7 @@ services:
       timeout: 10s
       retries: 5
   rabbitmq-init:
-    image: tcero76/rabbitmq-init:${TAG}
+    image: tcero76/demo/rabbitmq-init:${TAG}
     entrypoint: [ "sh", "/init_rabbitmq.sh" ]
     environment:
       HOST: broker

@@ -20,9 +20,6 @@ FROM mcr.microsoft.com/playwright/python:v1.50.0-noble AS base
   
   FROM base AS dev
   
-  COPY scrap-service/ /app/scrap-service/
-  COPY rabbitmq/ /app/rabbitmq/
-  
   RUN pip install debugpy watchdog watchfiles
   
   COPY scrap-service/deploy/entrypoint-dev.sh /entrypoint.sh
@@ -40,9 +37,6 @@ FROM mcr.microsoft.com/playwright/python:v1.50.0-noble AS base
   COPY --chown=app:app rabbitmq/ /app/rabbitmq/
   
   USER app
-  
-  HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
-    CMD python -c "import sys; sys.exit(0)"
   
   USER root
   COPY scrap-service/deploy/entrypoint.sh /entrypoint.sh

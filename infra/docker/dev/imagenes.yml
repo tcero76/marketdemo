@@ -1,12 +1,12 @@
 services:
   bff-service:
-    image: tcero76/bff-service:${TAG}
+    image: tcero76/demo/bff-service:dev
     build:
       dockerfile: ./bff-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
   front:
-    image: tcero76/front:${TAG}
+    image: tcero76/demo/front:dev
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
@@ -17,13 +17,13 @@ services:
         VITE_CLIENT_ID: "${CLIENT_ID}"
         VITE_MOCK: ${VITE_MOCK}
   scrap-service:
-    image: tcero76/scrap-service:${TAG}
+    image: tcero76/demo/scrap-service:dev
     build:
       dockerfile: ./scrap-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
   beat-service:
-    image: tcero76/beat-service:${TAG}
+    image: tcero76/demo/beat-service:dev
     build:
       dockerfile: beat-service/deploy/Dockerfile
       context: .

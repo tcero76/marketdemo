@@ -1,12 +1,12 @@
 services:
   bff-service:
-    image: tcero76/bff-service:525b09edd57f7065b2bdfec3d7e44a5bb7bd06d9
+    image: tcero76/demo/bff-service:525b09edd57f7065b2bdfec3d7e44a5bb7bd06d9
     build:
       dockerfile: ./bff-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
   front:
-    image: tcero76/front:f82b50fad2f660d09af3043c57e5c01fd03b659a
+    image: tcero76/demo/front:f82b50fad2f660d09af3043c57e5c01fd03b659a
     build:
       dockerfile: deploy/Dockerfile
       context: ./front
@@ -20,29 +20,24 @@ services:
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH2_CLIENT_ID}
         NEXT_PUBLIC_HOME_PAGE_PATH: ${HOME_PAGE_PATH}
   scrap-service:
-    image: tcero76/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
+    image: tcero76/demo/scrap-service:4ea48a2edff92518f7d9652879474ce3be9f125f
     build:
       dockerfile: ./scrap-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
   beat-service:
-    image: tcero76/beat-service:${TAG}
+    image: tcero76/demo/beat-service:${TAG}
     build:
       dockerfile: beat-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
   rabbitmq-init:
-    image: tcero76/rabbitmq-init:${TAG}
+    image: tcero76/demo/rabbitmq-init:${TAG}
     build:
       dockerfile: Dockerfile
       context: infra/docker/config/rabbitmq/
-  hydra:
-    build:
-      dockerfile: Dockerfile
-      context: infra/docker/config/hydra/
-      target: ${PROFILE}
   flyway:
-    image: tcero76/flyway:85cd3dfe9696a6294958af26d0d82578e726341b
+    image: tcero76/demo/flyway:85cd3dfe9696a6294958af26d0d82578e726341b
     build:
       dockerfile: deploy/Dockerfile
       context: flyway/

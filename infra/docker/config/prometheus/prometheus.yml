@@ -56,7 +56,7 @@ scrape_configs:
 
   - job_name: "redis"
     static_configs:
-      - targets: 
+      - targets: ["redis_exporter:9121"]
 
   - job_name: "hydra"
     metrics_path: /admin/metrics/prometheus

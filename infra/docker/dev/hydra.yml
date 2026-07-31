@@ -25,6 +25,15 @@ services:
       - traefik.http.routers.hydra.entrypoints=websecure
       - traefik.http.routers.hydra.tls=true
       - traefik.http.services.hydra.loadbalancer.server.port=4444
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:4445/health/ready"
+        ]
     depends_on:
      - db
     networks:
