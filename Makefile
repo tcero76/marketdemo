@@ -25,13 +25,6 @@ up:
 		--project-name marketplace \
 		up -d $(filter-out $@,$(MAKECMDGOALS))
 
-config:
-	@docker compose \
-		--env-file ${ENVIRONMENTS} \
-		--project-directory ${PWD} \
-		--project-name marketplace \
-		config
-
 ps:
 	@watch docker compose \
 		--env-file ${ENVIRONMENTS} \
@@ -43,20 +36,11 @@ down:
 	@docker compose --env-file ${ENVIRONMENTS} --project-directory ${PWD} \
 		--project-name marketplace down
 
-kill:
-	@docker rm -f $(filter-out $@,$(MAKECMDGOALS))
-
-exec:
-	@docker exec -it $(filter-out $@,$(MAKECMDGOALS)) /bin/bash
-
 queue:
 	@docker exec broker-job rabbitmqadmin declare queue name=$(QUEUE_NAME) durable=true
 
 delay:
 	@docker compose --env-file ${ENVIRONMENTS} exec scrap-worker python -c "from main import run_modelo_spider; run_modelo_spider.delay()"
-
-recomender:
-	@docker compose --env-file ${ENVIRONMENTS} exec recomender python -c "from main import calculate_recommendations_task; calculate_recommendations_task.delay()"
 
 sendmsg:
 	@docker exec broker rabbitmqadmin publish \
@@ -92,9 +76,6 @@ build:
 		--project-name marketplace \
 		build $(SERVICE) --no-cache
 
-reset:
-	@sudo rm -rf ./infra/volumes/timescaleDB/
-	@mkdir -p ./infra/volumes/timescaleDB/data
 migra:
 	@docker run --env-file ${ENVIRONMENTS} --network ${NETWORK_APPLICATION} --rm -v ./flyway/sql:/flyway/sql flyway/flyway:latest-alpine \
 	  -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
@@ -151,23 +132,3 @@ dumpHydra:
 
 psql:
 	@psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p 5432
-
-trans:
-	@ffmpeg \
-		-thread_queue_size 512 -f v4l2 -i /dev/video0 \
-		-thread_queue_size 512 -f alsa -i default \
-		-c:v libx264 -preset veryfast -tune zerolatency \
-		-pix_fmt yuv420p \
-		-g 30 \
-		-c:a aac -b:a 128k \
-		-f flv rtmp://localhost:1935/streams?jwt=$(ACCESS_TOKEN)
-
-webrtc:
-	@curl -k -X POST \
-		-H "Content-Type: application/sdp" \
-		-H "Authorization: Basic $(echo -n 'any:any' | base64)" \
-		http://localhost:8889/streams/whip \
-		--data-binary @offer.sdp
-
-play:
-	@ffplay -headers "Authorization: Bearer $(ACCESS_TOKEN)" http://localhost:8888/streams/index.m3u8
