@@ -10,9 +10,14 @@ services:
       - ./rabbitmq:/app/rabbitmq
       - ./redis:/app/redis
       - ./infra/volumes/uploads:/app/bff-service/uploads
+      - ./.vscode:/app/.vscode
     profiles:
       - bff
     container_name: bff
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
     stdin_open: true
     tty: true
     environment:
