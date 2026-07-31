@@ -4,6 +4,7 @@ import psutil
 import time
 from marketdemo.metrics import RAM_USAGE
 from celery import Celery, chain
+from celery.signals import worker_ready
 import os
 import subprocess
 import psycopg2
@@ -19,8 +20,6 @@ app.conf.update(
         'main.run_modelo_spider': {'queue': SCRAPY_QUEUE}
     }
 )
-
-metrics_thread_started = False
 
 def start_metrics_server():
     port = int(os.getenv("PORT", 8000))
@@ -48,12 +47,15 @@ def ejecutar_funcion_items_postgres(_=None):
 
 @app.task
 def run_modelo_spider():
-    global metrics_thread_started
-    if not metrics_thread_started:
-        threading.Thread(target=start_metrics_server, daemon=True).start()
-        metrics_thread_started = True
     id_job = int(time.time())  
     chain(
         run_dummy.s(id_job).set(queue=SCRAPY_QUEUE),
         ejecutar_funcion_items_postgres.s().set(queue=SCRAPY_QUEUE)
     ).apply_async()
+
+@worker_ready.connect
+def on_worker_ready(**kwargs):
+    threading.Thread(
+        target=start_metrics_server,
+        daemon=True
+    ).start()
