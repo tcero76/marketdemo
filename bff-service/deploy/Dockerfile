@@ -1,7 +1,9 @@
 FROM golang:1.25 AS dev
 WORKDIR /app
 
-RUN go install github.com/air-verse/air@latest
+RUN go install github.com/air-verse/air@v1.65.3
+RUN go install golang.org/x/tools/gopls@v0.21.0
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.27.0
 
 FROM golang:1.25 AS builder 
 WORKDIR /app
