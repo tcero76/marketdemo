@@ -164,25 +164,19 @@ Secrets:
 - [x] Arquitectura de microservicios
 - [x] OAuth2 / OpenID Connect
 - [x] RabbitMQ
-- [x] PostgreSQL + TimescaleDB
+- [x] PostgreSQL
 - [x] Redis
 - [x] Traefik
 - [x] Observabilidad con Prometheus y Grafana
 - [x] Logs centralizados con Loki
-- [x] Trazas distribuidas con Tempo
 - [x] CI/CD con GitHub Actions
 
 ### 🚧 En desarrollo
 
-- [ ] Dashboards adicionales de observabilidad
-- [ ] Métricas de negocio
-- [ ] Pruebas de carga
+- [ ] Testing unitario, integral, endtoend Playwright
+- [ ] Filter by Categories
 
 ### 📌 Planificado
 
-- [ ] Alta disponibilidad de PostgreSQL
-- [ ] Service Mesh
-- [ ] Event Sourcing
-- [ ] CQRS
-- [ ] Multi-región
+- [ ] Chat
 
