@@ -294,13 +294,13 @@ jobs:
           "
           scp \
             infra/docker/prod/acme.json \
-            hydra.yml \
-            monitoring.yml \
-            rabbitmq.yml \
-            postgres.yml \
-            redis.yml \
-            traefik.yml \
-            services.yml \
+            infra/docker/prod/hydra.yml \
+            infra/docker/prod/monitoring.yml \
+            infra/docker/prod/rabbitmq.yml \
+            infra/docker/prod/postgres.yml \
+            infra/docker/prod/redis.yml \
+            infra/docker/prod/traefik.yml \
+            infra/docker/prod/services.yml \
             root@${{ vars.MANAGER_IP }}:/root/docker/
           
           scp -o StrictHostKeyChecking=no \
