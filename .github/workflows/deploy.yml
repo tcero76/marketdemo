@@ -238,6 +238,9 @@ jobs:
           ssh root@${{ vars.MANAGER_IP }} '
             bash /root/deploy-config.sh rabbitmq_init
           ' < infra/docker/config/rabbitmq/init_rabbitmq.sh
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-config.sh flyway_entrypoint
+          ' < flyway/deploy/entrypoint.sh
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
         run: |

@@ -32,7 +32,7 @@ services:
       context: .
       target: ${PROFILE}
   flyway:
-    image: tcero76/demo-flyway:85cd3dfe9696a6294958af26d0d82578e726341b
+    image: flyway/flyway:latest-alpine
     build:
       dockerfile: deploy/Dockerfile
       context: flyway/

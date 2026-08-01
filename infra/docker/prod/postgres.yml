@@ -30,14 +30,20 @@ services:
         delay: 10s
         max_attempts: 5
   flyway:
+    command:
+      - migrate
     environment:
-     POSTGRES_USER: ${POSTGRES_USER}
-     POSTGRES_DB: ${POSTGRES_DB}
-     POSTGRES_HOST: ${POSTGRES_HOST}
-     POSTGRES_PORT: ${POSTGRES_PORT}
-     URL_EXTERNAL: ${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
+      FLYWAY_URL: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      FLYWAY_USER: ${POSTGRES_USER}
+      FLYWAY_SCHEMAS: marketplace,scrap,hydra,marketplacedemo,chat,extension
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql/migration,filesystem:/flyway/sql/seed
+      FLYWAY_PLACEHOLDERS_URL_EXTERNAL: ${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
     secrets:
       - postgres_password
+    configs:
+      - source: flyway_entrypoint
+        target: /entrypoint.sh
+        mode: 0555
     deploy:
       mode: replicated-job
       restart_policy:

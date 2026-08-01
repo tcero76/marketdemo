@@ -32,6 +32,8 @@ configs:
     external: true
   rabbitmq_init:
     external: true
+  flyway_entrypoint:
+    external: true  
 secrets:
   hydra_secret:
     external: true
