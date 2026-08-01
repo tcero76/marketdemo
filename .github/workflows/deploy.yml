@@ -300,7 +300,7 @@ jobs:
             postgres.yml \
             redis.yml \
             traefik.yml \
-            services.yml \  
+            services.yml \
             root@${{ vars.MANAGER_IP }}:/root/docker/
           
           scp -o StrictHostKeyChecking=no \
