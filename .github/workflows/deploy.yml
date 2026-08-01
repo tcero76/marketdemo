@@ -68,7 +68,7 @@ jobs:
             tag: push-bff
             dir: bff-service
             pattern: (bff-service|postgres|redis|rabbitmq|config)
-            image: tcero76/demo/bff-service
+            image: tcero76/demo-bff-service
             prefix: BFF
 
           - service: scrap-service
