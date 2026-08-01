@@ -27,7 +27,7 @@ services:
       retries: 5
   rabbitmq-init:
     image: rabbitmq:${RABBITMQ_VERSION}
-    entrypoint: [ "sh", "/init_rabbitmq.sh" ]
+    entrypoint: ["/init_rabbitmq.sh" ]
     configs:
       - source: rabbitmq_init
         target: /init_rabbitmq.sh
