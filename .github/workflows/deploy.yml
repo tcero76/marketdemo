@@ -61,7 +61,7 @@ jobs:
             tag: push-front
             dir: front
             pattern: front
-            image: tcero76/demo/front
+            image: tcero76/demo-front
             prefix: FRONT
 
           - service: bff-service
@@ -75,21 +75,21 @@ jobs:
             tag: push-scrap
             dir: scrap-service
             pattern: (scrap-service|rabbitmq)
-            image: tcero76/demo/scrap-service
+            image: tcero76/demo-scrap-service
             prefix: SCRAP
 
           - service: flyway
             tag: push-flyway
             dir: flyway
             pattern: flyway
-            image: tcero76/demo/flyway
+            image: tcero76/demo-flyway
             prefix: FLYWAY
 
           - service: beat-service
             tag: push-beat
             dir: beat-service
             pattern: (beat-service|rabbitmq)
-            image: tcero76/demo/beat-service
+            image: tcero76/demo-beat-service
             prefix: BEAT
     name: Build ${{ matrix.service }}
     runs-on: ubuntu-22.04
@@ -231,7 +231,7 @@ jobs:
           ' < infra/docker/config/alloy/config.alloy
           ssh root@${{ vars.MANAGER_IP }} '
             bash /root/deploy-config.sh postgres_exporter_custom_queries
-          ' < infra/docker/config/postgres_exporter/custom_queries.yaml
+          ' < infra/docker/config/postgres_exporter/custom_queries.yml
           ssh root@${{ vars.MANAGER_IP }} '
             bash /root/deploy-config.sh loki_config
           ' < infra/docker/config/loki/loki-config.yaml
