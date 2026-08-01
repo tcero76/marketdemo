@@ -30,6 +30,7 @@ services:
         delay: 10s
         max_attempts: 5
   flyway:
+    entrypoint: ["/entrypoint.sh"]
     command:
       - migrate
     environment:

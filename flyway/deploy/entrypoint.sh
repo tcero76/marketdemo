@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-
+apk add --no-cache postgresql-client
 export FLYWAY_PASSWORD=$(cat /run/secrets/postgres_password)
 export FLYWAY_URL=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 export FLYWAY_USER=${POSTGRES_USER}
