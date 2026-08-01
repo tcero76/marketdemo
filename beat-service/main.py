@@ -13,6 +13,7 @@ import time
 
 cron_hour = int(os.getenv("CRON_HOUR", "2"))
 cron_minute = int(os.getenv("CRON_MINUTE", "30"))
+metrics_started = False
 
 app = Celery('marketdemo')
 app.conf.update(
