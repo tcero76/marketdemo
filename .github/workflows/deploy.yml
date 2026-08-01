@@ -294,6 +294,7 @@ jobs:
           "
           scp \
             infra/docker/prod/acme.json \
+            infra/docker/prod/common.yml \
             infra/docker/prod/hydra.yml \
             infra/docker/prod/monitoring.yml \
             infra/docker/prod/rabbitmq.yml \
