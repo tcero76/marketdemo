@@ -35,6 +35,10 @@ app.conf.update(
 )
 
 def start_metrics_server():
+    global metrics_started
+    if metrics_started:
+        return
+    metrics_started = True
     port = int(os.getenv("PORT", 8000))
     start_http_server(port)
     while True:
