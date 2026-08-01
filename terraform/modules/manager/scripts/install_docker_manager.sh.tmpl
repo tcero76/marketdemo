@@ -57,14 +57,14 @@ EOF
 cat > /root/deploy-config.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+
 NAME="$1"
-if [ -z "$NAME" ]; then
-  echo "Usage: deploy-config.sh <name>"
-  exit 1
+
+if docker config inspect "$NAME" >/dev/null 2>&1; then
+  echo "Config $NAME ya existe, se mantiene"
+  exit 0
 fi
-# eliminar si existe
-docker config rm "$NAME" 2>/dev/null || true
-# crear desde stdin
+
 docker config create "$NAME" -
 EOF
 chmod +x /root/deploy_stack.sh

@@ -290,14 +290,13 @@ jobs:
           echo "===== imagenes.generated.yml ====="
           cat infra/docker/prod/imagenes.generated.yml
 
-      - name: Copy docker-compose.yml to manager
+      - name: Copy docker/*.yml to manager
         run: |
           git fetch origin
           git reset --hard ${{ github.sha }}
-          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
-            mkdir -p docker
-          "
-          scp \
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} \
+            "mkdir -p /root/docker"
+          scp -o StrictHostKeyChecking=no \
             infra/docker/prod/acme.json \
             infra/docker/prod/common.yml \
             infra/docker/prod/hydra.yml \
@@ -312,6 +311,14 @@ jobs:
           scp -o StrictHostKeyChecking=no \
             infra/docker/prod/imagenes.generated.yml \
             root@${{ vars.MANAGER_IP }}:/root/docker/imagenes.yml
+
+      - name: update flyway migrations
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} \
+            "mkdir -p /root/flyway/sql"
+          scp -o StrictHostKeyChecking=no \
+            flyway/sql/*.sql \
+            root@${{ vars.MANAGER_IP }}:/root/flyway/sql/
 
       - name: excecute deploy
         run: ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "

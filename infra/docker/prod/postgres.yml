@@ -43,6 +43,8 @@ services:
       - source: flyway_entrypoint
         target: /entrypoint.sh
         mode: 0555
+    volumes:
+      - /root/flyway/sql/:/flyway/sql
     deploy:
       mode: replicated-job
       restart_policy:
