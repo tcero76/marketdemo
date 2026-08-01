@@ -278,10 +278,10 @@ jobs:
           BEAT_SHA=$(git rev-parse push-beat)
           cp infra/docker/prod/imagenes.yml infra/docker/prod/imagenes.generated.yml
           sed -i \
-            -e "s|image: tcero76/demo-front:.*|image: tcero76/front:${FRONT_SHA}|g" \
+            -e "s|image: tcero76/demo-front:.*|image: tcero76/demo-front:${FRONT_SHA}|g" \
             -e "s|image: tcero76/demo-bff-service:.*|image: tcero76/bff-service:${BFF_SHA}|g" \
             -e "s|image: tcero76/demo-scrap-service:.*|image: tcero76/scrap-service:${SCRAP_SHA}|g" \
-            -e "s|image: tcero76/demo-flyway:.*|image: tcero76/flyway:${FLYWAY_SHA}|g" \
+            -e "s|image: tcero76/demo-flyway:.*|image: tcero76/demo-flyway:${FLYWAY_SHA}|g" \
             -e "s|image: tcero76/demo-beat-service:.*|image: tcero76/demo-beat-service:${BEAT_SHA}|g" \
             infra/docker/prod/imagenes.generated.yml
           echo "===== imagenes.generated.yml ====="
