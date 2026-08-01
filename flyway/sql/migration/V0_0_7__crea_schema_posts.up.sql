@@ -25,10 +25,5 @@ CREATE TABLE IF NOT EXISTS posts.post_modelos (
     CONSTRAINT fk_ps_post
         FOREIGN KEY (post_id)
         REFERENCES posts.posts(id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_ps_service
-        FOREIGN KEY (modelos_id)
-        REFERENCES marketplace.modelos(id)
         ON DELETE CASCADE
 );

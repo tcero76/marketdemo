@@ -32,12 +32,15 @@ services:
   flyway:
     entrypoint: ["/entrypoint.sh"]
     command:
+      - flyway
       - migrate
     environment:
      POSTGRES_USER: ${POSTGRES_USER}
      POSTGRES_DB: ${POSTGRES_DB}
      POSTGRES_HOST: ${POSTGRES_HOST}
      POSTGRES_PORT: ${POSTGRES_PORT}
+     PROTOCOL_EXTERNAL: ${PROTOCOL_EXTERNAL}
+     HOST_EXTERNAL: ${HOST_EXTERNAL}
     secrets:
       - postgres_password
     configs:
@@ -52,7 +55,7 @@ services:
         condition: none
       placement:
         constraints:
-          - node.hostname == swarm-worker-0
+          - node.hostname == swarm-manager
     networks:
       - ${NETWORK_APPLICATION:-application}
       
