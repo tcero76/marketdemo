@@ -292,7 +292,15 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} "
             mkdir -p docker
           "
-          scp -o StrictHostKeyChecking=no infra/docker/prod/* \
+          scp \
+            infra/docker/prod/acme.json \
+            hydra.yml \
+            monitoring.yml \
+            rabbitmq.yml \
+            postgres.yml \
+            redis.yml \
+            traefik.yml \
+            services.yml \  
             root@${{ vars.MANAGER_IP }}:/root/docker/
           
           scp -o StrictHostKeyChecking=no \
