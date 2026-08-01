@@ -24,6 +24,12 @@ configs:
     external: true
   traefik_tls:
     external: true
+  alloy_config:
+    external: true
+  postgres_exporter_custom_queries:
+    external: true
+  loki_config:
+    external: true
 secrets:
   hydra_secret:
     external: true

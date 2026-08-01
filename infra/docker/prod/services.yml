@@ -70,6 +70,17 @@ services:
       - NEXT_PUBLIC_HOME_PAGE_PATH=${HOME_PAGE_PATH}
     networks:
       - ${NETWORK_APPLICATION:-application}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       labels:
         - traefik.enable=true
@@ -102,6 +113,11 @@ services:
       - TOTAL_POSTS=${TOTAL_POSTS}
       - CMD_SCRAPY_START_QUEUE=${CMD_SCRAPY_START_QUEUE}
       - CMD_SCRAPY_START_EXCHANGE=${CMD_SCRAPY_START_EXCHANGE}
+    healthcheck:
+      test: ["CMD", "celery", "-A", "main", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - ${NETWORK_APPLICATION:-application}
     deploy:
@@ -111,7 +127,8 @@ services:
         constraints:
           - node.hostname == swarm-manager
       restart_policy:
-        condition: on-failure
+        condition: any
+        delay: 5s
   beat-service:
     working_dir: /app/beat-service
     user: app
@@ -122,6 +139,17 @@ services:
       - CRON_MINUTE=${CRON_MINUTE}
       - RECOMENDER_QUEUE=${RECOMENDER_QUEUE}
       - SCRAPY_QUEUE=${SCRAPY_QUEUE}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/metrics')"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     networks:
       - ${NETWORK_APPLICATION:-application}
     deploy:
@@ -131,4 +159,5 @@ services:
         constraints:
           - node.hostname == swarm-manager
       restart_policy:
-        condition: on-failure
+        condition: any
+        delay: 5s

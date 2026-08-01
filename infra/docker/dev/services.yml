@@ -120,6 +120,11 @@ services:
     volumes:
       - ./scrap-service:/app/scrap-service
       - ./rabbitmq:/app/rabbitmq
+    healthcheck:
+      test: ["CMD", "celery", "-A", "main", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
       - broker
     networks:
@@ -142,6 +147,17 @@ services:
     volumes:
       - ./beat-service:/app/beat-service
       - ./rabbitmq:/app/rabbitmq
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/metrics')"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - broker
       - scrap-service

@@ -37,8 +37,16 @@ services:
         constraints:
           - node.hostname == swarm-manager
       restart_policy:
-        condition: on-failure
+        condition: any
+        delay: 5s
     healthcheck:
-      disable: true
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:4445/health/ready"
+        ]
     depends_on:
       - db

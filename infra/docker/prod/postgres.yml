@@ -14,6 +14,11 @@ services:
       - postgres_password
     networks:
       - ${NETWORK_APPLICATION:-application}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       mode: replicated
       replicas: 1
@@ -22,6 +27,8 @@ services:
           - node.hostname == swarm-worker-0
       restart_policy:
         condition: on-failure
+        delay: 10s
+        max_attempts: 5
   flyway:
     environment:
      POSTGRES_USER: ${POSTGRES_USER}

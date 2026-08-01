@@ -9,6 +9,8 @@ services:
     configs:
       - source: redis_config
         target: /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
     deploy:
       mode: replicated
       replicas: 1
@@ -16,4 +18,5 @@ services:
         constraints:
           - node.hostname == swarm-worker-0
       restart_policy:
-        condition: on-failure
+        condition: any
+        delay: 5s

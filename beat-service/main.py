@@ -1,8 +1,15 @@
 from celery import Celery
+from celery.signals import beat_init
 import os
 from celery.schedules import crontab
 from datetime import timedelta
 from rabbitmq.celeryconfig import queues, routes
+from metrics.metrics import RAM_USAGE
+from prometheus_client import start_http_server
+import psutil
+import threading
+import time
+
 
 cron_hour = int(os.getenv("CRON_HOUR", "2"))
 cron_minute = int(os.getenv("CRON_MINUTE", "30"))
@@ -26,3 +33,17 @@ app.conf.update(
     },
     timezone='UTC',
 )
+
+def start_metrics_server():
+    port = int(os.getenv("PORT", 8000))
+    start_http_server(port)
+    while True:
+        RAM_USAGE.set(psutil.virtual_memory().percent)
+        time.sleep(5)
+
+@beat_init.connect
+def on_worker_ready(**kwargs):
+    threading.Thread(
+        target=start_metrics_server,
+        daemon=True
+    ).start()

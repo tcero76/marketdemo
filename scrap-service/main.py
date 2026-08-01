@@ -28,6 +28,13 @@ def start_metrics_server():
         RAM_USAGE.set(psutil.virtual_memory().percent)
         time.sleep(5)
 
+@worker_ready.connect
+def on_worker_ready(**kwargs):
+    threading.Thread(
+        target=start_metrics_server,
+        daemon=True
+    ).start()
+
 @app.task
 def run_dummy(id_job):
     print(f"Inicia run_dummy")
@@ -52,10 +59,3 @@ def run_modelo_spider():
         run_dummy.s(id_job).set(queue=SCRAPY_QUEUE),
         ejecutar_funcion_items_postgres.s().set(queue=SCRAPY_QUEUE)
     ).apply_async()
-
-@worker_ready.connect
-def on_worker_ready(**kwargs):
-    threading.Thread(
-        target=start_metrics_server,
-        daemon=True
-    ).start()
