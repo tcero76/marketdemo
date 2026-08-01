@@ -30,6 +30,8 @@ configs:
     external: true
   loki_config:
     external: true
+  rabbitmq_init:
+    external: true
 secrets:
   hydra_secret:
     external: true

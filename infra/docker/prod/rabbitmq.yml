@@ -26,8 +26,12 @@ services:
       timeout: 10s
       retries: 5
   rabbitmq-init:
-    image: tcero76/demo/rabbitmq-init:${TAG}
+    image: rabbitmq:${RABBITMQ_VERSION}
     entrypoint: [ "sh", "/init_rabbitmq.sh" ]
+    configs:
+      - source: rabbitmq_init
+        target: /init_rabbitmq.sh
+        mode: 0755
     environment:
       HOST: broker
       PORT: 15672

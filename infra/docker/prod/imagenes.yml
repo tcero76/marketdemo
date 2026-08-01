@@ -31,11 +31,6 @@ services:
       dockerfile: beat-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
-  rabbitmq-init:
-    image: tcero76/demo/rabbitmq-init:${TAG}
-    build:
-      dockerfile: Dockerfile
-      context: infra/docker/config/rabbitmq/
   flyway:
     image: tcero76/demo/flyway:85cd3dfe9696a6294958af26d0d82578e726341b
     build:
