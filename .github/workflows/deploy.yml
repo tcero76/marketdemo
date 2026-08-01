@@ -316,8 +316,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ vars.MANAGER_IP }} \
             "mkdir -p /root/flyway/sql"
-          scp -o StrictHostKeyChecking=no \
-            flyway/sql/*.sql \
+          scp -o StrictHostKeyChecking=no -r \
+            flyway/sql/migration \
+            flyway/sql/seed \
             root@${{ vars.MANAGER_IP }}:/root/flyway/sql/
 
       - name: excecute deploy
