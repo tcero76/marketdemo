@@ -31,9 +31,3 @@ services:
       dockerfile: beat-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
-  flyway:
-    image: flyway/flyway:latest-alpine
-    build:
-      dockerfile: deploy/Dockerfile
-      context: flyway/
-      target: ${PROFILE}

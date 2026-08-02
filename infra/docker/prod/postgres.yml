@@ -30,6 +30,7 @@ services:
         delay: 10s
         max_attempts: 5
   flyway:
+    image: flyway/flyway:latest-alpine
     entrypoint: ["/entrypoint.sh"]
     command:
       - flyway
