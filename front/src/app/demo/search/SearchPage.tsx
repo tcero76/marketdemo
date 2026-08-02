@@ -25,7 +25,7 @@ export default function SearchPage() {
       (_, index) => {
         const start = index * 3;
         return {
-          row: data.map(d => parseInt(d.idItem)).slice(start, start + 3),
+          row: data.map(d => d.id).slice(start, start + 3),
           key: start,
         };
       }

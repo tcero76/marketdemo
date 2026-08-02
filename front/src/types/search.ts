@@ -10,5 +10,6 @@ export type SearchProps = {
 
 export type SearchPosts = {
     idItem: string
+    id: number
     score: number
   }
