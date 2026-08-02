@@ -110,7 +110,7 @@ services:
     profiles:
       - monitoring
     command:
-      - -config.file=/etc/loki/local-config.yaml
+      - -config.file=/etc/loki/loki-config.yaml
     volumes:
       - ./infra/docker/config/loki:/etc/loki
       - ${LOKI_VOLUME}:/loki
