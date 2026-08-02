@@ -10,10 +10,8 @@ import psutil
 import threading
 import time
 
-
 cron_hour = int(os.getenv("CRON_HOUR", "2"))
 cron_minute = int(os.getenv("CRON_MINUTE", "30"))
-metrics_started = False
 
 app = Celery('marketdemo')
 app.conf.update(
@@ -36,10 +34,6 @@ app.conf.update(
 )
 
 def start_metrics_server():
-    global metrics_started
-    if metrics_started:
-        return
-    metrics_started = True
     port = int(os.getenv("PORT", 8000))
     start_http_server(port)
     while True:
