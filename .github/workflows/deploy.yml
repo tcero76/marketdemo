@@ -59,35 +59,30 @@ jobs:
         include:
           - service: front
             tag: push-front
-            dir: front
             pattern: front
             image: tcero76/demo-front
             prefix: FRONT
 
           - service: bff-service
             tag: push-bff
-            dir: bff-service
             pattern: (bff-service|postgres|redis|rabbitmq|config)
             image: tcero76/demo-bff-service
             prefix: BFF
 
           - service: scrap-service
             tag: push-scrap
-            dir: scrap-service
             pattern: (scrap-service|rabbitmq)
             image: tcero76/demo-scrap-service
             prefix: SCRAP
 
           - service: flyway
             tag: push-flyway
-            dir: flyway
             pattern: flyway
             image: tcero76/demo-flyway
             prefix: FLYWAY
 
           - service: beat-service
             tag: push-beat
-            dir: beat-service
             pattern: (beat-service|rabbitmq)
             image: tcero76/demo-beat-service
             prefix: BEAT
