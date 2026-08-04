@@ -13,3 +13,4 @@ func HealthCheckHandler(log *logConfig.LoggerLogstash) echo.HandlerFunc {
 		})
 	}
 }
+	
