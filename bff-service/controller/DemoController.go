@@ -76,8 +76,14 @@ func (h *ProductController) GetSearchProduct() echo.HandlerFunc {
 func (h *ProductController) GetRecomendationsProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Fetching recommendations for user")
-		user := c.Get("user").(jwt.MapClaims)
-		userId := user["sub"].(string)
+		user, ok := c.Get("user").(jwt.MapClaims)
+		if !ok {
+			return echo.NewHTTPError(http.StatusUnauthorized)
+		}
+		userId, ok := user["sub"].(string)
+		if !ok {
+			return echo.NewHTTPError(http.StatusUnauthorized)
+		}
 		h.log.Debug("User ID: ", userId)
 		items := h.productService.GetRecomendationsProduct(c.Request().Context(), userId)
 		return c.JSON(http.StatusOK, items)
@@ -110,8 +116,14 @@ func (h *ProductController) CreatePosteoDemo() echo.HandlerFunc {
 			})
 		}
 		h.log.Debug("Posteo recibido: ", posteo)
-		claims := c.Get("user").(jwt.MapClaims)
-		sub := claims["sub"].(string)
+		claims, ok := c.Get("user").(jwt.MapClaims)
+		if !ok {
+			return echo.NewHTTPError(http.StatusUnauthorized, "missing user claims")
+		}
+		sub, ok := claims["sub"].(string)
+		if !ok {
+			return echo.NewHTTPError(http.StatusUnauthorized, "missing subject claim")
+		}
 		h.log.Debug("Usuario: ", sub)
 		userId, err := uuid.Parse(sub)
 		if err != nil {
@@ -136,10 +148,20 @@ func (h *ProductController) CreatePosteoDemo() echo.HandlerFunc {
 func (h *ProductController) GetPosteosDemo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("GetPosteos Entrando")
-		h.log.Debug("Obteniendo posteos")
 		productId := c.QueryParams().Get("productId")
+		if productId == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"error": "productId requerido",
+			})
+		}
 		h.log.Debug("productId recibido: ", productId)
-		posteos := h.postsService.GetPosteos(productId)
+		posteos, err := h.postsService.GetPosteos(productId)
+		if err != nil {
+			h.log.Error("Error al obtener los posteos: ", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"error": "no se pudo obtener los posteos",
+			})
+		}
 		h.log.Debug("Posteos encontrados: ", posteos)
 		return c.JSON(http.StatusOK, posteos)
 	}

@@ -69,13 +69,13 @@ func (c *PostsService) CreatePosteo(posteoDTO *demo.PostDTO, userId string) erro
 	return result.Error
 }
 
-func (c *PostsService) GetPosteos(productId string) []demo.PostDTO {
+func (c *PostsService) GetPosteos(productId string) ([]demo.PostDTO, error) {
 	c.log.Info("GetPosteos Entrando al servicio modelo: ", productId)
 	posteos := []model.PostsDemo{}
 	err := c.dbRead.Where("product_id = ?", productId).Find(&posteos)
 	if err.Error != nil {
 		c.log.Error("Error al obtener los posteos: ", err.Error)
-		return []demo.PostDTO{}
+		return []demo.PostDTO{}, err.Error
 	}
-	return adapters.ToPostDTOS(posteos)
+	return adapters.ToPostDTOS(posteos), nil
 }

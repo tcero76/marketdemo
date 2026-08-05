@@ -33,6 +33,7 @@ func (h *ProductService) GetProduct(query string) (*demo.Product, error) {
 	}
 	return adapters.ToProductDTO(&product), nil
 }
+
 func (h *ProductService) GetProducts() ([]demo.Product, error) {
 	h.log.Infof("Fetching all products")
 	var products []model.Product
