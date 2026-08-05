@@ -34,3 +34,14 @@ USER appuser
 
 EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+FROM golang:1.25 AS test
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+CMD ["go", "test", "./..."]
