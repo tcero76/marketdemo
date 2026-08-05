@@ -1,0 +1,57 @@
+services:
+  bff-service:
+    working_dir: /app/bff-service
+    command: ["air"]
+    volumes:
+      - ./bff-service:/app/bff-service
+      - ./config:/app/config
+      - ./postgres:/app/postgres
+      - ./clickhouse:/app/clickhouse
+      - ./rabbitmq:/app/rabbitmq
+      - ./redis:/app/redis
+      - ./infra/volumes/uploads:/app/bff-service/uploads
+      - ./.vscode:/app/.vscode
+    profiles:
+      - bff
+    container_name: bff
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    stdin_open: true
+    tty: true
+    environment:
+      - DNS_WRITE=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT_WRITE}/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dmarketplace
+      - DNS_READ=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT_READ}/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dmarketplace
+      - PORT=3000
+      - PORT_EXTERNAL=${PORT_EXTERNAL}
+      - HOST_EXTERNAL=${HOST_EXTERNAL}
+      - REDIRECT_URL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}/bff/callback
+      - HYDRA_ADMIN_URL=http://hydra:4445
+      - HYDRA_PUBLIC_URL=http://hydra:4444
+      - GOOGLE_OAUTH2_CLIENT_SECRET=${GOOGLE_OAUTH2_CLIENT_SECRET}
+      - GOOGLE_OAUTH2_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - PROFILE=${PROFILE}
+      - REDIS_HOST=${REDIS_HOST}
+      - MONITOREO=${MONITOREO}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - UploadImages=/app/bff-service/uploads
+      - HOME_PAGE_PATH=${HOME_PAGE_PATH}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bff.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/bff`)
+      - traefik.http.middlewares.bff-strip.stripprefix.prefixes=/bff
+      - traefik.http.routers.bff.middlewares=bff-strip
+      - traefik.http.routers.bff.entrypoints=websecure
+      - traefik.http.routers.bff.tls=true
+      - traefik.http.services.bff.loadbalancer.server.port=3000
+      - traefik.http.routers.bff.priority=100
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - ${NETWORK_APPLICATION:-application}
