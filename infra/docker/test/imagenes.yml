@@ -1,0 +1,7 @@
+services:
+  bff-service:
+    image: tcero76/demo-bff-service:dev
+    build:
+      dockerfile: ./bff-service/deploy/Dockerfile
+      context: .
+      target: ${PROFILE}
