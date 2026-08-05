@@ -18,4 +18,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run unit tests
-        run: make test-unit
+        run: |
+          docker compose \
+            --env-file infra/test.env \
+            --project-directory ${PWD} \
+            --project-name marketplace \
+            run --rm --no-deps bff-service \
+            go test ./... -race
