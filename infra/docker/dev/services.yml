@@ -58,7 +58,6 @@ services:
     depends_on:
       - db
       - cache
-      - broker
   front:
     container_name: front
     profiles:
