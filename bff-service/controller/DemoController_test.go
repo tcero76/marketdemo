@@ -10,6 +10,7 @@ import (
 	"strings"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"io"
 
 	"github.com/labstack/echo/v4"
 	logConfig "github.com/tcero76/marketplace/config/log"
@@ -45,11 +46,43 @@ func (m *mockProductService) GetCategories() ([]string, error) {
 	return m.GetCategoriesFunc()
 }
 
-func TestGetProduct_Error(t *testing.T) {
+func newTestContext(
+	method string,
+	url string,
+	body io.Reader,
+) (echo.Context, *httptest.ResponseRecorder) {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/product?product=tv", nil)
+	req := httptest.NewRequest(
+		method,
+		url,
+		body,
+	)
 	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	return e.NewContext(req, rec), rec
+}
+
+func newTestBodyContext(
+	method string,
+	url string,
+	body io.Reader,
+) (echo.Context, *httptest.ResponseRecorder) {
+	e := echo.New()
+	req := httptest.NewRequest(
+		method,
+		url,
+		body,
+	)
+	rec := httptest.NewRecorder()
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	return e.NewContext(req, rec), rec
+}
+
+func TestGetProduct_Error(t *testing.T) {
+	c, rec := newTestContext(
+		http.MethodGet,
+		"/product?product=tv",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetProductFunc: func(string) (*demo.Product, error) {
 			return nil, errors.New("db error")
@@ -74,10 +107,11 @@ func TestGetProduct_Error(t *testing.T) {
 }
 
 func TestGetProduct_OK(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/product?product=tv", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	c, rec := newTestContext(
+		http.MethodGet,
+		"/product?product=tv",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetProductFunc: func(q string) (*demo.Product, error) {
 			if q != "tv" {
@@ -112,10 +146,11 @@ func TestGetProduct_OK(t *testing.T) {
 }
 
 func TestGetProduct_MissingQuery(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/product", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	c, rec := newTestContext(
+		http.MethodGet,
+		"/product",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetProductFunc: func(string) (*demo.Product, error) {
 			t.Fatal("GetProduct should not have been called")
@@ -142,12 +177,11 @@ func TestGetProduct_MissingQuery(t *testing.T) {
 }
 
 func TestGetProducts_OK(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/products", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
+	c, rec := newTestContext(
+		http.MethodGet,
+		"/products",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetProductsFunc: func() ([]demo.Product, error) {
 			return []demo.Product{
@@ -156,48 +190,40 @@ func TestGetProducts_OK(t *testing.T) {
 			}, nil
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetProducts()(c)
-
 	if err != nil {
 		t.Fatalf("handler returned error: %v", err)
 	}
-
 	if rec.Code != http.StatusOK {
 		t.Fatalf("expected %d, got %d", http.StatusOK, rec.Code)
 	}
-
 	var products []demo.Product
-
 	err = json.Unmarshal(rec.Body.Bytes(), &products)
 	if err != nil {
 		t.Fatalf("invalid json: %v", err)
 	}
-
 	if len(products) != 2 {
 		t.Fatalf("expected 2 products, got %d", len(products))
 	}
-
 	if products[0].Description != "Televisor" {
 		t.Fatalf("expected first product %q, got %q", "Televisor", products[0].Description)
 	}
-
 	if products[1].Description != "Notebook" {
 		t.Fatalf("expected second product %q, got %q", "Notebook", products[1].Description)
 	}
 }
 
 func TestGetProducts_Error(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/products", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	c, rec := newTestContext(
+		http.MethodGet,
+		"/products",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetProductsFunc: func() ([]demo.Product, error) {
 			return nil, errors.New("db error")
@@ -227,54 +253,35 @@ func TestGetProducts_Error(t *testing.T) {
 }
 
 func TestGetSearchProduct_BadRequest(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(
-		http.MethodPost,
+	c, rec := newTestContext(
+		http.MethodGet,
 		"/products/search",
 		strings.NewReader("{"),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
 	mockSvc := &mockProductService{}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetSearchProduct()(c)
-
 	if err != nil {
 		t.Fatalf("handler returned error: %v", err)
 	}
-
 	if rec.Code != http.StatusBadRequest {
 		t.Fatalf("expected %d, got %d", http.StatusBadRequest, rec.Code)
 	}
 }
 
 func TestGetSearchProduct_OK(t *testing.T) {
-	e := echo.New()
-
 	body := `{
 		"query":"tv"
 	}`
-
-	req := httptest.NewRequest(
+	c, rec := newTestBodyContext(
 		http.MethodPost,
 		"/products/search",
 		strings.NewReader(body),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
 	mockSvc := &mockProductService{
 		GetSearchProductFunc: func(req payload.SearchRequest) []demo.Product {
 			return []demo.Product{
@@ -284,37 +291,29 @@ func TestGetSearchProduct_OK(t *testing.T) {
 			}
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetSearchProduct()(c)
-
 	if err != nil {
 		t.Fatalf("handler returned error: %v", err)
 	}
-
 	if rec.Code != http.StatusOK {
 		t.Fatalf("expected %d, got %d", http.StatusOK, rec.Code)
 	}
 }
 
 func TestGetSearchProduct_RequestMapped(t *testing.T) {
-	e := echo.New()
 	body := `{
 		"text":["televisor"]
 	}`
-	req := httptest.NewRequest(
+	c, rec := newTestBodyContext(
 		http.MethodPost,
 		"/products/search",
 		strings.NewReader(body),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	var received payload.SearchRequest
 	mockSvc := &mockProductService{
 		GetSearchProductFunc: func(r payload.SearchRequest) []demo.Product {
@@ -340,136 +339,113 @@ func TestGetSearchProduct_RequestMapped(t *testing.T) {
 }
 
 func TestGetRecomendationsProduct_Unauthorized_NoUser(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/recommendations", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
+	c, _ := newTestContext(
+		http.MethodGet,
+		"/recommendations",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetRecomendationsProductFunc: func(ctx context.Context, userID string) []int {
 			t.Fatal("service should not be called")
 			return nil
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetRecomendationsProduct()(c)
-
 	if err == nil {
 		t.Fatal("expected an HTTP error")
 	}
-
 	httpErr, ok := err.(*echo.HTTPError)
 	if !ok {
 		t.Fatalf("expected *echo.HTTPError, got %T", err)
 	}
-
 	if httpErr.Code != http.StatusUnauthorized {
 		t.Fatalf("expected %d, got %d", http.StatusUnauthorized, httpErr.Code)
 	}
 }
 
 func TestGetRecomendationsProduct_Unauthorized_NoSub(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/recommendations", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
+	c, _ := newTestContext(
+		http.MethodGet,
+		"/recommendations",
+		nil,
+	)
 	c.Set("user", jwt.MapClaims{
 		"email": "test@test.cl",
 	})
-
 	mockSvc := &mockProductService{
 		GetRecomendationsProductFunc: func(ctx context.Context, userID string) []int {
 			t.Fatal("service should not be called")
 			return nil
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetRecomendationsProduct()(c)
-
 	if err == nil {
 		t.Fatal("expected an HTTP error")
 	}
-
 	httpErr, ok := err.(*echo.HTTPError)
 	if !ok {
 		t.Fatalf("expected *echo.HTTPError, got %T", err)
 	}
-
 	if httpErr.Code != http.StatusUnauthorized {
 		t.Fatalf("expected %d, got %d", http.StatusUnauthorized, httpErr.Code)
 	}
 }
 
 func TestGetCategories_OK(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/categories", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
+	c, rec := newTestContext(
+		http.MethodGet,
+		"/categories",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetCategoriesFunc: func() ([]string, error) {
 			return []string{"TV", "Computación", "Celulares"}, nil
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetCategories()(c)
-
 	if err != nil {
 		t.Fatalf("handler returned error: %v", err)
 	}
-
 	if rec.Code != http.StatusOK {
 		t.Fatalf("expected %d, got %d", http.StatusOK, rec.Code)
 	}
-
 	expected := `["TV","Computación","Celulares"]`
-
 	if strings.TrimSpace(rec.Body.String()) != expected {
 		t.Fatalf("expected %s, got %s", expected, rec.Body.String())
 	}
 }
 
 func TestGetCategories_Error(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/categories", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
+	c, rec := newTestContext(
+		http.MethodPost,
+		"/categories",
+		nil,
+	)
 	mockSvc := &mockProductService{
 		GetCategoriesFunc: func() ([]string, error) {
 			return nil, errors.New("database error")
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		mockSvc,
 		nil,
 	)
-
 	err := ctrl.GetCategories()(c)
 
 	if err != nil {
@@ -509,15 +485,11 @@ func (m *mockPostsService) GetPosteos(productId string) ([]demo.PostDTO, error){
 }
 
 func TestCreatePosteoDemo_BadRequest_InvalidJSON(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(
+	c, rec := newTestBodyContext(
 		http.MethodPost,
 		"/posteo",
 		strings.NewReader("{"),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	mockPosts := &mockPostsService{
 		CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
 			t.Fatal("service should not be called")
@@ -537,20 +509,17 @@ func TestCreatePosteoDemo_BadRequest_InvalidJSON(t *testing.T) {
 		t.Fatalf("expected %d, got %d", http.StatusBadRequest, rec.Code)
 	}
 }
+
 func TestCreatePosteoDemo_Unauthorized_NoUser(t *testing.T) {
-	e := echo.New()
 	body := `{
 		"title":"Mi post",
 		"description":"demo"
 	}`
-	req := httptest.NewRequest(
+	c, _ := newTestBodyContext(
 		http.MethodPost,
 		"/posteo",
 		strings.NewReader(body),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	mockPosts := &mockPostsService{
 		CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
 			t.Fatal("service should not be called")
@@ -573,15 +542,11 @@ func TestCreatePosteoDemo_Unauthorized_NoUser(t *testing.T) {
 }
 
 func TestCreatePosteoDemo_Unauthorized_NoSub(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(
+	c, _ := newTestBodyContext(
 		http.MethodPost,
 		"/posteo",
 		strings.NewReader(`{"title":"demo"}`),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	c.Set("user", jwt.MapClaims{
 		"email": "test@test.com",
 	})
@@ -607,15 +572,11 @@ func TestCreatePosteoDemo_Unauthorized_NoSub(t *testing.T) {
 }
 
 func TestCreatePosteoDemo_InvalidUUID(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(
+	c, rec := newTestBodyContext(
 		http.MethodPost,
 		"/posteo",
 		strings.NewReader(`{"title":"demo"}`),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	c.Set("user", jwt.MapClaims{
 		"sub": "no-es-un-uuid",
 	})
@@ -640,59 +601,41 @@ func TestCreatePosteoDemo_InvalidUUID(t *testing.T) {
 }
 
 func TestCreatePosteoDemo_CreateError(t *testing.T) {
-	e := echo.New()
-
-	userID := uuid.New().String()
-
-	req := httptest.NewRequest(
+	c, rec := newTestBodyContext(
 		http.MethodPost,
 		"/posteo",
 		strings.NewReader(`{"title":"demo"}`),
 	)
-
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
+	userID := uuid.New().String()
 	c.Set("user", jwt.MapClaims{
 		"sub": userID,
 	})
-
 	mockPosts := &mockPostsService{
 		CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
 			return errors.New("database error")
 		},
 	}
-
 	ctrl := NewProductController(
 		logConfig.NewLoggerLogstash("test"),
 		nil,
 		mockPosts,
 	)
-
 	err := ctrl.CreatePosteoDemo()(c)
-
 	if err != nil {
 		t.Fatalf("handler returned error: %v", err)
 	}
-
 	if rec.Code != http.StatusInternalServerError {
 		t.Fatalf("expected %d, got %d", http.StatusInternalServerError, rec.Code)
 	}
 }
 
 func TestCreatePosteoDemo_OK(t *testing.T) {
-	e := echo.New()
-	userID := uuid.New().String()
-	req := httptest.NewRequest(
+	c, rec := newTestBodyContext(
 		http.MethodPost,
 		"/posteo",
 		strings.NewReader(`{"title":"demo"}`),
 	)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	userID := uuid.New().String()
 	c.Set("user", jwt.MapClaims{
 		"sub": userID,
 	})
@@ -700,11 +643,9 @@ func TestCreatePosteoDemo_OK(t *testing.T) {
 	mockPosts := &mockPostsService{
 		CreatePosteoFunc: func(posteo *demo.PostDTO, id string) error {
 			called = true
-
 			if id != userID {
 				t.Fatalf("expected user %s, got %s", userID, id)
 			}
-
 			return nil
 		},
 	}
@@ -726,20 +667,16 @@ func TestCreatePosteoDemo_OK(t *testing.T) {
 }
 
 func TestGetPosteosDemo_OK(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(
+	c, rec := newTestContext(
 		http.MethodGet,
 		"/posteos?productId=123",
 		nil,
 	)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	mockPosts := &mockPostsService{
 		GetPosteosFunc: func(productId string) ([]demo.PostDTO, error) {
 			if productId != "123" {
 				t.Fatalf("expected productId 123, got %s", productId)
 			}
-
 			return []demo.PostDTO{
 				{},
 			}, nil
@@ -760,14 +697,11 @@ func TestGetPosteosDemo_OK(t *testing.T) {
 }
 
 func TestGetPosteosDemo_MissingProductID(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(
+	c, rec := newTestContext(
 		http.MethodGet,
 		"/posteos",
 		nil,
 	)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	mockPosts := &mockPostsService{
 		GetPosteosFunc: func(productId string) ([]demo.PostDTO, error) {
 			t.Fatal("service should not be called")
@@ -790,14 +724,11 @@ func TestGetPosteosDemo_MissingProductID(t *testing.T) {
 }
 
 func TestGetPosteosDemo_Error(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(
+	c, rec := newTestContext(
 		http.MethodGet,
 		"/posteos?productId=123",
 		nil,
 	)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	mockPosts := &mockPostsService{
 		GetPosteosFunc: func(productId string) ([]demo.PostDTO, error) {
 			return nil, errors.New("database error")
