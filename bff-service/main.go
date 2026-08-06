@@ -53,7 +53,6 @@ func main() {
 	googleAuth := cor.NewGoogleAuth(googleClient, userServices)
 	loginHandler, consentHandler, callbackHandler := oauth2.InitOauth2Handlers(authCacheService, userServices, internalAuth, googleAuth)
 
-
 	e.Use(config.RedisSessionMiddleware(authCacheService, log))
 	e.Use(config.LoggerMiddleware(log))
 

@@ -46,7 +46,13 @@ func RedisSessionMiddleware(authCacheService services.IAuthCacheService, log *lo
 				sessionData := &model.SessionData{}
 				sessionData.SessionID = sessionID
 				sessionData.IsAuthenticated = false
-				authCacheService.SaveSession(sessionID, *sessionData, c.Request().Context())
+				if err := authCacheService.SaveSession(sessionID, *sessionData, c.Request().Context()); err != nil {
+					log.Error("Error saving session: ", err)
+					return c.JSON(http.StatusInternalServerError,map[string]string{
+						"error": "unable to create session",
+					})
+				}
+				val = sessionData
 			}
 			c.Set("session_data", val)
 			return next(c)
