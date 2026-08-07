@@ -2,13 +2,11 @@ import { Highlighter, HighlightResult, MetaRaw } from "@/types";
 
 function getTextValue(value: unknown): string {
   if (typeof value === "string") return value;
-
   if (typeof value === "object" && value !== null) {
     if ("nombre" in value && typeof value.nombre === "string") {
       return value.nombre;
     }
   }
-
   return "";
 }
 
@@ -18,7 +16,7 @@ const cleanTexto = (texto: string, metaRaw: MetaRaw) => {
         arr?.forEach(value => {
         const text = getTextValue(value);
         if (!text) return;
-        result = result.replace(text, '');
+        result = result.replaceAll(text, '');
         });
     });
     const resp = result.trim().replace(/\s+/g, ' ');
