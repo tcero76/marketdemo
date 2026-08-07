@@ -16,7 +16,7 @@ ACCESS_TOKEN = $(shell \
 	| jq -r '.access_token' | tr -d '\n' \
 )
 
-.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token
+.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput
 
 up:
 	@docker compose \
@@ -132,3 +132,25 @@ dumpHydra:
 
 psql:
 	@psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p 5432
+
+test-unit:
+	@$(MAKE) test ENVIRONMENTS=/home/leonardo/.environments/test.env
+
+test:
+	@docker compose \
+		--env-file ${ENVIRONMENTS} \
+		--project-directory ${PWD} \
+		--project-name marketplace \
+		run --rm  --no-deps bff-service \
+		go test ./controller -race
+
+test-integration:
+	@$(MAKE) test2 ENVIRONMENTS=/home/leonardo/.environments/test.env
+
+test2:
+	@docker compose \
+		--env-file ${ENVIRONMENTS} \
+		--project-directory ${PWD} \
+		--project-name marketplace \
+		run --rm  --no-deps bff-service \
+		go test -run TestGetProducts ./integration
