@@ -36,7 +36,7 @@ func (h *ProductController) GetProduct() echo.HandlerFunc {
 		product, err := h.productService.GetProduct(query)
 		if err != nil {
 			h.log.Error("Error in GetProduct: ", err)
-			return c.String(http.StatusInternalServerError, "Error fetching product: "+err.Error())
+			return c.String(http.StatusNotFound, "Error fetching product: "+err.Error())
 		}
 		h.log.Debug("Product found: ", product)
 		return c.JSON(http.StatusOK, product)

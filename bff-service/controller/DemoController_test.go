@@ -2,28 +2,29 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-	"encoding/json"
 	"strings"
+	"testing"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"io"
 
 	"github.com/labstack/echo/v4"
-	logConfig "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
+	logConfig "github.com/tcero76/marketplace/config/log"
 )
 
 type mockProductService struct {
-	GetProductFunc                func(string) (*demo.Product, error)
-	GetProductsFunc               func() ([]demo.Product, error)
-	GetSearchProductFunc          func(payload.SearchRequest) []demo.Product
-	GetRecomendationsProductFunc  func(context.Context, string) []int
-	GetCategoriesFunc             func() ([]string, error)
+	GetProductFunc               func(string) (*demo.Product, error)
+	GetProductsFunc              func() ([]demo.Product, error)
+	GetSearchProductFunc         func(payload.SearchRequest) []demo.Product
+	GetRecomendationsProductFunc func(context.Context, string) []int
+	GetCategoriesFunc            func() ([]string, error)
 }
 
 func (m *mockProductService) GetProduct(q string) (*demo.Product, error) {
@@ -97,8 +98,8 @@ func TestGetProduct_Error(t *testing.T) {
 	if err != nil {
 		t.Fatalf("handler returned error: %v", err)
 	}
-	if rec.Code != http.StatusInternalServerError {
-		t.Fatalf("expected %d, got %d", http.StatusInternalServerError, rec.Code)
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("expected %d, got %d", http.StatusNotFound, rec.Code)
 	}
 	expected := "Error fetching product: db error"
 	if rec.Body.String() != expected {
@@ -480,7 +481,7 @@ func (m *mockPostsService) CreatePosteo(posteo *demo.PostDTO, userId string) err
 	return m.CreatePosteoFunc(posteo, userId)
 }
 
-func (m *mockPostsService) GetPosteos(productId string) ([]demo.PostDTO, error){
+func (m *mockPostsService) GetPosteos(productId string) ([]demo.PostDTO, error) {
 	return m.GetPosteosFunc(productId)
 }
 

@@ -22,9 +22,9 @@ import (
 
 var hydraAdminClient *hydra.APIClient
 
-var ctx = context.Background() 
+var ctx = context.Background()
 
-func StartServer() {
+func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
 	e := echo.New()	
 
@@ -69,7 +69,7 @@ func StartServer() {
 	e.GET("/health", controller.HealthCheckHandler(log))
 
 	protegido := e.Group("/usuario")
-	protegido.Use(oauth2.JWTMiddleware())
+	protegido.Use(oauth2.JWTMiddleware(log, validator))
 
 	productController := controller.NewProductController(log, productService, postsService)
 
@@ -92,5 +92,6 @@ func StartServer() {
 	e.POST("/token", jwkController.TokenHandler())
 
 	e.GET("/embeded", controller.GetEmbeded(log))
+	log.Info("Servidor iniciado en el puerto: ", os.Getenv("PORT"))
 	return e
 }
