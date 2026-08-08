@@ -38,5 +38,6 @@ ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 FROM golang:1.25 AS test
 
 WORKDIR /app
+COPY --from=builder /app/bff-service .
 
 
