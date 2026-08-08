@@ -7,8 +7,6 @@ services:
     ports:
       - "4444:4444"
       - "4445:4445"
-    profiles:
-      - hydra
     entrypoint: ["hydra", "serve", "all"]
     environment:
       - DSN=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dhydra

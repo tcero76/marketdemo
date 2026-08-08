@@ -2,7 +2,6 @@ services:
   db:
     image: timescale/timescaledb:${TIMESCALEDB_VERSION}
     container_name: db
-    profiles: ["postgres"]
     command: >
       postgres
       -c shared_preload_libraries=timescaledb,pg_stat_statements

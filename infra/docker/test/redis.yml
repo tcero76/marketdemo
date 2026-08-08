@@ -2,8 +2,6 @@ services:
   cache:
     image: redis:${REDIS_VERSION}
     container_name: cache
-    profiles:
-      - cache
     ports:
       - 6379:6379
     volumes:

@@ -2,8 +2,6 @@ services:
   broker:
     image: rabbitmq:${RABBITMQ_VERSION}
     container_name: broker
-    profiles:
-      - broker
     tty: true
     stdin_open: true
     # volumes:

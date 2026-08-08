@@ -11,8 +11,6 @@ services:
       - ./redis:/app/redis
       - ./infra/volumes/uploads:/app/bff-service/uploads
       - ./.vscode:/app/.vscode
-    profiles:
-      - bff
     container_name: bff
     cap_add:
       - SYS_PTRACE
@@ -60,8 +58,6 @@ services:
       - cache
   front:
     container_name: front
-    profiles:
-      - front
     working_dir: /app
     command: ["npm", "run", "dev"]
     tty: true
