@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/server"
+	"github.com/tcero76/marketplace/postgres/model"
 )
 
 type FakeValidator struct{}
@@ -113,7 +114,7 @@ func TestGetCategories_Ok(t *testing.T) {
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 	require.Equal(t, http.StatusOK, rec.Code)
-	var categories []demo.Category
+	var categories []model.Category
 	json.Unmarshal(rec.Body.Bytes(), &categories)
 	require.Len(t, categories, 4)
 }

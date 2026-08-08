@@ -43,7 +43,7 @@ jobs:
             --project-directory ${PWD} \
             --project-name marketplace \
             up bff-service -d
-      - name: Run unit tests
+      - name: Run integration tests
         run: |
           docker compose \
             --env-file infra/test.env \
