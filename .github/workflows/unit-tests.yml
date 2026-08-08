@@ -35,8 +35,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Start test environment
+      - name: mkdir volumes
+        run: |
+          mkdir -p infra/volumes/clickhouse
+          mkdir -p infra/volumes/timescaleDB
+          mkdir -p infra/volumes/rabbitmq
+          mkdir -p infra/volumes/redis
+          mkdir -p infra/volumes/grafana
+          mkdir -p infra/volumes/prometheus
+          mkdir -p infra/volumes/mediamtx
+          mkdir -p infra/volumes/loki
+      - name: Set up test environment
         run: |
           docker compose \
             --env-file infra/test.env \
