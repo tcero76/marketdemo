@@ -1,7 +1,7 @@
 services:
   bff-service:
     working_dir: /app/bff-service
-    command: ["air"]
+    command: ["/app/main"]
     volumes:
       - ./bff-service:/app/bff-service
       - ./config:/app/config
