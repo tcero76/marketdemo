@@ -42,7 +42,7 @@ jobs:
             --env-file infra/test.env \
             --project-directory ${PWD} \
             --project-name marketplace \
-            up bff-service -d
+            up -d
       - name: Run integration tests
         run: |
           docker compose \
@@ -51,7 +51,6 @@ jobs:
             --project-name marketplace \
             run --rm --no-deps bff-service \
             go test ./integration -race
-
       - name: Run frontend component tests
         run: |
           docker compose \
