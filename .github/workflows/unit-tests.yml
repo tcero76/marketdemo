@@ -28,13 +28,10 @@ jobs:
             --project-name marketplace \
             run --rm --no-deps bff-service \
             go test ./controller ./config/ -race
-      
-          
 
   component-tests:
     name: Component Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,7 +42,7 @@ jobs:
             --env-file infra/test.env \
             --project-directory ${PWD} \
             --project-name marketplace \
-            up -d
+            up bff-service -d
       - name: Run unit tests
         run: |
           docker compose \
