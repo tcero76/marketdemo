@@ -41,6 +41,13 @@ jobs:
       - name: Set up test environment
         run: |
           docker compose \
+            -f infra/docker/test/imagenes.yml \
+            -f infra/docker/test/services.yml \
+            -f infra/docker/test/common.yml \
+            -f infra/docker/test/test.yml \
+            -f infra/docker/test/hydra.yml \
+            -f infra/docker/test/redis.yml \
+            -f infra/docker/test/postgres.yml \
             --env-file infra/test.env \
             --project-directory ${PWD} \
             --project-name marketplace \
@@ -51,6 +58,13 @@ jobs:
           echo "COMPOSE_FILE=${COMPOSE_FILE}"
 
           docker compose \
+            -f infra/docker/test/imagenes.yml \
+            -f infra/docker/test/services.yml \
+            -f infra/docker/test/common.yml \
+            -f infra/docker/test/test.yml \
+            -f infra/docker/test/hydra.yml \
+            -f infra/docker/test/redis.yml \
+            -f infra/docker/test/postgres.yml \
             --env-file infra/test.env \
             --project-directory "${PWD}" \
             --project-name marketplace \
@@ -60,6 +74,13 @@ jobs:
       - name: Run integration tests
         run: |
           docker compose \
+            -f infra/docker/test/imagenes.yml \
+            -f infra/docker/test/services.yml \
+            -f infra/docker/test/common.yml \
+            -f infra/docker/test/test.yml \
+            -f infra/docker/test/hydra.yml \
+            -f infra/docker/test/redis.yml \
+            -f infra/docker/test/postgres.yml \
             --env-file infra/test.env \
             --project-directory ${PWD} \
             --project-name marketplace \
