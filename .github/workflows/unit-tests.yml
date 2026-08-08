@@ -54,23 +54,15 @@ jobs:
             up bff-service db cache hydra front -d
       - name: Debug compose
         run: |
-          echo "PWD=${PWD}"
-          echo "COMPOSE_FILE=${COMPOSE_FILE}"
-
-          docker compose \
-            -f infra/docker/test/imagenes.yml \
-            -f infra/docker/test/services.yml \
-            -f infra/docker/test/common.yml \
-            -f infra/docker/test/test.yml \
-            -f infra/docker/test/hydra.yml \
-            -f infra/docker/test/redis.yml \
-            -f infra/docker/test/postgres.yml \
-            --env-file infra/test.env \
-            --project-directory "${PWD}" \
-            --project-name marketplace \
-            config --services
-          echo "=== test.env ==="
-          cat infra/test.env
+          docker run --env-file ${ENVIRONMENTS} --network ${NETWORK_APPLICATION} --rm -v ./flyway/sql:/flyway/sql flyway/flyway:latest-alpine \
+            -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
+            -user=${POSTGRES_USER} \
+            -password=${POSTGRES_PASSWORD} \
+            -schemas=marketplace,scrap,hydra,marketplacedemo,chat,extension \
+            -cleanDisabled=false \
+            -locations=filesystem:/flyway/sql/migration,filesystem:/flyway/sql/seed \
+            -placeholders.URL_EXTERNAL=${URL_EXTERNAL} \
+            migrate
       - name: Run integration tests
         run: |
           docker compose \
