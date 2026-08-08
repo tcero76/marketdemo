@@ -45,3 +45,9 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 USER node
 EXPOSE 3000
 CMD npm run start
+
+
+FROM base AS test
+RUN npm ci
+COPY . .
+CMD ["npm", "run", "test", "--", "--run"]
