@@ -37,14 +37,7 @@ jobs:
         uses: actions/checkout@v4
       - name: mkdir volumes
         run: |
-          mkdir -p infra/volumes/clickhouse
-          mkdir -p infra/volumes/timescaleDB
-          mkdir -p infra/volumes/rabbitmq
-          mkdir -p infra/volumes/redis
-          mkdir -p infra/volumes/grafana
-          mkdir -p infra/volumes/prometheus
-          mkdir -p infra/volumes/mediamtx
-          mkdir -p infra/volumes/loki
+          mkdir -p infra/volumes/{timescaleDB/data,rabbitmq/data,redis/data,grafana/data,prometheus/data,}
       - name: Set up test environment
         run: |
           docker compose \
