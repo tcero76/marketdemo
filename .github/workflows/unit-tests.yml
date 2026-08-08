@@ -45,6 +45,13 @@ jobs:
             --project-directory ${PWD} \
             --project-name marketplace \
             up bff-service db cache hydra front -d
+      - name: docker compose config --services
+        run: |
+          docker compose \
+          --env-file infra/test.env \
+          --project-directory "${PWD}" \
+          --project-name marketplace \
+          config --services
       - name: Run integration tests
         run: |
           docker compose \
