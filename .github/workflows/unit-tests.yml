@@ -1,5 +1,4 @@
-name: Unit Tests
-
+name: test-unit
 on:
   push:
     branches:
@@ -7,12 +6,16 @@ on:
   pull_request:
     branches:
       - '**'
-
+  workflow_dispatch:
+    inputs:
+      run_job:
+        description: "test-unit"
+        required: true
+        default: "all"
 jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,4 +27,48 @@ jobs:
             --project-directory ${PWD} \
             --project-name marketplace \
             run --rm --no-deps bff-service \
-            go test ./... -race
+            go test ./controller ./config/ -race
+      
+          
+
+  component-tests:
+    name: Component Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Start test environment
+        run: |
+          docker compose \
+            --env-file infra/test.env \
+            --project-directory ${PWD} \
+            --project-name marketplace \
+            up -d
+      - name: Run unit tests
+        run: |
+          docker compose \
+            --env-file infra/test.env \
+            --project-directory ${PWD} \
+            --project-name marketplace \
+            run --rm --no-deps bff-service \
+            go test ./integration -race
+
+      - name: Run frontend component tests
+        run: |
+          docker compose \
+            --env-file infra/test.env \
+            --project-directory ${PWD} \
+            --project-name marketplace \
+            run --rm --no-deps front \
+            npm run test -- --run
+
+      - name: Stop test environment
+        if: always()
+        run: |
+          docker compose \
+            --env-file infra/test.env \
+            --project-directory ${PWD} \
+            --project-name marketplace \
+            down -v
