@@ -32,6 +32,8 @@ jobs:
   component-tests:
     name: Component Tests
     runs-on: ubuntu-latest
+    env:
+      ENVIRONMENTS: infra/test.env
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,6 +56,9 @@ jobs:
             up bff-service db cache hydra front -d
       - name: Debug compose
         run: |
+          set -a
+          source "${ENVIRONMENTS}"
+          set +a
           docker run --env-file ${ENVIRONMENTS} --network ${NETWORK_APPLICATION} --rm -v ./flyway/sql:/flyway/sql flyway/flyway:latest-alpine \
             -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
             -user=${POSTGRES_USER} \
