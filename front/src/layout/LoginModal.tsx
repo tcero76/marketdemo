@@ -82,6 +82,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
                 <Input id="password"
                   type="password"
                   value={password}
+                  placeholder="password"
                   name="password"
                   onChange={(ev) => setPassword(ev.target.value)}
                   required />
