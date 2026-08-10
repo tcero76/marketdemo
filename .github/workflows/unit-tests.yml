@@ -42,6 +42,9 @@ jobs:
           mkdir -p /home/runner/work/marketplace/marketplace/infra/volumes/{timescaleDB/data,rabbitmq/data,redis/data,grafana/data,prometheus/data}
       - name: Set up test environment
         run: |
+          set -a
+          source "${ENVIRONMENTS}"
+          set +a
           docker compose \
             -f infra/docker/test/imagenes.yml \
             -f infra/docker/test/services.yml \
@@ -50,7 +53,7 @@ jobs:
             -f infra/docker/test/hydra.yml \
             -f infra/docker/test/redis.yml \
             -f infra/docker/test/postgres.yml \
-            --env-file infra/test.env \
+            --env-file ${ENVIRONMENTS} \
             --project-directory ${PWD} \
             --project-name marketplace \
             up bff-service db cache hydra front -d
@@ -89,7 +92,7 @@ jobs:
           source "${ENVIRONMENTS}"
           set +a
           docker compose \
-            --env-file infra/test.env \
+            --env-file ${ENVIRONMENTS} \
             --project-directory ${PWD} \
             --project-name marketplace \
             run --rm --no-deps front \
@@ -97,8 +100,11 @@ jobs:
       - name: Stop test environment
         if: always()
         run: |
+          set -a
+          source "${ENVIRONMENTS}"
+          set +a
           docker compose \
-            --env-file infra/test.env \
+            --env-file ${ENVIRONMENTS} \
             --project-directory ${PWD} \
             --project-name marketplace \
             down -v
