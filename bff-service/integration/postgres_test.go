@@ -106,7 +106,8 @@ func TestGetSearchProduct_NotFound(t *testing.T) {
 func TestGetCategories_Ok(t *testing.T) {
 	validator := &FakeValidator{}
 	e := server.StartServer(validator)
-	req := httptest.NewRequest(http.MethodPost,
+	req := httptest.NewRequest(
+		http.MethodGet,
 		"/usuario/getCategories",
 		nil)
 	req.Header.Set("Authorization", "Bearer cualquier-cosa")
