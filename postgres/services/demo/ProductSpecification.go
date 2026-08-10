@@ -3,7 +3,6 @@ package demo
 import (
 	"strings"
 
-	"github.com/lib/pq"
 	logger "github.com/tcero76/marketplace/config/log"
 	"gorm.io/gorm"
 )
@@ -39,19 +38,11 @@ type CategorySpecProduct struct {
 }
 
 func (s CategorySpecProduct) Apply(db *gorm.DB) *gorm.DB {
-	if len(s.CategoryIDs) == 0 {
-		return db
-	}
-	query := `
-	EXISTS (
-		SELECT 1
-		FROM marketplace.ts_servicios tss
-		WHERE tss.ts_id = marketplace.ts.id
-		  AND tss.servicio_id = ANY(?)
-	`
-	args := []interface{}{pq.Array(s.CategoryIDs)}
-	query += ")"
-	return db.Where(query, args...)
+    if len(s.CategoryIDs) == 0 {
+        return db
+    }
+    s.Log.Info("Filtering products by categories: ", s.CategoryIDs)
+    return db.Where("categoryid IN ?", s.CategoryIDs)
 }
 
 type Specification interface {

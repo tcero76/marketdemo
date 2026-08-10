@@ -2,7 +2,6 @@ package demo
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
@@ -48,19 +47,22 @@ func (h *ProductService) GetProducts() ([]demo.Product, error) {
 func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) []demo.Product {
 	h.log.Debug("Searching products with request: ", searchRequest)
 	var productIDs []int
+	var categoryIDs []int
 	if searchRequest.Hashtag != "" {
 		h.log.Debug("Searching by hashtag: %s", searchRequest.Hashtag)
-		if id, err := strconv.Atoi(searchRequest.Hashtag); err == nil {
-			productIDs = []int{id}
-		} else {
-			h.log.Warn("Invalid hashtag (not a number): %s", searchRequest.Hashtag)
+		idCategory, err := getCategoryIdByName(searchRequest.Hashtag, h.dbRead)
+		categoryIDs =[]int{int(idCategory)}
+		if err != nil {
+			h.log.Error("No encontró la categoria", err.Error())
 		}
 	} else {
 		h.log.Debug("No hashtag provided, returning empty search results")
 	}
 	h.log.Debug("Search product IDs: %v", productIDs)
+	h.log.Debug("Search category IDs: %v", categoryIDs)
 	specs := []Specification{
 		TextSpecProduct{Words: searchRequest.Text, Log: h.log},
+		CategorySpecProduct{CategoryIDs: categoryIDs, Log: h.log},
 	}
 	var products []model.Product
 	err := ApplySpecifications(h.dbRead.Model(&model.Product{}), specs...).Find(&products).Error
@@ -99,4 +101,15 @@ func (h *ProductService) GetCategories() ([]string, error) {
 	}
 	h.log.Debug("Categories found: ", categories)
 	return categories, nil
+}
+
+func getCategoryIdByName(name string, db  *gorm.DB) (uint, error) {
+    var category model.Category
+    err := db.
+        Where("name = ?", name).
+        First(&category).Error
+    if err != nil {
+        return 0, err
+    }
+    return category.ID, nil
 }

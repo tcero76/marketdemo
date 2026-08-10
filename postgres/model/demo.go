@@ -66,10 +66,3 @@ type PostsDemo struct {
 func (PostsDemo) TableName() string {
 	return "marketplacedemo.posts"
 }
-
-// func (p *PostsDemo) BeforeCreate(tx *gorm.DB) error {
-// 	if p.ID == uuid.Nil {
-// 		p.ID = uuid.New()
-// 	}
-// 	return nil
-// }
