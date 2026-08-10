@@ -173,10 +173,10 @@ Secrets:
 
 ### 🚧 En desarrollo
 
-- [ ] Testing unitario, integral, endtoend Playwright
-- [ ] Filter by Categories
+- [ ] Testing unitario, integral, end-to-end Playwright
 
 ### 📌 Planificado
 
 - [ ] Chat
+- [ ] Agregar Swagger
 
