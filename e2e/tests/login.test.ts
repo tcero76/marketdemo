@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('login test', async ({ page }) => {
-    await page.goto('https://sugarfever.ddns.net/demo');
+    await page.goto(`${process.env.URL_EXTERNAL}/demo`);
     await expect(
         page.getByText('Marketplace', { exact: true })
     ).toBeVisible();
