@@ -1,6 +1,9 @@
 package metrics
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+    "sync"
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 var (
 	HTTPDuration = prometheus.NewHistogramVec(
@@ -43,6 +46,7 @@ var (
 		},
 		[]string{"service"},
 	)
+    registerOnce sync.Once
 )
 
 func Register() {
