@@ -26,3 +26,4 @@ scrap-service/celerybeat-schedule
 terraform/.terraform.tfstate.lock.info
 **/.next/**
 **/test-results/**
+.vscode/**
