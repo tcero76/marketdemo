@@ -72,8 +72,6 @@ services:
       - NEXT_PUBLIC_HOME_PAGE_PATH=${HOME_PAGE_PATH}
     ports:
      - 3000:3000
-    volumes:
-      - ./front:/app
     healthcheck:
       test:
         [
