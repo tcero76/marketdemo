@@ -54,7 +54,7 @@ jobs:
             --project-directory ${PWD} \
             --project-name marketplace \
             up bff-service db cache hydra front -d
-      - name: Debug compose
+      - name: Run database migrations
         run: |
           set -a
           source "${ENVIRONMENTS}"
@@ -85,13 +85,15 @@ jobs:
             go test ./integration -race
       - name: Run frontend component tests
         run: |
+          set -a
+          source "${ENVIRONMENTS}"
+          set +a
           docker compose \
             --env-file infra/test.env \
             --project-directory ${PWD} \
             --project-name marketplace \
             run --rm --no-deps front \
             npm run test -- --run
-
       - name: Stop test environment
         if: always()
         run: |
