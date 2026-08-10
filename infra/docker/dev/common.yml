@@ -50,3 +50,5 @@ volumes:
       type: none
       device: ${MEDIAMTX_VOLUME}/data
       o: bind
+  go-mod-cache:
+  go-build-cache:
