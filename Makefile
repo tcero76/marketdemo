@@ -16,7 +16,7 @@ ACCESS_TOKEN = $(shell \
 	| jq -r '.access_token' | tr -d '\n' \
 )
 
-.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput
+.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput e2e
 
 up:
 	@docker compose \
@@ -144,9 +144,6 @@ test:
 		run --rm  --no-deps bff-service \
 		go test ./controller -race
 
-test-integration:
-	@$(MAKE) test2 ENVIRONMENTS=/home/leonardo/.environments/test.env
-
 test2:
 	@docker compose \
 		--env-file ${ENVIRONMENTS} \
@@ -154,3 +151,20 @@ test2:
 		--project-name marketplace \
 		run --rm  --no-deps bff-service \
 		go test -run TestGetProducts ./integration
+
+test-integration:
+	@$(MAKE) test2 ENVIRONMENTS=/home/leonardo/.environments/test.env
+
+test3:
+	@docker compose \
+		--env-file ${ENVIRONMENTS} \
+		--project-directory ${PWD} \
+		--project-name marketplace \
+		run --rm --no-deps front \
+		npm run test -- --run
+
+test-frontend:
+	@$(MAKE) test3 ENVIRONMENTS=/home/leonardo/.environments/test.env
+
+e2e:
+	@docker exec -it e2e npm run test -- --headed
