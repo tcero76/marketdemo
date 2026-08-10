@@ -28,3 +28,10 @@ services:
       dockerfile: beat-service/deploy/Dockerfile
       context: .
       target: ${PROFILE}
+  e2e:
+    image: tcero76/demo-e2e:dev
+    build:
+      dockerfile: deploy/Dockerfile
+      context: ./e2e
+      target: ${PROFILE}
+    command: tail -f /dev/null

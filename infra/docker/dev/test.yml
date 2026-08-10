@@ -1,13 +1,11 @@
 services:
-  bff-service:
-    volumes:
-      - go-mod-cache:/go/pkg/mod
-      - go-build-cache:/root/.cache/go-build
   e2e:
     container_name: e2e
     working_dir: /e2e
     extra_hosts:
       - "${HOST_EXTERNAL}:172.30.0.10"
+    environment:
+      - URL_EXTERNAL=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
     profiles: 
       - e2e
     volumes:

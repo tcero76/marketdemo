@@ -2,6 +2,11 @@ networks:
   application:
     name: ${NETWORK_APPLICATION}
     driver: bridge
+  proxy:
+    name: proxy
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
 volumes:
   timescaledb_data:
     name: timescaledb_data
@@ -45,3 +50,5 @@ volumes:
       type: none
       device: ${MEDIAMTX_VOLUME}/data
       o: bind
+  go-mod-cache:
+  go-build-cache:

@@ -35,7 +35,9 @@ services:
       # - ./infra/docker/config/traefik/acme.json:/letsencrypt/acme.json
       - ~/.environments/certs:/certs
     networks:
-      - ${NETWORK_APPLICATION:-application}
+      application:
+      proxy:
+        ipv4_address: 172.30.0.10
     labels:
       - traefik.enable=true
 
