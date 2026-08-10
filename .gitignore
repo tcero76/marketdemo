@@ -25,3 +25,4 @@ terraform/.terraform.lock.hcl
 scrap-service/celerybeat-schedule
 terraform/.terraform.tfstate.lock.info
 **/.next/**
+**/test-results/**
