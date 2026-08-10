@@ -62,7 +62,9 @@ jobs:
           set -a
           source "${ENVIRONMENTS}"
           set +a
-          docker run --env-file ${ENVIRONMENTS} --network ${NETWORK_APPLICATION} --rm -v ./flyway/sql:/flyway/sql flyway/flyway:latest-alpine \
+          docker run --env-file ${ENVIRONMENTS} \
+            --network ${NETWORK_APPLICATION} --rm \
+            -v ./flyway/sql:/flyway/sql flyway/flyway:latest-alpine \
             -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
             -user=${POSTGRES_USER} \
             -password=${POSTGRES_PASSWORD} \
@@ -88,9 +90,6 @@ jobs:
             go test ./integration -race
       - name: Run frontend component tests
         run: |
-          set -a
-          source "${ENVIRONMENTS}"
-          set +a
           docker compose \
             --env-file ${ENVIRONMENTS} \
             --project-directory ${PWD} \
