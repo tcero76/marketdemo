@@ -46,6 +46,7 @@ var (
 )
 
 func Register() {
+    registerOnce.Do(func() {
 	prometheus.MustRegister(
 		HTTPDuration,
 		HTTPRequests,
@@ -53,4 +54,5 @@ func Register() {
 		HTTPInFlight,
 		ExternalDuration,
 	)
+    })
 }
