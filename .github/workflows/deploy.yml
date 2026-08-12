@@ -66,12 +66,6 @@ jobs:
             image: tcero76/demo-scrap-service
             prefix: SCRAP
 
-          - service: flyway
-            tag: push-flyway
-            pattern: flyway
-            image: tcero76/demo-flyway
-            prefix: FLYWAY
-
           - service: beat-service
             tag: push-beat
             pattern: (beat-service|rabbitmq)
