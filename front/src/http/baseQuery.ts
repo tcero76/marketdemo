@@ -187,6 +187,7 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
   }
   if(url === '/usuario/getProduct?product=10') {
     return {
+      data: {
         "id": 10,
         "title": "Gucci Bloom Eau de",
         "description": "Gucci Bloom by Gucci is a floral and captivating fragrance, with notes of tuberose, jasmine, and Rangoon creeper. It's a modern and romantic scent.",
@@ -197,6 +198,7 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Gucci",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=11') {
