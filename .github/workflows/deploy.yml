@@ -45,7 +45,6 @@ jobs:
 
   build_all:
     # needs: [terraform]
-    if: false
     strategy:
       max-parallel: 1
       matrix:
