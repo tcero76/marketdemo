@@ -39,22 +39,27 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
   if(url === '/usuario/createPost' && args.method === 'POST') {
     return { data: { message: 'ok' } }
   }
-  if(url === '/usuario/getProduct?product=1') {
+  if (url === '/usuario/getProduct?product=1') {
     return {
-        "id": 1,
-        "title": "Essence Mascara Lash Princess",
-        "description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",
-        "price": 9.99,
-        "discountPercentage": 10.48,
-        "rating": 2.56,
-        "stock": 99,
-        "brand": "Essence",
-        "category": "beauty",
-        "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
+      data: {
+        id: 1,
+        title: "Essence Mascara Lash Princess",
+        description:
+          "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",
+        price: 9.99,
+        discountPercentage: 10.48,
+        rating: 2.56,
+        stock: 99,
+        brand: "Essence",
+        category: "beauty",
+        thumbnail:
+          "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp",
+      },
     }
   }
   if(url === '/usuario/getProduct?product=2') {
     return {
+      data: {
         "id": 2,
         "title": "Eyeshadow Palette with Mirror",
         "description": "The Eyeshadow Palette with Mirror offers a versatile range of eyeshadow shades for creating stunning eye looks. With a built-in mirror, it's convenient for on-the-go makeup application.",
@@ -65,10 +70,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Glamour Beauty",
         "category": "beauty",
         "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=3') {
     return {
+      data: {
         "id": 3,
         "title": "Powder Canister",
         "description": "The Powder Canister is a finely milled setting powder designed to set makeup and control shine. With a lightweight and translucent formula, it provides a smooth and matte finish.",
@@ -79,10 +86,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Velvet Touch",
         "category": "beauty",
         "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/powder-canister/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=4') {
     return {
+      data: {
         "id": 4,
         "title": "Red Lipstick",
         "description": "The Red Lipstick is a classic and bold choice for adding a pop of color to your lips. With a creamy and pigmented formula, it provides a vibrant and long-lasting finish.",
@@ -93,10 +102,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Chic Cosmetics",
         "category": "beauty",
         "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/red-lipstick/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=5') {
     return {
+      data: {
         "id": 5,
         "title": "Red Nail Polish",
         "description": "The Red Nail Polish offers a rich and glossy red hue for vibrant and polished nails. With a quick-drying formula, it provides a salon-quality finish at home.",
@@ -107,10 +118,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Nail Couture",
         "category": "beauty",
         "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/red-nail-polish/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=6') {
     return {
+      data: {
         "id": 6,
         "title": "Calvin Klein CK One",
         "description": "CK One by Calvin Klein is a classic unisex fragrance, known for its fresh and clean scent. It's a versatile fragrance suitable for everyday wear.",
@@ -121,10 +134,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Calvin Klein",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=7') {
     return {
+      data: {
         "id": 7,
         "title": "Chanel Coco Noir Eau De",
         "description": "Coco Noir by Chanel is an elegant and mysterious fragrance, featuring notes of grapefruit, rose, and sandalwood. Perfect for evening occasions.",
@@ -135,10 +150,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Chanel",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=8') {
     return {
+      data: {
         "id": 8,
         "title": "Dior J'adore",
         "description": "J'adore by Dior is a luxurious and floral fragrance, known for its blend of ylang-ylang, rose, and jasmine. It embodies femininity and sophistication.",
@@ -149,10 +166,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Dior",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/dior-j'adore/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=9') {
     return {
+      data: {
         "id": 9,
         "title": "Dolce Shine Eau de",
         "description": "Dolce Shine by Dolce \u0026 Gabbana is a vibrant and fruity fragrance, featuring notes of mango, jasmine, and blonde woods. It's a joyful and youthful scent.",
@@ -163,6 +182,7 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Dolce \u0026 Gabbana",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/dolce-shine-eau-de/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=10') {
@@ -181,6 +201,7 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
   }
   if(url === '/usuario/getProduct?product=11') {
     return {
+      data: {
         "id": 11,
         "title": "Hugo Boss Bottled Tonic",
         "description": "Hugo Boss Bottled Tonic is a fresh and vibrant fragrance, with notes of bergamot, cardamom, and vetiver. It's a modern and confident scent.",
@@ -191,10 +212,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Hugo Boss",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/hugo-boss-bottled-tonic/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=12') {
     return {
+      data: {
         "id": 12,
         "title": "Light Blue Eau de",
         "description": "Light Blue by Dolce \u0026 Gabbana is a fresh and feminine fragrance, featuring notes of lemon, jasmine, and musk. It's a timeless and elegant scent.",
@@ -205,10 +228,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Dolce \u0026 Gabbana",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/light-blue-eau-de/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=13') {
     return {
+      data: {
         "id": 13,
         "title": "Miss Dior Eau de",
         "description": "Miss Dior by Dior is a fresh and feminine fragrance, with notes of orange blossom, rose, and vanilla. It's a classic and elegant scent.",
@@ -219,10 +244,12 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Dior",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/miss-dior-eau-de/thumbnail.webp"
+      }
     }
   }
   if(url === '/usuario/getProduct?product=14') {
     return {
+      data: {
         "id": 14,
         "title": "Opium Eau de",
         "description": "Opium by Yves Saint Laurent is a bold and seductive fragrance, featuring notes of coffee, vanilla, and sandalwood. It's a modern and captivating scent.",
@@ -233,6 +260,7 @@ export const fakeBaseQueryWithRefresh: BaseQueryFn<
         "brand": "Yves Saint Laurent",
         "category": "fragrances",
         "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/opium-eau-de/thumbnail.webp"
+      }
     }
   }
   return { data: { message: 'ok' } }
