@@ -19,6 +19,7 @@ func GetPostgresWrite(log *logger.LoggerLogstash) *gorm.DB {
 	log.Info("Entra a Config Postgres WRITE...")
 	onceWrite.Do(func() {
 		dsn := os.Getenv("DNS_WRITE")
+		log.Info("DNS_WRITE: ", dsn)
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
 			log.Error("Error al conectar a la base de datos (write):", err)
@@ -34,6 +35,7 @@ func GetPostgresRead(log *logger.LoggerLogstash) *gorm.DB {
 	log.Info("Entra a Config Postgres READ...")
 	onceRead.Do(func() {
 		dsn := os.Getenv("DNS_READ")
+		log.Info("DNS_READ: ", dsn)
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
 			log.Error("Error al conectar a la base de datos (read):", err)

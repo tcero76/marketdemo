@@ -258,14 +258,12 @@ jobs:
           FRONT_SHA=$(git rev-parse push-front)
           BFF_SHA=$(git rev-parse push-bff)
           SCRAP_SHA=$(git rev-parse push-scrap)
-          FLYWAY_SHA=$(git rev-parse push-flyway)
           BEAT_SHA=$(git rev-parse push-beat)
           cp infra/docker/prod/imagenes.yml infra/docker/prod/imagenes.generated.yml
           sed -i \
             -e "s|image: tcero76/demo-front:.*|image: tcero76/demo-front:${FRONT_SHA}|g" \
             -e "s|image: tcero76/demo-bff-service:.*|image: tcero76/demo-bff-service:${BFF_SHA}|g" \
             -e "s|image: tcero76/demo-scrap-service:.*|image: tcero76/demo-scrap-service:${SCRAP_SHA}|g" \
-            -e "s|image: tcero76/demo-flyway:.*|image: tcero76/demo-flyway:${FLYWAY_SHA}|g" \
             -e "s|image: tcero76/demo-beat-service:.*|image: tcero76/demo-beat-service:${BEAT_SHA}|g" \
             infra/docker/prod/imagenes.generated.yml
           echo "===== imagenes.generated.yml ====="
