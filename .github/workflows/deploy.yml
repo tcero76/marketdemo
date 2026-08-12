@@ -120,6 +120,7 @@ jobs:
           VITE_MOCK: ${{ vars.VITE_MOCK }}
           GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID}}
+          PROFILE: ${{ vars.PROFILE }}
         run: |
           BUILD_ENV_KEYS=(
             PROTOCOL_EXTERNAL
