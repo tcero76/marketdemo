@@ -49,7 +49,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
       <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>Entra a tu cuenta</CardTitle>
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>
