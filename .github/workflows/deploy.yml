@@ -157,7 +157,7 @@ jobs:
     if: false
     permissions:
       contents: write
-    if: ${{ always() }}
+    # if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
