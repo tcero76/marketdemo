@@ -7,8 +7,6 @@ services:
       - monitoring
     tty: true
     stdin_open: true
-    ports:
-      - 3030:3000
     volumes:
       - ${GRAFANA_VOLUME}:/var/lib/grafana
       # - ./infra/docker/config/postgres_exporter/postgres_observability/alerts/pg_up.yml:/etc/grafana/provisioning/alerting/pg_up.yml
@@ -39,6 +37,7 @@ services:
       - traefik.http.routers.monitoring.rule=Host(`monitoring.${HOST_EXTERNAL}`)
       - traefik.http.routers.monitoring.entrypoints=websecure
       - traefik.http.routers.monitoring.tls=true
+      - traefik.http.routers.monitoring.tls.options=admin-mtls@file
       - traefik.http.services.monitoring.loadbalancer.server.port=3000
   prometheus:
     image: prom/prometheus:v3.4.0
@@ -48,13 +47,12 @@ services:
       - monitoring
     tty: true
     stdin_open: true
-    ports:
-      - 9090:9090
     labels:
       - traefik.enable=true
       - traefik.http.routers.prometheus.rule=Host(`prom.${HOST_EXTERNAL}`)
       - traefik.http.routers.prometheus.entrypoints=websecure
       - traefik.http.routers.prometheus.tls=true
+      - traefik.http.routers.prometheus.tls.options=admin-mtls@file
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
     volumes:
       - ./infra/docker/config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml

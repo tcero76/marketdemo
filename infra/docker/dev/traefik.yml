@@ -44,6 +44,7 @@ services:
       - traefik.http.routers.traefik.rule=Host(`traefik.${HOST_EXTERNAL}`)
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.options=admin-mtls@file
       # - traefik.http.routers.traefik.tls.certresolver=le
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik.priority=100

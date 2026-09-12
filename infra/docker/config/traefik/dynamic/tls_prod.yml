@@ -4,3 +4,9 @@ tls:
       defaultCertificate:
         certFile: /run/secrets/traefik_server_crt
         keyFile: /run/secrets/traefik_server_key
+  options:
+    admin-mtls:
+      clientAuth:
+        caFiles:
+          - /certs/ca.crt
+        clientAuthType: RequireAndVerifyClientCert

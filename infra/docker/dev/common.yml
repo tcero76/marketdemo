@@ -50,5 +50,8 @@ volumes:
       type: none
       device: ${MEDIAMTX_VOLUME}/data
       o: bind
+  postgres:
+  pgadmin_data:
+  portainer_data:
   go-mod-cache:
   go-build-cache:
