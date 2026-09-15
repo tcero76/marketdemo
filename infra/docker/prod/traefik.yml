@@ -25,6 +25,8 @@ services:
     configs:
       - source: traefik_tls
         target: /etc/traefik/dynamic/tls.yml
+      - source: mTLS_ca
+        target: /certs/ca.crt
     secrets:
      - traefik_server_crt
      - traefik_server_key
@@ -50,6 +52,7 @@ services:
         - traefik.swarm.network=${NETWORK_APPLICATION:-application}
         # - traefik.http.routers.traefik.tls.certresolver=le
         - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.options=admin-mtls@file
         - traefik.http.services.traefik.loadbalancer.server.port=8080
       mode: replicated
       replicas: 1

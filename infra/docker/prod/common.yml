@@ -34,6 +34,8 @@ configs:
     external: true
   flyway_entrypoint:
     external: true  
+  mTLS_ca:
+    external: true  
 secrets:
   hydra_secret:
     external: true

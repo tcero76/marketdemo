@@ -222,6 +222,9 @@ jobs:
           ssh root@${{ vars.MANAGER_IP }} '
             bash /root/deploy-config.sh flyway_entrypoint
           ' < flyway/deploy/entrypoint.sh
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-config.sh mTLS_ca
+          ' < infra/docker/config/traefik/mTLS/ca.crt
       - name: Crear secrets en Docker Swarm
         continue-on-error: true
         run: |
