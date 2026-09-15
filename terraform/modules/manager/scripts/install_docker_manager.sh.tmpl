@@ -36,7 +36,7 @@ docker stack deploy \
   -c /root/docker/traefik.yml \
   -c /root/docker/services.yml \
   -c /root/docker/redis.yml \
-  -c /root/docker/imagenes.yml \
+  -c /root/docker/services.prod.yml \
   mystack \
   --with-registry-auth
 echo "Despliegue completado."
