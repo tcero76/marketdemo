@@ -58,14 +58,20 @@ cat > /root/deploy-config.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-NAME="$1"
+NAME="${1:-}"
 
-if docker config inspect "$NAME" >/dev/null 2>&1; then
-  echo "Config $NAME ya existe, se mantiene"
+if [ -z "$NAME" ]; then
+  echo "Usage: deploy-secret.sh <name>"
+  exit 1
+fi
+
+if docker secret inspect "$NAME" >/dev/null 2>&1; then
+  echo "Secret '$NAME' already exists. Skipping."
   exit 0
 fi
 
-docker config create "$NAME" -
+echo "Creating secret '$NAME'..."
+docker secret create "$NAME" -
 EOF
 chmod +x /root/deploy_stack.sh
 chmod +x /root/deploy-secret.sh
