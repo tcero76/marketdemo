@@ -1,5 +1,10 @@
 services:
   e2e:
+    image: tcero76/demo-e2e:dev
+    build:
+      dockerfile: deploy/Dockerfile
+      context: ./e2e
+      target: ${PROFILE}
     container_name: e2e
     working_dir: /e2e
     extra_hosts:

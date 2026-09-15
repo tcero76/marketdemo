@@ -259,15 +259,15 @@ jobs:
           BFF_SHA=$(git rev-parse push-bff)
           SCRAP_SHA=$(git rev-parse push-scrap)
           BEAT_SHA=$(git rev-parse push-beat)
-          cp infra/docker/prod/imagenes.yml infra/docker/prod/imagenes.generated.yml
+          cp infra/docker/services.yml infra/docker/prod/services.generated.yml
           sed -i \
             -e "s|image: tcero76/demo-front:.*|image: tcero76/demo-front:${FRONT_SHA}|g" \
             -e "s|image: tcero76/demo-bff-service:.*|image: tcero76/demo-bff-service:${BFF_SHA}|g" \
             -e "s|image: tcero76/demo-scrap-service:.*|image: tcero76/demo-scrap-service:${SCRAP_SHA}|g" \
             -e "s|image: tcero76/demo-beat-service:.*|image: tcero76/demo-beat-service:${BEAT_SHA}|g" \
-            infra/docker/prod/imagenes.generated.yml
-          echo "===== imagenes.generated.yml ====="
-          cat infra/docker/prod/imagenes.generated.yml
+            infra/docker/prod/services.generated.yml
+          echo "===== services.generated.yml ====="
+          cat infra/docker/prod/services.generated.yml
 
       - name: Copy docker/*.yml to manager
         run: |
@@ -284,12 +284,12 @@ jobs:
             infra/docker/prod/postgres.yml \
             infra/docker/prod/redis.yml \
             infra/docker/prod/traefik.yml \
-            infra/docker/prod/services.yml \
+            infra/docker/prod/services.prod.yml \
             root@${{ vars.MANAGER_IP }}:/root/docker/
           
           scp -o StrictHostKeyChecking=no \
-            infra/docker/prod/imagenes.generated.yml \
-            root@${{ vars.MANAGER_IP }}:/root/docker/imagenes.yml
+            infra/docker/prod/services.generated.yml \
+            root@${{ vars.MANAGER_IP }}:/root/docker/services.yml
 
       - name: update flyway migrations
         run: |
