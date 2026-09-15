@@ -252,6 +252,9 @@ jobs:
           ssh root@${{ vars.MANAGER_IP }} '
             bash /root/deploy-secret.sh traefik_server_key
           ' < <(printf "%s" "${{ secrets.TRAEFIK_SERVER_KEY }}")
+          ssh root@${{ vars.MANAGER_IP }} '
+            bash /root/deploy-secret.sh pgadmin_default_password
+          ' < <(printf "%s" "${{ secrets.PGADMIN_DEFAULT_PASSWORD }}")
         shell: bash
 
       - name: Generate image tags

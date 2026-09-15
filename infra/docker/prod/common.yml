@@ -55,3 +55,5 @@ secrets:
     external: true
   traefik_server_key:
     external: true
+  pgadmin_default_password:
+    external: true
