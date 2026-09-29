@@ -10,7 +10,7 @@ services:
       - ./rabbitmq:/app/rabbitmq
       - ./redis:/app/redis
       - ./infra/volumes/uploads:/app/bff-service/uploads
-      - ./.vscode:/app/.vscode
+      - ./.vscode:/app/bff-service/.vscode
     profiles:
       - bff
     container_name: bff
