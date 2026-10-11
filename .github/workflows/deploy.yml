@@ -52,7 +52,7 @@ jobs:
         - id: gen
           run: |
             set -euo pipefail
-            FILE=infra/docker/imagenes.yml
+            FILE=infra/docker/services.yml
             [ -f "$FILE" ] || { echo "::error::No existe $FILE"; exit 1; }
 
             MATRIX=$(yq -o=json '.services' "$FILE" | jq -c '
@@ -143,8 +143,8 @@ jobs:
           set -a
             source <(grep -E "^(${PATTERN})=" infra/.env)
           set +a
-          sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${{ github.sha }}|g" infra/docker/imagenes.yml
-          if docker compose --project-directory "$PWD" --project-name marketplace -f infra/docker/imagenes.yml build "${{ matrix.service }}" --push; then
+          sed -i "s|image: ${{ matrix.image }}:.*|image: ${{ matrix.image }}:${{ github.sha }}|g" infra/docker/services.yml
+          if docker compose --project-directory "$PWD" --project-name marketplace -f infra/docker/services.yml build "${{ matrix.service }}" --push; then
             if docker manifest inspect "${{ matrix.image }}:${{ github.sha }}" >/dev/null 2>&1; then
               git tag -f "${{ matrix.tag }}" "$GITHUB_SHA"
               if git push origin "refs/tags/${{ matrix.tag }}" --force; then
