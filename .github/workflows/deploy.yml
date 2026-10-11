@@ -53,15 +53,18 @@ jobs:
       - uses: actions/checkout@v4
       - id: gen
         run: |
-          yq -o=json '
-            .services | to_entries | map({
-              "service": .key,
-              "image": (.value.image | split(":")[0]),
-              "tag": ("push-" + .key),
-              "prefix": (.key | ascii_upcase)
-            })
-          ' infra/docker/prod/imagenes.yml > matrix.json
-          echo "matrix={\"include\":$(cat matrix.json)}" >> "$GITHUB_OUTPUT"
+          MATRIX=$(yq -o=json -I=0 '
+            .services | to_entries
+            | map(select(.value.build))
+            | map({
+                "service": .key,
+                "image": (.value.image | split(":") | .[0]),
+                "tag": ("push-" + .key),
+                "prefix": (.key | ascii_upcase | sub("-", "_")),
+                "pattern": (.value.labels."ci.pattern" // .key)
+              })
+          ' infra/docker/prod/imagenes.yml)
+          echo "matrix={\"include\":$MATRIX}" >> "$GITHUB_OUTPUT"
 
   build_all:
     needs: [generate_matrix]
