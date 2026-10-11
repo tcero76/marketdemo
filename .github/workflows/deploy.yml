@@ -9,6 +9,7 @@ on:
 jobs:
   terraform:
     name: Terraform Apply
+    if: false
     runs-on: ubuntu-22.04
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
@@ -42,35 +43,30 @@ jobs:
           curl -u "${{ secrets.DDNS_USERNAME }}:${{ secrets.DDNS_PASSWORD }}" \
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
+
+  generate_matrix:
+    # needs: [terraform]
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gen
+        run: |
+          yq -o=json '
+            .services | to_entries | map({
+              "service": .key,
+              "image": (.value.image | split(":")[0]),
+              "tag": ("push-" + .key),
+              "prefix": (.key | ascii_upcase)
+            })
+          ' infra/docker/prod/imagenes.yml > matrix.json
+          echo "matrix={\"include\":$(cat matrix.json)}" >> "$GITHUB_OUTPUT"
+
   build_all:
-    needs: [terraform]
+    needs: [generate_matrix]
     strategy:
-      max-parallel: 1
-      matrix:
-        include:
-          - service: front
-            tag: push-front
-            pattern: front
-            image: tcero76/demo-front
-            prefix: FRONT
-
-          - service: bff-service
-            tag: push-bff
-            pattern: (bff-service|postgres|redis|rabbitmq|config)
-            image: tcero76/demo-bff-service
-            prefix: BFF
-
-          - service: scrap-service
-            tag: push-scrap
-            pattern: (scrap-service|rabbitmq)
-            image: tcero76/demo-scrap-service
-            prefix: SCRAP
-
-          - service: beat-service
-            tag: push-beat
-            pattern: (beat-service|rabbitmq)
-            image: tcero76/demo-beat-service
-            prefix: BEAT
+      matrix: ${{ fromJson(needs.generate_matrix.outputs.matrix) }}
     name: Build ${{ matrix.service }}
     runs-on: ubuntu-22.04
     permissions:
@@ -156,7 +152,8 @@ jobs:
     needs: [build_all]
     permissions:
       contents: write
-    if: ${{ always() }}
+    # if: ${{ always() }}
+    if: false
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
