@@ -43,40 +43,25 @@ jobs:
           curl -u "${{ secrets.DDNS_USERNAME }}:${{ secrets.DDNS_PASSWORD }}" \
             "https://dynupdate.no-ip.com/nic/update?hostname=marketdemo.ddns.net&myip=$manager_ip"
 
+
   generate_matrix:
-      runs-on: ubuntu-22.04
-      outputs:
-        matrix: ${{ steps.gen.outputs.matrix }}
-      steps:
-        - uses: actions/checkout@v4
-        - id: gen
-          run: |
-            set -euo pipefail
-            FILE=infra/docker/services.yml
-            [ -f "$FILE" ] || { echo "::error::No existe $FILE"; exit 1; }
-
-            MATRIX=$(yq -o=json '.services' "$FILE" | jq -c '
-              to_entries
-              | map(select(.value.build))
-              | map(. as $s | {
-                  service: $s.key,
-                  image: ($s.value.image | split(":")[0]),
-                  tag: ("push-" + $s.key),
-                  prefix: ($s.key | ascii_upcase | gsub("[^A-Z0-9]"; "_")),
-                  pattern: (
-                    ($s.value.labels // {}) as $l
-                    | (if ($l | type) == "array"
-                      then ($l | map(select(startswith("ci.pattern="))) | .[0] // null
-                            | if . then sub("^ci.pattern="; "") else null end)
-                      else $l["ci.pattern"] end)
-                    // $s.key
-                  )
-                })
-            ')
-
-            [ "$(jq 'length' <<< "$MATRIX")" -gt 0 ] || { echo "::error::Ningún servicio con build en $FILE"; exit 1; }
-            jq . <<< "$MATRIX"
-            echo "matrix={\"include\":$MATRIX}" >> "$GITHUB_OUTPUT"
+    needs: [terraform]
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gen
+        run: |
+          yq -o=json '
+            .services | to_entries | map({
+              "service": .key,
+              "image": (.value.image | split(":")[0]),
+              "tag": ("push-" + .key),
+              "prefix": (.key | ascii_upcase)
+            })
+          ' infra/docker/services.yml > matrix.json
+          echo "matrix={\"include\":$(cat matrix.json)}" >> "$GITHUB_OUTPUT"
 
   build_all:
     needs: [generate_matrix]
@@ -167,8 +152,7 @@ jobs:
     needs: [build_all]
     permissions:
       contents: write
-    # if: ${{ always() }}
-    if: false
+    if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
