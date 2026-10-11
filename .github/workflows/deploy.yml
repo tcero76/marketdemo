@@ -45,7 +45,7 @@ jobs:
 
 
   generate_matrix:
-    needs: [terraform]
+    # needs: [terraform]
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.gen.outputs.matrix }}
@@ -152,7 +152,8 @@ jobs:
     needs: [build_all]
     permissions:
       contents: write
-    if: ${{ always() }}
+    # if: ${{ always() }}
+    if: false
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
