@@ -7,7 +7,7 @@ import {
 import { composeHighlighters } from '@/utils/highlights/composeHighlighters';
 import EmbededComponent from "@/app/product/[id]/post/textEditor/Images/embeded";
 import { PosteoRaw } from '@/types';
-import { PosteoCreateBase } from '@/types';
+import { PosteoCreateBase } from '@/types/demo';
 
 type UseFormatTextProps<T> = {
   onChangePosteo:(posteoRaw:PosteoRaw) => void

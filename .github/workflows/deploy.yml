@@ -148,6 +148,11 @@ jobs:
           echo "${{ matrix.prefix }}_BUILD=$STATUS" >> "$GITHUB_ENV"
           echo "Resultado build $SERVICE: $STATUS"
 
+          if [[ "$STATUS" != "SUCCESS" ]]; then
+            echo "::error::Build de ${{ matrix.service }} fallido. Estado: $STATUS"
+            exit 1
+          fi
+
   deploy:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
