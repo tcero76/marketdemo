@@ -86,7 +86,7 @@ export function ChatBox() {
     <div className="fixed bottom-4 right-4 z-50">
       {!open ? (
         <Button
-          size="icon-lg"
+          size="lg"
           className="rounded-full shadow-lg"
           onClick={() => setOpen(true)}
           aria-label="Abrir chat"
