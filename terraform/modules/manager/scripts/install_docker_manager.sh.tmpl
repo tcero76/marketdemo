@@ -61,18 +61,20 @@ set -euo pipefail
 NAME="$${1:-}"
 
 if [ -z "$NAME" ]; then
-  echo "Usage: deploy-secret.sh <name>"
+  echo "Usage: deploy-config.sh <name>"
   exit 1
 fi
 
-if docker secret inspect "$NAME" >/dev/null 2>&1; then
-  echo "Secret '$NAME' already exists. Skipping."
+if docker config inspect "$NAME" >/dev/null 2>&1; then
+  echo "Config '$NAME' already exists. Skipping."
   exit 0
 fi
 
-echo "Creating secret '$NAME'..."
-docker secret create "$NAME" -
+echo "Creating config '$NAME'..."
+docker config create "$NAME" -
 EOF
+
+
 chmod +x /root/deploy_stack.sh
 chmod +x /root/deploy-secret.sh
 chmod +x /root/deploy-config.sh

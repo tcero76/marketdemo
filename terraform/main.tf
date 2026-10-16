@@ -39,25 +39,25 @@ module "manager" {
   region          = var.region
   size            = var.size
   image           = var.image
-  ssh_private_key = var.ssh_private_key  
+  ssh_private_key = var.ssh_private_key
   overlay_network = var.overlay_network
   internal_pubkey = tls_private_key.swarm_internal.public_key_openssh
-  vpc = data.digitalocean_vpc.default.id
-  ssh_keys  = [data.digitalocean_ssh_key.default.id]
+  vpc             = data.digitalocean_vpc.default.id
+  ssh_keys        = [data.digitalocean_ssh_key.default.id]
 }
 
 module "worker" {
-  source = "./modules/worker"
-  region          = var.region
-  size            = var.size
-  image           = var.image
-  worker_count    = var.worker_count
-  ssh_private_key = var.ssh_private_key
-  manager_ip      = module.manager.manager_ip
+  source           = "./modules/worker"
+  region           = var.region
+  size             = var.size
+  image            = var.image
+  worker_count     = var.worker_count
+  ssh_private_key  = var.ssh_private_key
+  manager_ip       = module.manager.manager_ip
   internal_privkey = tls_private_key.swarm_internal.private_key_pem
-  ssh_keys  = [data.digitalocean_ssh_key.default.id]
-  vpc = data.digitalocean_vpc.default.id
-  depends = module.manager.swarm_manager
+  ssh_keys         = [data.digitalocean_ssh_key.default.id]
+  vpc              = data.digitalocean_vpc.default.id
+  depends          = module.manager.swarm_manager
 }
 
 resource "digitalocean_project_resources" "swarm" {

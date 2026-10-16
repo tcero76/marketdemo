@@ -23,8 +23,8 @@ variable "worker_count" {
 
 variable "overlay_network" {
   description = "Nombre de la red Overlay"
-  type = string
-  default = "application"
+  type        = string
+  default     = "application"
 }
 
 variable "ssh_private_key" {
