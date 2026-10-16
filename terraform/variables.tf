@@ -12,7 +12,7 @@ variable "image" {
 }
 
 variable "size" {
-  default = "s-1vcpu-1gb"
+  default = "s-1vcpu-1gb-amd"
 }
 
 variable "worker_count" {
