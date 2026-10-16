@@ -58,7 +58,7 @@ cat > /root/deploy-config.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-NAME="${1:-}"
+NAME="$${1:-}"
 
 if [ -z "$NAME" ]; then
   echo "Usage: deploy-secret.sh <name>"
