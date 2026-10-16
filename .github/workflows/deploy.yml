@@ -9,7 +9,6 @@ on:
 jobs:
   terraform:
     name: Terraform Apply
-    if: false
     runs-on: ubuntu-22.04
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
@@ -45,7 +44,7 @@ jobs:
 
 
   generate_matrix:
-    # needs: [terraform]
+    needs: [terraform]
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.gen.outputs.matrix }}
@@ -68,7 +67,7 @@ jobs:
           echo "matrix={\"include\":$MATRIX}" >> "$GITHUB_OUTPUT"
 
   build_all:
-    needs: [generate_matrix]
+    needs: [generate_matrix,terraform]
     strategy:
       matrix: ${{ fromJson(needs.generate_matrix.outputs.matrix) }}
     name: Build ${{ matrix.service }}
