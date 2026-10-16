@@ -153,11 +153,10 @@ jobs:
   deploy:
     name: Update environment variables on Manager
     runs-on: ubuntu-22.04
-    needs: [build_all]
+    needs: [generate_matrix, build_all]
     permissions:
       contents: write
-    # if: ${{ always() }}
-    if: false
+    if: ${{ always() }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -175,14 +174,11 @@ jobs:
             while [ ! -f /root/bootstrap-complete ]; do
               sleep 5
             done
-
             echo "Bootstrap completado"
           '
-
       - name: Copiar .env base
         run: |
           scp -o StrictHostKeyChecking=no infra/.env root@${{ vars.MANAGER_IP }}:/root/.env
-
       - name: Configurar variables de producción
         run: |
           ssh root@${{ vars.MANAGER_IP }} "
@@ -257,25 +253,44 @@ jobs:
             bash /root/deploy-secret.sh pgadmin_default_password
           ' < <(printf "%s" "${{ secrets.PGADMIN_DEFAULT_PASSWORD }}")
         shell: bash
-
       - name: Generate image tags
+        env:
+          MATRIX: ${{ needs.generate_matrix.outputs.matrix }}
         run: |
+          set -euo pipefail
           git fetch --tags --force
 
-          FRONT_SHA=$(git rev-parse push-front)
-          BFF_SHA=$(git rev-parse push-bff)
-          SCRAP_SHA=$(git rev-parse push-scrap)
-          BEAT_SHA=$(git rev-parse push-beat)
-          cp infra/docker/services.yml infra/docker/prod/services.generated.yml
-          sed -i \
-            -e "s|image: tcero76/demo-front:.*|image: tcero76/demo-front:${FRONT_SHA}|g" \
-            -e "s|image: tcero76/demo-bff-service:.*|image: tcero76/demo-bff-service:${BFF_SHA}|g" \
-            -e "s|image: tcero76/demo-scrap-service:.*|image: tcero76/demo-scrap-service:${SCRAP_SHA}|g" \
-            -e "s|image: tcero76/demo-beat-service:.*|image: tcero76/demo-beat-service:${BEAT_SHA}|g" \
-            infra/docker/prod/services.generated.yml
-          echo "===== services.generated.yml ====="
-          cat infra/docker/prod/services.generated.yml
+          SRC=infra/docker/services.yml
+          OUT=infra/docker/prod/services.generated.yml
+          cp "$SRC" "$OUT"
 
+          while IFS=$'\t' read -r name image tag; do
+            NAME="$name" yq -e '.services[strenv(NAME)]' "$OUT" >/dev/null \
+              || { echo "::error::'$name' no existe en $SRC"; exit 1; }
+            sha=$(git rev-parse --verify "refs/tags/$tag^{commit}")
+            NAME="$name" IMG="$image:$sha" yq -i '.services[strenv(NAME)].image = strenv(IMG)' "$OUT"
+          done < <(jq -r '.include[] | [.service, .image, .tag] | @tsv' <<< "$MATRIX")
+
+          echo "===== services.generated.yml ====="
+          cat "$OUT"
+
+      # - name: Generate image tags
+      #   run: |
+      #     git fetch --tags --force
+
+      #     FRONT_SHA=$(git rev-parse push-front)
+      #     BFF_SHA=$(git rev-parse push-bff)
+      #     SCRAP_SHA=$(git rev-parse push-scrap)
+      #     BEAT_SHA=$(git rev-parse push-beat)
+      #     cp infra/docker/services.yml infra/docker/prod/services.generated.yml
+      #     sed -i \
+      #       -e "s|image: tcero76/demo-front:.*|image: tcero76/demo-front:${FRONT_SHA}|g" \
+      #       -e "s|image: tcero76/demo-bff-service:.*|image: tcero76/demo-bff-service:${BFF_SHA}|g" \
+      #       -e "s|image: tcero76/demo-scrap-service:.*|image: tcero76/demo-scrap-service:${SCRAP_SHA}|g" \
+      #       -e "s|image: tcero76/demo-beat-service:.*|image: tcero76/demo-beat-service:${BEAT_SHA}|g" \
+      #       infra/docker/prod/services.generated.yml
+      #     echo "===== services.generated.yml ====="
+      #     cat infra/docker/prod/services.generated.yml
       - name: Copy docker/*.yml to manager
         run: |
           git fetch origin
