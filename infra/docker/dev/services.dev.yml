@@ -18,9 +18,14 @@ services:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
+    models:
+      llm:
+        endpoint_var: LLM_URL
+        model_var: LLM_MODEL
     stdin_open: true
     tty: true
     environment:
+      - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN}
       - DNS_WRITE=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT_WRITE}/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dmarketplace
       - DNS_READ=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT_READ}/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dmarketplace
       - PORT=3000
@@ -38,16 +43,16 @@ services:
       - MONITOREO=${MONITOREO}
       - LOG_LEVEL=${LOG_LEVEL}
       - UploadImages=/app/bff-service/uploads
-      - HOME_PAGE_PATH=${HOME_PAGE_PATH}
     labels:
       - traefik.enable=true
       - traefik.http.routers.bff.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/bff`)
-      - traefik.http.middlewares.bff-strip.stripprefix.prefixes=/bff
       - traefik.http.routers.bff.middlewares=bff-strip
       - traefik.http.routers.bff.entrypoints=websecure
+      - traefik.http.routers.bff.tls.certresolver=le
       - traefik.http.routers.bff.tls=true
-      - traefik.http.services.bff.loadbalancer.server.port=3000
       - traefik.http.routers.bff.priority=100
+      - traefik.http.middlewares.bff-strip.stripprefix.prefixes=/bff
+      - traefik.http.services.bff.loadbalancer.server.port=3000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -73,7 +78,6 @@ services:
       - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
       - NEXT_PUBLIC_MOCK=${VITE_MOCK}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
-      - NEXT_PUBLIC_HOME_PAGE_PATH=${HOME_PAGE_PATH}
     ports:
      - 3000:3000
     volumes:

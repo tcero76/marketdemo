@@ -90,7 +90,7 @@ type CallbackInternalHandler struct {
 
 func (h *CallbackInternalHandler) Handle(c echo.Context) error {
 	log.Info("Callback Handle Internal")
-	homePagePath := os.Getenv("HOME_PAGE_PATH")
+	homePagePath := "/"
 	sessionData := c.Get("session_data").(*model.SessionData)
 	if sessionData.Idp == "internal" {
 		code := c.QueryParam("code")

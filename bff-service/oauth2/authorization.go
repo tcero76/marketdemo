@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/labstack/echo/v4"
+	logger "github.com/tcero76/marketplace/config/log"
 )
 
 func JWTMiddleware(log *logger.LoggerLogstash, validator TokenValidator) echo.MiddlewareFunc {
@@ -17,7 +17,7 @@ func JWTMiddleware(log *logger.LoggerLogstash, validator TokenValidator) echo.Mi
 				return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid Authorization header")
 			}
 			token := strings.TrimPrefix(auth, "Bearer ")
-            claims, err := validator.Validate(token)
+			claims, err := validator.Validate(token)
 			if err != nil {
 				log.Warn("Invalid token")
 				return echo.NewHTTPError(http.StatusUnauthorized, err.Error())

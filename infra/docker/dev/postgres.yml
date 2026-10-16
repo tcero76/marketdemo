@@ -42,5 +42,6 @@ services:
         - traefik.http.routers.pgadmin.rule=Host(`pgadmin.${HOST_EXTERNAL}`)
         - traefik.http.routers.pgadmin.entrypoints=websecure
         - traefik.http.routers.pgadmin.tls=true
+        - traefik.http.routers.pgadmin.tls.certresolver=le
         - traefik.http.routers.pgadmin.tls.options=admin-mtls@file
         - traefik.http.services.pgadmin.loadbalancer.server.port=80

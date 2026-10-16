@@ -1,4 +1,4 @@
-import { AuthorizationType, AuthType, CredencialType, EmbededType,
+import { AuthorizationType, AuthType, ChatRequest, ChatSuccess, CredencialType, EmbededType,
   FetchLoginChallengeType, ImagePasteRes, LoginPayloadType, LoginResponseType,
   SearchPosts, SearchType } from "@/types";
 import { createApi } from "@reduxjs/toolkit/query/react";
@@ -22,6 +22,14 @@ export const api = createApi({
                   'Content-Type': 'application/json',
                 }
         })
+      }),
+      sendChatMessage: builder.mutation<ChatSuccess, ChatRequest>({
+        query: (body) => ({
+          url: '/usuario/chat',
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        }),
       }),
       login: builder.mutation<AuthorizationType, LoginPayloadType>({
         query: ({ user, password }:LoginPayloadType) => ({
@@ -199,6 +207,7 @@ export const {
   useSignUpQuery,
   useOnEmbedQuery,
   useOnImagePasteMutation,
+  useSendChatMessageMutation
 } = api
 
 export const {

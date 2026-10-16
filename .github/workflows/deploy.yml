@@ -125,7 +125,6 @@ jobs:
             HOST_EXTERNAL
             PROTOCOL_WS_EXTERNAL
             VITE_MOCK
-            HOME_PAGE_PATH
           )
           PATTERN=$(IFS='|'; echo "${BUILD_ENV_KEYS[*]}")
           set -a
@@ -272,24 +271,6 @@ jobs:
 
           echo "===== services.generated.yml ====="
           cat "$OUT"
-
-      # - name: Generate image tags
-      #   run: |
-      #     git fetch --tags --force
-
-      #     FRONT_SHA=$(git rev-parse push-front)
-      #     BFF_SHA=$(git rev-parse push-bff)
-      #     SCRAP_SHA=$(git rev-parse push-scrap)
-      #     BEAT_SHA=$(git rev-parse push-beat)
-      #     cp infra/docker/services.yml infra/docker/prod/services.generated.yml
-      #     sed -i \
-      #       -e "s|image: tcero76/demo-front:.*|image: tcero76/demo-front:${FRONT_SHA}|g" \
-      #       -e "s|image: tcero76/demo-bff-service:.*|image: tcero76/demo-bff-service:${BFF_SHA}|g" \
-      #       -e "s|image: tcero76/demo-scrap-service:.*|image: tcero76/demo-scrap-service:${SCRAP_SHA}|g" \
-      #       -e "s|image: tcero76/demo-beat-service:.*|image: tcero76/demo-beat-service:${BEAT_SHA}|g" \
-      #       infra/docker/prod/services.generated.yml
-      #     echo "===== services.generated.yml ====="
-      #     cat infra/docker/prod/services.generated.yml
       - name: Copy docker/*.yml to manager
         run: |
           git fetch origin

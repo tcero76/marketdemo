@@ -36,7 +36,6 @@ services:
       - MONITOREO=${MONITOREO}
       - LOG_LEVEL=${LOG_LEVEL}
       - UploadImages=/app/bff-service/uploads
-      - HOME_PAGE_PATH=${HOME_PAGE_PATH}
     labels:
       - traefik.enable=true
       - traefik.http.routers.bff.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/bff`)
@@ -69,7 +68,6 @@ services:
       - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
       - NEXT_PUBLIC_MOCK=${VITE_MOCK}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
-      - NEXT_PUBLIC_HOME_PAGE_PATH=${HOME_PAGE_PATH}
     ports:
      - 3000:3000
     healthcheck:

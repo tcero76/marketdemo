@@ -41,7 +41,7 @@ const Login = () => {
         e.preventDefault()
         try {
             await logout().unwrap()
-            window.location.href = `/${process.env.NEXT_PUBLIC_HOME_PAGE_PATH}`
+            window.location.href = "/"
         } catch (err) {
             console.error("Error en logout", err)
         }

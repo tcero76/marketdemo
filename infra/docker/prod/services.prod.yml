@@ -23,7 +23,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - MONITOREO=${MONITOREO}
       - UploadImages=/app/bff-service/uploads
-      - HOME_PAGE_PATH=${HOME_PAGE_PATH}
     networks:
       - ${NETWORK_APPLICATION:-application}
     secrets:
@@ -67,7 +66,6 @@ services:
       - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
       - NEXT_PUBLIC_MOCK=${VITE_MOCK}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
-      - NEXT_PUBLIC_HOME_PAGE_PATH=${HOME_PAGE_PATH}
     networks:
       - ${NETWORK_APPLICATION:-application}
     healthcheck:

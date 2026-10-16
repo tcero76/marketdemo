@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	formLLM "github.com/tcero76/marketplace/bff-service/bot/llm"
 	"github.com/tcero76/marketplace/bff-service/config"
 	"github.com/tcero76/marketplace/bff-service/controller"
 	logConfig "github.com/tcero76/marketplace/config/log"
@@ -26,7 +27,7 @@ var ctx = context.Background()
 
 func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
-	e := echo.New()	
+	e := echo.New()
 
 	metrics.Register()
 	e.Use(metrics.Middleware())
@@ -54,18 +55,19 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 	googleAuth := cor.NewGoogleAuth(googleClient, userServices)
 	loginHandler, consentHandler, callbackHandler := oauth2.InitOauth2Handlers(authCacheService, userServices, internalAuth, googleAuth)
 
-	e.Use(config.RedisSessionMiddleware(authCacheService, log))
-	e.Use(config.LoggerMiddleware(log))
+	session := e.Group("")
+	session.Use(config.RedisSessionMiddleware(authCacheService, log))
+	session.Use(config.LoggerMiddleware(log))
 
 	authController := controller.NewAuthController(log)
 
-	e.POST("/login", authController.HandleLogin(loginHandler))
-	e.GET("/consent", authController.HandleConsent(consentHandler))
-	e.GET("/callback", authController.HandleCallback(callbackHandler))
-	e.GET("/getAuthentication", authController.AuthHandler())
-	e.POST("/refresh", authController.RefreshTokenHandler(authCacheService))
-	e.GET("/logout", authController.LogoutHandler(authCacheService))
-	e.POST("/signup", authController.SignUpHandler(userServices))
+	session.POST("/login", authController.HandleLogin(loginHandler))
+	session.GET("/consent", authController.HandleConsent(consentHandler))
+	session.GET("/callback", authController.HandleCallback(callbackHandler))
+	session.GET("/getAuthentication", authController.AuthHandler())
+	session.POST("/refresh", authController.RefreshTokenHandler(authCacheService))
+	session.GET("/logout", authController.LogoutHandler(authCacheService))
+	session.POST("/signup", authController.SignUpHandler(userServices))
 	e.GET("/health", controller.HealthCheckHandler(log))
 
 	protegido := e.Group("/usuario")
@@ -84,6 +86,14 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
 	protegido.POST("/createPostDemo", productController.CreatePosteoDemo())
 	protegido.GET("/getPosteosDemo", productController.GetPosteosDemo())
+
+	// b := bot.New(bot.NewMemoryStore(), bot.RuleBased{})
+	// protegido.POST("/chat", controller.ChatHandler(b))
+	processorLLM := formLLM.NewBotLLM()
+	protegido.POST("/chat", controller.ChatLLMHandler(processorLLM))
+
+	e.GET("/webhook", controller.WebhookHandler())
+	e.POST("/webhook", controller.WebhookHandler())
 
 	e.POST("/uploadImage", fileController.UploadImage())
 	e.GET("/getImage/:name", fileController.GetImage())

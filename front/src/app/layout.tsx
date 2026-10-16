@@ -4,6 +4,7 @@ import { Providers } from "./providers";
 import Header from "@/layout/Header/Header";
 import Footer from "@/layout/Footer";
 import GoogleOneTap from "./GoogleOneTap";
+import { ChatBox } from "@/components/chatbox";
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -25,6 +26,7 @@ export default function RootLayout({
               <main className="flex-1 min-h-0 pt-4">
                 {children}
               </main>
+              <ChatBox/>
             <Footer />
           </div>
         </Providers>

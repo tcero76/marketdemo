@@ -18,7 +18,7 @@ import Login from './Login';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 const Header = () => {
     const isDesktop = useMediaQuery("(min-width: 768px)")
-    const urlPath = "/demo"
+    const urlPath = "/"
     if (isDesktop) {
     return(
     <header>

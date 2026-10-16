@@ -40,7 +40,7 @@ const { data } = useGetProductQuery(
         </div>
         <div className="pt-2">
           <Button asChild variant="outline" size="sm" className="w-full">
-            <Link href={`/demo/product/${data?.id}`}>
+            <Link href={`/product/${data?.id}`}>
               {data?.stock}
             </Link>
           </Button>

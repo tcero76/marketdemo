@@ -55,3 +55,7 @@ volumes:
   portainer_data:
   go-mod-cache:
   go-build-cache:
+
+models:
+  llm:
+    model: qwen2.5

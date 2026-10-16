@@ -134,9 +134,9 @@ psql:
 	@psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p 5432
 
 test-unit:
-	@$(MAKE) test ENVIRONMENTS=/home/leonardo/.environments/test.env
+	@$(MAKE) _test-unit ENVIRONMENTS=/home/leonardo/.environments/test.env
 
-test:
+_test-unit:
 	@docker compose \
 		--env-file ${ENVIRONMENTS} \
 		--project-directory ${PWD} \
@@ -144,18 +144,18 @@ test:
 		run --rm  --no-deps bff-service \
 		go test ./controller -race
 
-test2:
+_test-integration:
 	@docker compose \
 		--env-file ${ENVIRONMENTS} \
 		--project-directory ${PWD} \
 		--project-name marketplace \
 		run --rm  --no-deps bff-service \
-		go test -run TestGetProducts ./integration
+		go test -run TestGetProduct ./integration
 
 test-integration:
-	@$(MAKE) test2 ENVIRONMENTS=/home/leonardo/.environments/test.env
+	@$(MAKE) _test-integration ENVIRONMENTS=/home/leonardo/.environments/test.env
 
-test3:
+_test-front:
 	@docker compose \
 		--env-file ${ENVIRONMENTS} \
 		--project-directory ${PWD} \
@@ -164,7 +164,7 @@ test3:
 		npm run test -- --run
 
 test-frontend:
-	@$(MAKE) test3 ENVIRONMENTS=/home/leonardo/.environments/test.env
+	@$(MAKE) _test-front ENVIRONMENTS=/home/leonardo/.environments/test.env
 
 e2e:
 	@docker exec -it e2e npm run test -- --headed

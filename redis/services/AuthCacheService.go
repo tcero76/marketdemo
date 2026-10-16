@@ -93,7 +93,6 @@ func (h *AuthCacheService) LoadTokenFromRedis(sessionID string, key string, ctx 
 		h.log.Error("Error loading from Redis: ", err)
 		return "", err
 	}
-
 	return data, nil
 }
 

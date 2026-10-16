@@ -18,7 +18,6 @@ services:
         NEXT_PUBLIC_CLIENT_ID: ${CLIENT_ID}
         NEXT_PUBLIC_MOCK: ${VITE_MOCK}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH2_CLIENT_ID}
-        NEXT_PUBLIC_HOME_PAGE_PATH: ${HOME_PAGE_PATH}
   scrap-service:
     image: tcero76/demo-scrap-service:${TAG}
     build:

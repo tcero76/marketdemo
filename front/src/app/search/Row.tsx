@@ -2,7 +2,7 @@
 
 import { FC  } from 'react'
 import { RowProps } from '@/types';
-import Item from '@/app/demo/Item';
+import Item from '@/app/Item';
 
 const Row:FC<RowProps> = ({ row }:RowProps) => {
     if(!row) return
