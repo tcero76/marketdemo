@@ -35,7 +35,7 @@ const Search = ({ className, ...props }: SearchProps) => {
         const params = new URLSearchParams();
         meta.forEach(m => params.append("hashtag", m));
         if (cleanText.length > 0) params.append("text", cleanText);
-        router.push(`/demo/search?${params.toString()}`);
+        router.push(`/search?${params.toString()}`);
     }
     const onKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
             hashtagAutocomplete.onKey(e);
