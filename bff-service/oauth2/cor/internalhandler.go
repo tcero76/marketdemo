@@ -89,7 +89,6 @@ type CallbackInternalHandler struct {
 
 func (h *CallbackInternalHandler) Handle(c echo.Context) error {
 	log.Info("Callback Handle Internal")
-	homePagePath := "/"
 	sessionData := c.Get("session_data").(*model.SessionData)
 	if sessionData.Idp == "internal" {
 		code := c.QueryParam("code")
@@ -111,7 +110,15 @@ func (h *CallbackInternalHandler) Handle(c echo.Context) error {
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		token := h.InternalAuth.Callback(code, ctx)
+		log.Infof("OAuth callback: iniciando intercambio") 
+		token, err := h.InternalAuth.Callback(code, ctx)
+		if err != nil {
+			log.Errorf("Error completando OAuth callback: %v", err)
+			return c.String(
+				http.StatusBadGateway,
+				"Error completando autenticación",
+			)
+		}
 		sessionData.AccessToken = token.AccessToken
 		sessionData.RefreshToken = token.RefreshToken
 		ctxRedis, cancelRedis := context.WithTimeout(context.Background(), 10*time.Second)
@@ -120,7 +127,7 @@ func (h *CallbackInternalHandler) Handle(c echo.Context) error {
 		log.Debug("Storing tokens in session Data: ", sessionData)
 		return c.Redirect(
 			http.StatusFound,
-			fmt.Sprintf("/%s?accessToken=%s", homePagePath, token.AccessToken),
+			fmt.Sprintf("/?accessToken=%s", token.AccessToken),
 		)
 	} else {
 		return h.Next.Handle(c)

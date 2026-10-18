@@ -93,7 +93,7 @@ func (b *InternalAuth) Consent(ctx context.Context, consentChallenge string) (st
 	return resp.GetRedirectTo(), nil
 }
 
-func (b *InternalAuth) Callback(code string, ctx context.Context) *oauth2.Token {
+func (b *InternalAuth) Callback(code string, ctx context.Context) (*oauth2.Token, error)  {
 	log.Println("Callback Internal")
 	conf := &oauth2.Config{
 		ClientID:     os.Getenv("CLIENT_ID"),
@@ -108,9 +108,9 @@ func (b *InternalAuth) Callback(code string, ctx context.Context) *oauth2.Token 
 	log.Println("Conf.ClientID: ", conf.ClientID)
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
-		log.Println("Error intercambiando código por token: ", err)
+        return nil, fmt.Errorf("intercambiando código OAuth2: %w", err)
 	}
-	return token
+	return token, nil
 }
 
 func (b *InternalAuth) boolPtr(boolean bool) *bool {
