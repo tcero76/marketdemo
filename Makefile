@@ -58,7 +58,10 @@ tfssh:
 	ssh root@$(terraform -chdir=./terraform/ output -raw manager_public_ip)
 
 redis:
-	@docker compose --env-file ${ENVIRONMENTS} exec -it cache redis-cli
+	@docker compose \
+		--project-directory ${PWD} \
+		--project-name marketplace \
+		 exec -it cache redis-cli
 
 sshManager:
 	@ssh root@$(shell terraform -chdir=./terraform/ output -raw manager_public_ip)
