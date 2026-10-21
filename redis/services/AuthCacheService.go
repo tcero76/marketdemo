@@ -2,12 +2,13 @@ package services
 
 import (
 	"context"
-	"time"
+	"encoding/json"
 	"errors"
-	"github.com/fatih/structs"
+	"fmt"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	logger "github.com/tcero76/marketplace/config/log"
-	"github.com/tcero76/marketplace/redis/config"
 	"github.com/tcero76/marketplace/redis/model"
 )
 
@@ -16,9 +17,8 @@ type AuthCacheService struct {
 	log *logger.LoggerLogstash
 }
 
-func NewAuthCacheService(log *logger.LoggerLogstash) *AuthCacheService {
+func NewAuthCacheService(log *logger.LoggerLogstash, rdb *redis.Client) *AuthCacheService {
 	log.Info("Initializing AuthCacheService")
-	rdb := config.InitRedis()
 	return &AuthCacheService{Rdb: rdb, log: log}
 }
 
@@ -29,10 +29,22 @@ func (h *AuthCacheService) SaveSession(key string, s model.SessionData, ctx cont
 		h.log.FromContext(ctx).Error("Error: key is empty")
 		return nil
 	}
-	st := structs.New(s)
-	st.TagName = "redis"
-	data := st.Map()
-	err := h.Rdb.HSet(context.Background(), "session:"+key, data).Err()
+	botSessionJSON, err := json.Marshal(s.BotSession)
+	if err != nil {
+		return errors.New("marshal bot session: " + err.Error())
+	}
+	data := map[string]interface{}{
+		"access_token":     s.AccessToken,
+		"refresh_token":    s.RefreshToken,
+		"user_id":          s.UserID,
+		"idp":              s.Idp,
+		"session_id":       s.SessionID,
+		"is_authenticated": s.IsAuthenticated,
+		"login_challenge":  s.LoginChallenge,
+		"bot_session":      string(botSessionJSON),
+	}
+
+	err = h.Rdb.HSet(ctx, "session:"+key, data).Err()
 	if err != nil {
 		h.log.FromContext(ctx).Error("Error saving session to Redis: ", err)
 	}
@@ -50,6 +62,14 @@ func (h *AuthCacheService) GetSession(key string, ctx context.Context) (*model.S
 	if len(m) == 0 {
 		return nil, errors.New("no session found for key: " + key)
 	}
+	var botSession *model.FormSession
+	if raw := m["bot_session"]; raw != "" {
+		botSession = &model.FormSession{}
+
+		if err := json.Unmarshal([]byte(raw), botSession); err != nil {
+			return nil, fmt.Errorf("decoding bot_session: %w", err)
+		}
+	}
 	s := &model.SessionData{
 		AccessToken:     m["access_token"],
 		RefreshToken:    m["refresh_token"],
@@ -58,17 +78,22 @@ func (h *AuthCacheService) GetSession(key string, ctx context.Context) (*model.S
 		SessionID:       m["session_id"],
 		LoginChallenge:  m["login_challenge"],
 		IsAuthenticated: m["is_authenticated"] == "true",
+		BotSession:      botSession,
 	}
 	return s, nil
 }
 
-func (h *AuthCacheService) StoreTokenInRedis(sessionID string, key string, value string, ctx context.Context) error {
+func (h *AuthCacheService) StoreTokenInRedis(sessionID string, key string, s *model.FormSession, ctx context.Context) error {
 	h.log.Info("Storing in Redis")
-	h.log.Debug("sessionID=", sessionID, " key=", key, " value=", value)
-	err := h.Rdb.HSet(
+	h.log.Debug("sessionID=", sessionID, " key=", key)
+	botSessionJSON, err := json.Marshal(s)
+	if err != nil {
+		return errors.New("marshal bot session: " + err.Error())
+	}
+	err = h.Rdb.HSet(
 		ctx,
 		"session:"+sessionID,
-		key, value,
+		key, botSessionJSON,
 	).Err()
 	if err != nil {
 		h.log.Error("Error storing in Redis: ", err)
