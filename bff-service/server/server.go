@@ -9,6 +9,7 @@ import (
 	"github.com/tcero76/marketplace/bff-service/controller"
 	logConfig "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/config/metrics"
+	configRedis "github.com/tcero76/marketplace/redis/config"
 
 	"github.com/tcero76/marketplace/bff-service/oauth2"
 	"github.com/tcero76/marketplace/bff-service/oauth2/cor"
@@ -40,7 +41,8 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 	dbWrite := postgresConfig.GetPostgresWrite(log)
 	log.Info("Conectado a la base de datos Postgres")
 
-	authCacheService := redisServices.NewAuthCacheService(log)
+	rdb := configRedis.InitRedis()
+	authCacheService := redisServices.NewAuthCacheService(log, rdb)
 	userServices := modelServices.NewUserService(log, dbWrite, dbRead)
 	productService := demoServices.NewProductService(log, dbWrite, dbRead)
 	postsService := demoServices.NewPostsService(log, dbWrite, dbRead)
@@ -70,7 +72,7 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 	session.POST("/signup", authController.SignUpHandler(userServices))
 	e.GET("/health", controller.HealthCheckHandler(log))
 
-	protegido := e.Group("/usuario")
+	protegido := session.Group("/usuario")
 	protegido.Use(oauth2.JWTMiddleware(log, validator))
 
 	productController := controller.NewProductController(log, productService, postsService)
@@ -89,7 +91,8 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
 	// b := bot.New(bot.NewMemoryStore(), bot.RuleBased{})
 	// protegido.POST("/chat", controller.ChatHandler(b))
-	processorLLM := formLLM.NewBotLLM()
+	chatboxServices := modelServices.NewService(dbWrite)
+	processorLLM := formLLM.NewBotLLM(authCacheService, chatboxServices)
 	protegido.POST("/chat", controller.ChatLLMHandler(processorLLM))
 
 	e.GET("/webhook", controller.WebhookHandler())

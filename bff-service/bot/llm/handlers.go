@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/tcero76/marketplace/redis/model"
 )
 
 // Turn es el contexto de un mensaje entrante que viaja por la cadena.
 type Turn struct {
-	Session   *Session
+	Session   *model.FormSession
 	Form      Form
 	Input     string
 	Extractor FormExtractor // estrategia de extracción configurada en el Processor
@@ -20,8 +22,8 @@ type Turn struct {
 
 type Reply struct {
 	Text    string
-	Done    bool    // la conversación terminó (completa o cancelada)
-	Answers Answers // solo se llena al completar
+	Done    bool          // la conversación terminó (completa o cancelada)
+	Answers model.Answers // solo se llena al completar
 }
 
 // Handler (Chain of Responsibility): cada eslabón decide si atiende el mensaje.
@@ -103,7 +105,7 @@ func summary(t *Turn) string {
 func finish(t *Turn) Reply {
 	s := t.Session
 	s.Done = true
-	answers := s.clone().Answers
+	answers := s.Clone().Answers
 	t.Emit(Event{Type: FormCompleted, Answers: answers})
 	return Reply{Text: "¡Listo! Ya tengo todos tus datos.", Done: true, Answers: answers}
 }
@@ -119,7 +121,7 @@ func removeString(list []string, v string) []string {
 }
 
 // findField busca, entre los campos ya respondidos, el que el usuario menciona.
-func findField(form Form, answers Answers, input string) (Field, bool) {
+func findField(form Form, answers model.Answers, input string) (Field, bool) {
 	low := strings.ToLower(input)
 	for _, f := range form.Fields {
 		if _, ok := answers[f.Name]; !ok {
@@ -160,7 +162,7 @@ func (h BackHandler) Handle(_ context.Context, t *Turn) (Reply, bool, error) {
 		delete(s.Answers, s.History[n-1])
 		s.History = s.History[:n-1]
 	}
-	s.Phase = PhaseCollecting
+	s.Phase = model.PhaseCollecting
 	return Reply{Text: nextPrompt(t)}, true, nil
 }
 
@@ -178,7 +180,7 @@ type ConfirmHandler struct {
 
 func (h ConfirmHandler) Handle(_ context.Context, t *Turn) (Reply, bool, error) {
 	s := t.Session
-	if s.Phase != PhaseConfirming {
+	if s.Phase != model.PhaseConfirming {
 		return Reply{}, false, nil
 	}
 	yes, no := h.classify(t.Input)
@@ -186,7 +188,7 @@ func (h ConfirmHandler) Handle(_ context.Context, t *Turn) (Reply, bool, error) 
 	case yes:
 		return finish(t), true, nil
 	case no:
-		s.Phase = PhaseCorrecting
+		s.Phase = model.PhaseCorrecting
 		return Reply{Text: "¿Qué dato quieres corregir? (" + fieldLabels(t) + ")"}, true, nil
 	case h.Lenient:
 		return Reply{Text: "Responde «sí» para confirmar o «no» para corregir un dato."}, true, nil
@@ -219,7 +221,7 @@ type FillHandler struct{}
 func (FillHandler) Handle(ctx context.Context, t *Turn) (Reply, bool, error) {
 	s := t.Session
 	pending := t.Form.Pending(s.Answers)
-	if len(pending) == 0 && s.Phase == PhaseCollecting {
+	if len(pending) == 0 && s.Phase == model.PhaseCollecting {
 		return Reply{}, false, nil
 	}
 
@@ -283,7 +285,7 @@ func (FillHandler) Handle(ctx context.Context, t *Turn) (Reply, bool, error) {
 	}
 
 	nothing := len(filled) == 0 && len(changed) == 0 && len(problems) == 0
-	if nothing && s.Phase != PhaseCollecting {
+	if nothing && s.Phase != model.PhaseCollecting {
 		return Reply{}, false, nil // en confirmación/corrección: que lo atiendan los siguientes
 	}
 
@@ -306,14 +308,14 @@ func (FillHandler) Handle(ctx context.Context, t *Turn) (Reply, bool, error) {
 	next, more := t.Form.Next(s.Answers)
 	if !more {
 		if t.Confirm {
-			s.Phase = PhaseConfirming
+			s.Phase = model.PhaseConfirming
 			parts = append(parts, summary(t))
 			return Reply{Text: strings.Join(parts, " ")}, true, nil
 		}
 		return finish(t), true, nil
 	}
 
-	s.Phase = PhaseCollecting // p. ej. un cambio hizo aparecer un campo nuevo
+	s.Phase = model.PhaseCollecting // p. ej. un cambio hizo aparecer un campo nuevo
 	if nothing && !t.First {
 		parts = append(parts, ErrNotUnderstood.Error()+".")
 	}
@@ -330,7 +332,7 @@ type PickFieldHandler struct{}
 
 func (PickFieldHandler) Handle(_ context.Context, t *Turn) (Reply, bool, error) {
 	s := t.Session
-	if s.Phase != PhaseCorrecting {
+	if s.Phase != model.PhaseCorrecting {
 		return Reply{}, false, nil
 	}
 	f, ok := findField(t.Form, s.Answers, t.Input)
@@ -339,6 +341,6 @@ func (PickFieldHandler) Handle(_ context.Context, t *Turn) (Reply, bool, error) 
 	}
 	delete(s.Answers, f.Name)
 	s.History = removeString(s.History, f.Name)
-	s.Phase = PhaseCollecting
+	s.Phase = model.PhaseCollecting
 	return Reply{Text: f.Prompt}, true, nil
 }

@@ -12,6 +12,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 	basicBot "github.com/tcero76/marketplace/bff-service/bot/basic"
 	llmBot "github.com/tcero76/marketplace/bff-service/bot/llm"
+	"github.com/tcero76/marketplace/redis/model"
 )
 
 type chatRequest struct {
@@ -65,7 +66,8 @@ func ChatLLMHandler(b *llmBot.Processor) echo.HandlerFunc {
 		}
 		ctx, cancel := context.WithTimeout(c.Request().Context(), 30*time.Second)
 		defer cancel()
-		reply, err := b.Handle(ctx, token, req.Message)
+		sessionData := c.Get("session_data").(*model.SessionData)
+		reply, err := b.Handle(ctx, token, req.Message, sessionData.BotSession, b.ProcessFirst)
 		if err != nil {
 			log.Println("error:", err)
 			return c.JSON(http.StatusBadRequest, chatResponse{Reply: err.Error()})
@@ -73,7 +75,7 @@ func ChatLLMHandler(b *llmBot.Processor) echo.HandlerFunc {
 		if !reply.Done {
 			return c.JSON(http.StatusOK, chatResponse{Reply: reply.Text})
 		}
-		return c.JSON(http.StatusOK, chatResponse{Reply: "Conversación terminada"})
+		return c.JSON(http.StatusOK, chatResponse{Reply: "Registro almacenadas"})
 	}
 }
 

@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
-	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/bff-service/services"
+	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/redis/model"
 )
 
@@ -46,9 +46,10 @@ func RedisSessionMiddleware(authCacheService services.IAuthCacheService, log *lo
 				sessionData := &model.SessionData{}
 				sessionData.SessionID = sessionID
 				sessionData.IsAuthenticated = false
+				sessionData.BotSession = &model.FormSession{ID: sessionID, Answers: model.Answers{}}
 				if err := authCacheService.SaveSession(sessionID, *sessionData, c.Request().Context()); err != nil {
 					log.Error("Error saving session: ", err)
-					return c.JSON(http.StatusInternalServerError,map[string]string{
+					return c.JSON(http.StatusInternalServerError, map[string]string{
 						"error": "unable to create session",
 					})
 				}

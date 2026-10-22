@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/tcero76/marketplace/redis/model"
 )
 
 // ExtractRequest es todo lo que un extractor necesita saber del estado actual.
 type ExtractRequest struct {
-	Pending []Field // sin responder y no omitidos, en orden
-	Filled  []Field // ya respondidos (el usuario podría querer cambiarlos)
-	Answers Answers // valores actuales
+	Pending []Field       // sin responder y no omitidos, en orden
+	Filled  []Field       // ya respondidos (el usuario podría querer cambiarlos)
+	Answers model.Answers // valores actuales
 	Input   string
 }
 
