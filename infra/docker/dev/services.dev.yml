@@ -84,6 +84,7 @@ services:
      - 3000:3000
     volumes:
       - ./front:/app
+      - ./.vscode:/app/.vscode
     healthcheck:
       test:
         [
