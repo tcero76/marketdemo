@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo } from 'react';
-import { useAuthDispatch } from '@/store/hooks';
+import { useAppDispatch } from '@/store/hooks';
 import { Virtuoso } from 'react-virtuoso';
 import {
   useGetAuthenticatedQuery,
@@ -12,7 +12,7 @@ import { skipToken } from '@reduxjs/toolkit/query';
 import Row from './search/Row';
 
 export default function Home() {
-  const dispatch = useAuthDispatch()
+  const dispatch = useAppDispatch()
   const { data:user } = useGetAuthenticatedQuery()
   const { data, isLoading:isLoadingRecomendations } = useGetProductsIdxQuery(user?.sub ? undefined : skipToken);
   useEffect(() => {

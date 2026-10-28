@@ -16,6 +16,8 @@ import {
 import { Item, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item"
 import Login from './Login';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { CatalogActions } from '@/app/catalog-actions';
+import RightDrawerShoppingCart from '@/components/right-drawer-shopping-cart';
 const Header = () => {
     const isDesktop = useMediaQuery("(min-width: 768px)")
     const urlPath = "/"
@@ -52,7 +54,8 @@ const Header = () => {
             </div>
             <div/>
             <div className="flex items-center gap-2 md:gap-4 shrink-0">
-                <Search/>
+                <CatalogActions/>
+                <RightDrawerShoppingCart/>
                 <Login/>
             </div>
         </div>

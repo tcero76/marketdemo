@@ -9,21 +9,39 @@ import {
 } from "@/components/ui/card"
 import Link from 'next/dist/client/link';
 import { useGetProductQuery } from '@/http/api';
-import { ItemProductProps } from '@/types/demo';
+import { ItemProductProps, Product } from '@/types/demo';
+import { useAppDispatch } from '@/store/hooks';
+import { addItem } from "@/store/CartSlice";
+import { ShoppingCart } from 'lucide-react';
 
 const Item:FC<ItemProductProps> = ({ item }:ItemProductProps) => {
-const productId = item;
-const { data } = useGetProductQuery(
-  productId,
-  { skip: !productId }
-);
+  const dispatch = useAppDispatch();
+  const productId = item;
+  const { data } = useGetProductQuery(
+    productId,
+    { skip: !productId }
+  );
+  const onClickCart = (product: Product | undefined) => {
+  if (!product) return;
+  dispatch(
+    addItem({
+      productId: product?.id,
+      title: product?.title,
+      price: product?.price,
+      quantity: 1,
+      thumbnail: product?.thumbnail,
+    })
+  );
+};
   return (
     <Card className="w-full h-full flex flex-col">
-      <img
-        src={data?.thumbnail}
-        alt="Event cover"
-        className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-      />
+      <Link href={`/product/${data?.id}`}>
+        <img
+          src={data?.thumbnail}
+          alt="Event cover"
+          className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
+        />
+      </Link>
       <div className="flex flex-col h-full space-y-4 p-4">
         <div className="space-y-1">
           <CardTitle className="text-base font-semibold leading-tight">
@@ -39,10 +57,8 @@ const { data } = useGetProductQuery(
           </p>
         </div>
         <div className="pt-2">
-          <Button asChild variant="outline" size="sm" className="w-full">
-            <Link href={`/product/${data?.id}`}>
-              {data?.stock}
-            </Link>
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onClickCart(data)}>
+               <ShoppingCart size={24} strokeWidth={1.8} />
           </Button>
         </div>
       </div>

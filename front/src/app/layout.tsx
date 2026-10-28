@@ -5,6 +5,9 @@ import Header from "@/layout/Header/Header";
 import Footer from "@/layout/Footer";
 import GoogleOneTap from "./GoogleOneTap";
 import { ChatBox } from "@/components/chatbox";
+import { ProductFilters } from "./product-filter";
+import { ProductSort } from "./product-sort";
+import { CatalogActions } from "./catalog-actions";
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -22,7 +25,11 @@ export default function RootLayout({
       <body className="h-full antialiased">
         <Providers>
           <div className="flex h-screen flex-col">
-            <Header />
+            <Header/>
+              <div className="flex items-center justify-between">
+                <ProductFilters />
+                <ProductSort/>
+              </div>
               <main className="flex-1 min-h-0 pt-4">
                 {children}
               </main>
