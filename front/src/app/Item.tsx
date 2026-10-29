@@ -13,6 +13,7 @@ import { ItemProductProps, Product } from '@/types/demo';
 import { useAppDispatch } from '@/store/hooks';
 import { addItem } from "@/store/CartSlice";
 import { ShoppingCart } from 'lucide-react';
+import { currencyFormatter } from '@/utils/currency';
 
 const Item:FC<ItemProductProps> = ({ item }:ItemProductProps) => {
   const dispatch = useAppDispatch();
@@ -48,7 +49,7 @@ const Item:FC<ItemProductProps> = ({ item }:ItemProductProps) => {
             {data?.title}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            {data?.category}
+            {currencyFormatter.format(data?.price ?? 0)}
           </CardDescription>
         </div>
         <div className="flex-1">

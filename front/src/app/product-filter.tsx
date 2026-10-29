@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 type Filters = {
   categories: string[];
-  colors: string[];
-  inStock: boolean;
 };
 
 const categories = [
@@ -31,27 +31,14 @@ const categories = [
   { label: "Fragrances", value: "fragrances" },
 ];
 
-const colors = [
-  { label: "Black", value: "black" },
-  { label: "White", value: "white" },
-  { label: "Blue", value: "blue" },
-  { label: "Green", value: "green" },
-];
-
 function readFilters(params: URLSearchParams): Filters {
   return {
     categories: params.getAll("category"),
-    colors: params.getAll("color"),
-    inStock: params.get("in_stock") === "true",
   };
 }
 
 function countFilters(filters: Filters) {
-  return (
-    filters.categories.length +
-    filters.colors.length +
-    Number(filters.inStock)
-  );
+  return filters.categories.length;
 }
 
 export function ProductFilters() {
@@ -76,22 +63,14 @@ export function ProductFilters() {
   function openFilters() {
     setDraft({
       categories: [...applied.categories],
-      colors: [...applied.colors],
-      inStock: applied.inStock,
     });
     setOpen(true);
   }
 
-  function toggleValue(
-    key: "categories" | "colors",
-    value: string,
-    checked: boolean
-  ) {
+  function selectCategory(value: string) {
     setDraft((current) => ({
       ...current,
-      [key]: checked
-        ? [...current[key].filter((item) => item !== value), value]
-        : current[key].filter((item) => item !== value),
+      categories: value ? [value] : [],
     }));
   }
 
@@ -100,29 +79,15 @@ export function ProductFilters() {
 
     // Reemplaza solamente los parámetros administrados por este componente.
     params.delete("hashtag");
-    params.delete("color");
-    params.delete("in_stock");
 
     draft.categories.forEach((value) =>
-      params.append("hashtag", value)
+      params.set("hashtag", value)
     );
-
-    draft.colors.forEach((value) =>
-      params.append("color", value)
-    );
-
-    if (draft.inStock) {
-      params.set("in_stock", "true");
-    }
 
     const query = params.toString();
     const url = query ? `/search?${query}` : pathname;
 
-    setApplied({
-      categories: [...draft.categories],
-      colors: [...draft.colors],
-      inStock: draft.inStock,
-    });
+    setApplied({ categories: [...draft.categories] });
 
     setOpen(false);
     router.push(url, { scroll: false });
@@ -131,8 +96,6 @@ export function ProductFilters() {
   function clearFilters() {
     setDraft({
       categories: [],
-      colors: [],
-      inStock: false,
     });
   }
 
@@ -193,24 +156,14 @@ export function ProductFilters() {
           <section className="space-y-3">
             <h3 className="font-medium">Categoria</h3>
 
+          <RadioGroup defaultValue="comfortable" className="w-fit" value={draft.categories[0] ?? ""} onValueChange={selectCategory}>
             {categories.map((hashtag) => (
-              <label
-                key={hashtag.value}
-                className="flex cursor-pointer items-center gap-3 text-sm"
-              >
-                <Checkbox
-                  checked={draft.categories.includes(hashtag.value)}
-                  onCheckedChange={(checked) =>
-                    toggleValue(
-                      "categories",
-                      hashtag.value,
-                      checked === true
-                    )
-                  }
-                />
-                {hashtag.label}
-              </label>
+              <div className="flex items-center gap-3" key={hashtag.value}>
+                <RadioGroupItem value={hashtag.value} id="r1" />
+                <Label htmlFor="r1">{hashtag.label}</Label>
+              </div>
             ))}
+            </RadioGroup>
           </section>
           <Separator />
         </div>
