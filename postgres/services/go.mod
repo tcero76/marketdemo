@@ -5,9 +5,8 @@ go 1.25.5
 require (
 	github.com/google/uuid v1.6.0
 	github.com/lestrrat-go/jwx v1.2.31
-	github.com/lib/pq v1.10.9
 	github.com/tcero76/marketplace/bff-service v0.0.0
-	github.com/tcero76/marketplace/config v0.0.0
+	github.com/tcero76/marketplace/config/log v0.0.0
 	github.com/tcero76/marketplace/postgres/adapters v0.0.0
 	github.com/tcero76/marketplace/postgres/model v0.0.0
 	github.com/tcero76/marketplace/rabbitmq/events v0.0.0
@@ -19,7 +18,7 @@ replace github.com/tcero76/marketplace/rabbitmq/events => ../../rabbitmq/events
 
 replace github.com/tcero76/marketplace/bff-service => ../../bff-service
 
-replace github.com/tcero76/marketplace/config => ../../config
+replace github.com/tcero76/marketplace/config/log => ../../config/log
 
 replace github.com/tcero76/marketplace/postgres/config => ../config
 
@@ -40,10 +39,11 @@ require (
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	golang.org/x/crypto v0.44.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/text v0.38.0 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
 )
