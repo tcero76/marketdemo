@@ -38,7 +38,7 @@ const Search = ({ className, ...props }: SearchProps) => {
         router.push(`/search?${params.toString()}`);
     }
     const onKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
-            hashtagAutocomplete.onKey(e);
+        hashtagAutocomplete.onKey(e);
         if(e.key === "Enter") {
             onChangeSearch(e as any)
         }

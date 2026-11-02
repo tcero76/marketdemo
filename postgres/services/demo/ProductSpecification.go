@@ -26,8 +26,15 @@ func (s TextSpecProduct) Apply(db *gorm.DB) *gorm.DB {
 	s.Log.Info("Words son: ", s.Words)
 	clean := cleanWords(s.Words)
 	if len(clean) > 0 {
-		text := strings.Join(clean, " ")
-		return db.Where("search_vector @@ plainto_tsquery('english', ?)", text)
+		terms := make([]string, len(clean))
+		for i, word := range clean {
+			terms[i] = word + ":*"
+		}
+		text := strings.Join(terms, " & ")
+		return db.Where(
+			"search_vector @@ to_tsquery('english', ?)",
+			text,
+		)
 	}
 	return db
 }
@@ -38,11 +45,11 @@ type CategorySpecProduct struct {
 }
 
 func (s CategorySpecProduct) Apply(db *gorm.DB) *gorm.DB {
-    if len(s.CategoryIDs) == 0 {
-        return db
-    }
-    s.Log.Info("Filtering products by categories: ", s.CategoryIDs)
-    return db.Where("categoryid IN ?", s.CategoryIDs)
+	if len(s.CategoryIDs) == 0 {
+		return db
+	}
+	s.Log.Info("Filtering products by categories: ", s.CategoryIDs)
+	return db.Where("categoryid IN ?", s.CategoryIDs)
 }
 
 type Specification interface {

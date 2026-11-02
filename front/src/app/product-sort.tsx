@@ -11,15 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const sortOptions = [
-  { value: "featured", label: "Featured" },
-  { value: "price-ascending", label: "Price: low to high" },
-  { value: "price-descending", label: "Price: high to low" },
-  { value: "name-ascending", label: "Name: A to Z" },
-  { value: "name-descending", label: "Name: Z to A" },
-  { value: "created-descending", label: "Newest" },
-];
+import { sortOptions } from "@/types/demo";
 
 export function ProductSort() {
   const router = useRouter();
@@ -33,7 +25,7 @@ export function ProductSort() {
 
     params.set("sort_by", value);
 
-    router.push(`${pathname}?${params.toString()}`, {
+    router.push(`/search?${params.toString()}`, {
       scroll: false,
     });
   }

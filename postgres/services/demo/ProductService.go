@@ -3,11 +3,11 @@ package demo
 import (
 	"context"
 
-	"github.com/tcero76/marketplace/bff-service/dto/demo"
+	bffDemo "github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +21,7 @@ func NewProductService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gor
 	return &ProductService{dbWrite: dbWrite, dbRead: dbRead, log: log}
 }
 
-func (h *ProductService) GetProduct(query string) (*demo.Product, error) {
+func (h *ProductService) GetProduct(query string) (*bffDemo.Product, error) {
 	h.log.Infof("Fetching product with query: %s", query)
 	var product model.Product
 	err := h.dbRead.
@@ -33,7 +33,7 @@ func (h *ProductService) GetProduct(query string) (*demo.Product, error) {
 	return adapters.ToProductDTO(&product), nil
 }
 
-func (h *ProductService) GetProducts() ([]demo.Product, error) {
+func (h *ProductService) GetProducts() ([]bffDemo.Product, error) {
 	h.log.Infof("Fetching all products")
 	var products []model.Product
 	err := h.dbRead.Find(&products).Error
@@ -44,14 +44,14 @@ func (h *ProductService) GetProducts() ([]demo.Product, error) {
 	return adapters.ToProductDTOs(products), nil
 }
 
-func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) []demo.Product {
+func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) []bffDemo.Product {
 	h.log.Debug("Searching products with request: ", searchRequest)
 	var productIDs []int
 	var categoryIDs []int
 	if searchRequest.Hashtag != "" {
 		h.log.Debug("Searching by hashtag: %s", searchRequest.Hashtag)
 		idCategory, err := getCategoryIdByName(searchRequest.Hashtag, h.dbRead)
-		categoryIDs =[]int{int(idCategory)}
+		categoryIDs = []int{int(idCategory)}
 		if err != nil {
 			h.log.Error("No encontró la categoria", err.Error())
 		}
@@ -74,19 +74,19 @@ func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) [
 	return adapters.ToProductDTOs(products)
 }
 
-func (h *ProductService) GetRecomendationsProduct(ctx context.Context, userId string) []int {
-	h.log.Info("Fetching product recommendations for user ID: ", userId)
-	var products []int
+func (h *ProductService) GetRecomendationsProduct(ctx context.Context, userId string) []bffDemo.Product {
+	h.log.Info("Fetching product recommendations for user IDs: ", userId)
+	var products []model.Product
 	err := h.dbRead.
-		Model(&model.Product{}).
-		Select("id").
-		Scan(&products).Error
+		WithContext(ctx).
+		Table("marketplacedemo.products").
+		Find(&products).Error
 	if err != nil {
 		h.log.Error("Error fetching products for recommendations: ", err)
 		return nil
 	}
 	h.log.Debug("Products found for recommendations: ", products)
-	return products
+	return adapters.ToProductDTOs(products)
 }
 
 func (h *ProductService) GetCategories() ([]string, error) {
@@ -103,13 +103,13 @@ func (h *ProductService) GetCategories() ([]string, error) {
 	return categories, nil
 }
 
-func getCategoryIdByName(name string, db  *gorm.DB) (uint, error) {
-    var category model.Category
-    err := db.
-        Where("name = ?", name).
-        First(&category).Error
-    if err != nil {
-        return 0, err
-    }
-    return category.ID, nil
+func getCategoryIdByName(name string, db *gorm.DB) (uint, error) {
+	var category model.Category
+	err := db.
+		Where("name = ?", name).
+		First(&category).Error
+	if err != nil {
+		return 0, err
+	}
+	return category.ID, nil
 }

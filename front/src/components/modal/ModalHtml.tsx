@@ -66,7 +66,7 @@ const ModalHtml:FC<ModalHtmlProps>= ({
                 variant="outline"
                 onClick={onClickModal}
               >Save changes</Button>
-              <DrawerClose asChild>
+              <DrawerClose>
                 <Button variant="outline">Cancel</Button>
               </DrawerClose>
             </DrawerFooter>

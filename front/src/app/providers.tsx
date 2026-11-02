@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools/production";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UIProvider } from '@/context/UIContext';
+import { Suspense } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,13 +17,15 @@ const queryClient = new QueryClient({
 });
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-      <Provider store={store}>
-        <UIProvider>
-          <QueryClientProvider client={queryClient}>
-              {process.env.NEXT_PUBLIC_MOCK === "true" && <ReactQueryDevtools initialIsOpen={false} />}
-                          {children}
-          </QueryClientProvider>
-        </UIProvider>
-      </Provider>
+      <Suspense fallback={<div>Cargando...</div>}>
+        <Provider store={store}>
+          <UIProvider>
+            <QueryClientProvider client={queryClient}>
+                {process.env.NEXT_PUBLIC_MOCK === "true" && <ReactQueryDevtools initialIsOpen={false} />}
+                            {children}
+            </QueryClientProvider>
+          </UIProvider>
+        </Provider>
+      </Suspense>
   ) 
 }

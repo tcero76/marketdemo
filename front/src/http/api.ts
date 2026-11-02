@@ -1,6 +1,6 @@
 import { AuthorizationType, AuthType, ChatRequest, ChatSuccess, CredencialType, EmbededType,
-  FetchLoginChallengeType, ImagePasteRes, LoginPayloadType, LoginResponseType,
-  SearchPosts, SearchType } from "@/types";
+  FetchLoginChallengeType, ImagePasteRes, LoginPayloadType, LoginResponseType, 
+  SearchRequest} from "@/types";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithRefresh } from "./baseQueryWithRefresh"
 import { fetchLoginChallenge, logout } from "@/store/AuthSlice";
@@ -127,7 +127,7 @@ export const demo = createApi({
   endpoints:(builder) => {
     return (
       {
-        getProductsIdx: builder.query<number[], void>({
+        getProductsIdx: builder.query<Product[], void>({
           query: () => ({
             url: `/usuario/product/getRecommendations`
           })
@@ -147,8 +147,8 @@ export const demo = createApi({
             url: `/usuario/getCategories`
           })
         }),
-        searchProducts: builder.query<SearchPosts[],SearchType>({
-          query: (search:SearchType) => ({ 
+        searchProducts: builder.query<Product[],SearchRequest>({
+          query: (search:SearchRequest) => ({ 
             url:`/usuario/searchProducts`,
             method: 'POST',
             body: search

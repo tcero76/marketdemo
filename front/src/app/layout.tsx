@@ -1,13 +1,10 @@
-import type { Metadata } from "next";
 import '@/app/globals.css';
 import { Providers } from "./providers";
 import Header from "@/layout/Header/Header";
 import Footer from "@/layout/Footer";
-import GoogleOneTap from "./GoogleOneTap";
 import { ChatBox } from "@/components/chatbox";
 import { ProductFilters } from "./product-filter";
 import { ProductSort } from "./product-sort";
-import { CatalogActions } from "./catalog-actions";
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",

@@ -1,15 +1,9 @@
-export type SearchType = {
+export type SearchRequest = {
     mention: string;
     hashtag: string;
     text: string[];
 }
 
 export type SearchProps = {
-    onSearch: (search:SearchType) => void;
+    onSearch: (search:SearchRequest) => void;
 }
-
-export type SearchPosts = {
-    idItem: string
-    id: number
-    score: number
-  }

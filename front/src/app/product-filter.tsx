@@ -29,11 +29,12 @@ const categories = [
   { label: "Beauty", value: "beauty" },
   { label: "Groceries", value: "groceries" },
   { label: "Fragrances", value: "fragrances" },
+  { label: "Furnitures", value: "furniture"}
 ];
 
 function readFilters(params: URLSearchParams): Filters {
   return {
-    categories: params.getAll("category"),
+    categories: params.getAll("hashtag"),
   };
 }
 
@@ -48,14 +49,12 @@ export function ProductFilters() {
 
   const [open, setOpen] = useState(false);
 
-  // Filtros aplicados en la URL.
-  const [applied, setApplied] = useState<Filters>(() =>
+  const [draft, setDraft] = useState<Filters>(() =>
     readFilters(new URLSearchParams(searchParams.toString()))
   );
 
-  // Filtros que el usuario está editando en el panel.
-  const [draft, setDraft] = useState<Filters>(() =>
-    readFilters(new URLSearchParams(searchParams.toString()))
+  const applied = readFilters(
+    new URLSearchParams(searchParams.toString())
   );
 
   const activeCount = countFilters(applied);
@@ -76,21 +75,16 @@ export function ProductFilters() {
 
   function applyFilters() {
     const params = new URLSearchParams(searchParams.toString());
-
-    // Reemplaza solamente los parámetros administrados por este componente.
     params.delete("hashtag");
-
     draft.categories.forEach((value) =>
       params.set("hashtag", value)
     );
-
     const query = params.toString();
-    const url = query ? `/search?${query}` : pathname;
-
-    setApplied({ categories: [...draft.categories] });
-
+    router.push(
+      query ? `${pathname}?${query}` : pathname,
+      { scroll: false }
+    );
     setOpen(false);
-    router.push(url, { scroll: false });
   }
 
   function clearFilters() {

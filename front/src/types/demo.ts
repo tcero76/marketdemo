@@ -27,6 +27,36 @@ export type ItemProductProps = {
   item:number
 }
 
+export const sortOptions = [
+  {
+    value: "featured",
+    label: "Featured",
+    compare: null,
+  },
+  {
+    value: "price-ascending",
+    label: "Price: low to high",
+    compare: (a: Product, b: Product) => a.price - b.price,
+  },
+  {
+    value: "price-descending",
+    label: "Price: high to low",
+    compare: (a: Product, b: Product) => b.price - a.price,
+  },
+  {
+    value: "name-ascending",
+    label: "Name: A to Z",
+    compare: (a: Product, b: Product) => a.title.localeCompare(b.title),
+  },
+  {
+    value: "name-descending",
+    label: "Name: Z to A",
+    compare: (a: Product, b: Product) => b.title.localeCompare(a.title),
+  },
+] as const;
+
+export type SortBy = (typeof sortOptions)[number]["value"];
+
 export type PosteoBase = {
   id:string
   texto:string

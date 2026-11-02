@@ -33,7 +33,7 @@ type IDemoService interface {
 	GetProduct(query string) (*demo.Product, error)
 	GetProducts() ([]demo.Product, error)
 	GetSearchProduct(searchRequest payload.SearchRequest) []demo.Product
-	GetRecomendationsProduct(ctx context.Context, userId string) []int
+	GetRecomendationsProduct(ctx context.Context, userId string) []demo.Product
 	GetCategories() ([]string, error)
 }
 

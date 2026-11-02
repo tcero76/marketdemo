@@ -10,11 +10,17 @@ import {
 import { setToken } from '@/store/AuthSlice';
 import { skipToken } from '@reduxjs/toolkit/query';
 import Row from './search/Row';
+import { useSearchParams } from 'next/navigation';
+import { getProductRows } from '@/utils/products-rows';
+import { type SortBy } from '@/types/demo';
 
 export default function Home() {
   const dispatch = useAppDispatch()
   const { data:user } = useGetAuthenticatedQuery()
-  const { data, isLoading:isLoadingRecomendations } = useGetProductsIdxQuery(user?.sub ? undefined : skipToken);
+  const { data, isLoading:isLoadingRecomendations } =
+    useGetProductsIdxQuery(user?.sub ? undefined : skipToken);
+  const searchParams = useSearchParams();
+  const sortBy = searchParams.get("sort_by") as SortBy;
   useEffect(() => {
     const url = new URL(window.location.href)
     const accessToken = url.searchParams.get('accessToken');
@@ -25,18 +31,8 @@ export default function Home() {
     }
   }, [dispatch]);
   const rows = useMemo(() => {
-  if (!data?.length) return [];
-  return Array.from(
-      { length: Math.ceil(data.length / 3) },
-      (_, index) => {
-        const start = index * 3;
-        return {
-          row: data.slice(start, start + 3),
-          key: start,
-        };
-      }
-    );
-  }, [data]);
+    return getProductRows(data, sortBy)
+  }, [data,sortBy]);
   if (!user) return <div>No estás logeado</div>;
   if (isLoadingRecomendations) return <div>Cargando recomendaciones...</div>;
   return (
