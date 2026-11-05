@@ -33,23 +33,12 @@ const initialMessages: ChatMessage[] = [
     id: "1",
     role: "assistant",
     content:
-      "Hola 👋 Soy el asistente de documentación. ¿Qué quieres saber?",
-  },
-  {
-    id: "2",
-    role: "user",
-    content: "¿Qué es PostgreSQL?",
-  },
-  {
-    id: "3",
-    role: "assistant",
-    content:
-      "PostgreSQL es un sistema de gestión de bases de datos relacional y objeto-relacional de código abierto.",
+      "Hola 👋 Soy el asistente de reservas. ¿A nombre de quién quieres registrar la reserva?",
   },
 ];
 
 export function ChatBox() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
   const [sendChatMessage, { isLoading: loading }] = useSendChatMessageMutation();
@@ -97,7 +86,7 @@ export function ChatBox() {
         <Card className="flex h-[600px] w-[380px] flex-col gap-0 overflow-hidden shadow-xl">
           <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b">
             <CardTitle className="text-base">
-              PostgreSQL Assistant
+              Asistente de Reservas
             </CardTitle>
 
             <Button
@@ -125,9 +114,7 @@ export function ChatBox() {
                           <MessageContent>
                             <Bubble
                               variant={
-                                message.role === "user"
-                                  ? "default"
-                                  : "ghost"
+                                message.role === "user" ? "default" : "ghost"
                               }
                             >
                               <BubbleContent>
