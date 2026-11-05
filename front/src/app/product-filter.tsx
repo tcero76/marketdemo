@@ -81,7 +81,7 @@ export function ProductFilters() {
     );
     const query = params.toString();
     router.push(
-      query ? `${pathname}?${query}` : pathname,
+      query ? `/search?${query}` : pathname,
       { scroll: false }
     );
     setOpen(false);
