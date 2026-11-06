@@ -170,13 +170,13 @@ Secrets:
 - [x] Observabilidad con Prometheus y Grafana
 - [x] Logs centralizados con Loki
 - [x] CI/CD con GitHub Actions
+- [x] Chat
 
 ### 🚧 En desarrollo
 
 - [ ] Testing unitario, integral, end-to-end Playwright
+- [ ] Agregar Swagger
 
 ### 📌 Planificado
 
-- [ ] Chat
-- [ ] Agregar Swagger
 
