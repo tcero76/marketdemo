@@ -25,6 +25,18 @@ func NewProductController(log *logger.LoggerLogstash,
 	return &ProductController{log, productService, postsService}
 }
 
+// GetProduct godoc
+//
+// @Summary      Obtener un producto
+// @Description  Busca un producto por nombre.
+// @Tags         Products
+// @Produce      json
+// @Param        product query string true "Nombre del producto"
+// @Success      200 {object} demo.Product
+// @Failure      400 {string} string "Missing product parameter"
+// @Failure      404 {string} string "Error fetching product"
+// @Security	  BearerAuth
+// @Router       /usuario/getProduct [get]
 func (h *ProductController) GetProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Entrando a GetProduct")
@@ -43,6 +55,16 @@ func (h *ProductController) GetProduct() echo.HandlerFunc {
 	}
 }
 
+// GetProducts godoc
+//
+// @Summary      Obtener productos
+// @Description  Obtiene el catálogo de productos.
+// @Tags         Products
+// @Produce      json
+// @Success      200 {array} demo.Product
+// @Failure      500 {string} string "Internal server error"
+// @Security     BearerAuth
+// @Router       /usuario/getProducts [get]
 func (h *ProductController) GetProducts() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Entrando a GetProducts")
@@ -56,6 +78,17 @@ func (h *ProductController) GetProducts() echo.HandlerFunc {
 	}
 }
 
+// GetSearchProduct godoc
+//
+// @Summary      Buscar productos
+// @Description  Busca productos según los criterios proporcionados.
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        request body payload.SearchRequest true "Criterios de búsqueda"
+// @Success      200 {array} demo.Product
+// @Failure      400 {object} map[string]string
+// @Router       /products/search [post]
 func (h *ProductController) GetSearchProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Entrando a search Products")
@@ -73,6 +106,16 @@ func (h *ProductController) GetSearchProduct() echo.HandlerFunc {
 	}
 }
 
+// GetRecomendationsProduct godoc
+//
+// @Summary      Obtener recomendaciones de productos
+// @Description  Obtiene recomendaciones personalizadas para el usuario autenticado.
+// @Tags         Products
+// @Produce      json
+// @Success      200 {array} demo.Product
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Security     BearerAuth
+// @Router       /usuario/product/getRecommendations [get]
 func (h *ProductController) GetRecomendationsProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Fetching recommendations for user")
@@ -90,6 +133,15 @@ func (h *ProductController) GetRecomendationsProduct() echo.HandlerFunc {
 	}
 }
 
+// GetCategories godoc
+//
+// @Summary      Obtener categorías
+// @Description  Obtiene las categorías disponibles.
+// @Tags         Categories
+// @Produce      json
+// @Success      200 {array} string
+// @Failure      500 {object} map[string]string
+// @Router       /categories [get]
 func (h *ProductController) GetCategories() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Fetching categories")
@@ -104,7 +156,20 @@ func (h *ProductController) GetCategories() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, categories)
 	}
 }
-
+// CreatePosteoDemo godoc
+//
+// @Summary      Crear un posteo
+// @Description  Crea un posteo asociado al usuario autenticado.
+// @Tags         Posts
+// @Accept       json
+// @Produce      json
+// @Param        posteo body demo.PostDTO true "Datos del posteo"
+// @Success      201 {string} string "Posteo creado exitosamente"
+// @Failure      400 {object} map[string]string "Error en los datos enviados"
+// @Failure      401 {object} map[string]string "No autorizado"
+// @Failure      500 {object} map[string]string "Error al crear el posteo"
+// @Security     BearerAuth
+// @Router       /usuario/createPostDemo [post]
 func (h *ProductController) CreatePosteoDemo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Creando posteo")
@@ -144,7 +209,18 @@ func (h *ProductController) CreatePosteoDemo() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, "Posteo creado exitosamente")
 	}
 }
-
+// GetPosteosDemo godoc
+//
+// @Summary      Obtener posteos de un producto
+// @Description  Obtiene los posteos asociados a un producto.
+// @Tags         Posts
+// @Produce      json
+// @Param        productId query string true "Identificador del producto"
+// @Success      200 {array} demo.PostDTO
+// @Failure      400 {object} map[string]string "productId requerido"
+// @Failure      500 {object} map[string]string "Error al obtener los posteos"
+// @Security     BearerAuth
+// @Router       /usuario/getPosteosDemo [get]
 func (h *ProductController) GetPosteosDemo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("GetPosteos Entrando")

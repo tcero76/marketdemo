@@ -4,6 +4,10 @@ import (
 	"context"
 	"os"
 
+	echoSwagger "github.com/swaggo/echo-swagger"
+
+	_ "github.com/tcero76/marketplace/bff-service/docs"
+
 	formLLM "github.com/tcero76/marketplace/bff-service/bot/llm"
 	"github.com/tcero76/marketplace/bff-service/config"
 	"github.com/tcero76/marketplace/bff-service/controller"
@@ -25,7 +29,6 @@ import (
 var hydraAdminClient *hydra.APIClient
 
 var ctx = context.Background()
-
 func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
 	e := echo.New()
@@ -71,6 +74,7 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 	session.GET("/logout", authController.LogoutHandler(authCacheService))
 	session.POST("/signup", authController.SignUpHandler(userServices))
 	e.GET("/health", controller.HealthCheckHandler(log))
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	protegido := session.Group("/usuario")
 	protegido.Use(oauth2.JWTMiddleware(log, validator))

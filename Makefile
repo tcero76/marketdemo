@@ -16,7 +16,7 @@ ACCESS_TOKEN = $(shell \
 	| jq -r '.access_token' | tr -d '\n' \
 )
 
-.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput e2e
+.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput e2e swagger
 
 up:
 	@docker compose \
@@ -171,3 +171,6 @@ test-frontend:
 
 e2e:
 	@docker exec -it e2e npm run test -- --headed
+
+swagger:
+	@docker exec -it bff swag init -g server/docs.go -d . --parseInternal

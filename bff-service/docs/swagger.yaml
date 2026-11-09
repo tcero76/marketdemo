@@ -1,0 +1,282 @@
+basePath: /
+definitions:
+  demo.PostDTO:
+    properties:
+      id:
+        type: string
+      productId:
+        type: integer
+      replies:
+        items:
+          $ref: '#/definitions/demo.PostDTO'
+        type: array
+      replyTo:
+        $ref: '#/definitions/demo.PostDTO'
+      replyToId:
+        type: string
+      texto:
+        type: string
+    type: object
+  demo.Product:
+    properties:
+      brand:
+        type: string
+      category:
+        type: string
+      description:
+        type: string
+      discountPercentage:
+        type: number
+      id:
+        type: integer
+      price:
+        type: number
+      rating:
+        type: number
+      stock:
+        type: integer
+      thumbnail:
+        type: string
+      title:
+        type: string
+    type: object
+  payload.SearchRequest:
+    properties:
+      hashtag:
+        type: string
+      mention:
+        type: string
+      text:
+        items:
+          type: string
+        type: array
+    type: object
+info:
+  contact: {}
+  description: API de servicios de MarketDemo.
+  title: MarketDemo API
+  version: "1.0"
+paths:
+  /categories:
+    get:
+      description: Obtiene las categorías disponibles.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener categorías
+      tags:
+      - Categories
+  /health:
+    get:
+      description: Verifica el estado del servicio.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - Health
+  /products/search:
+    post:
+      consumes:
+      - application/json
+      description: Busca productos según los criterios proporcionados.
+      parameters:
+      - description: Criterios de búsqueda
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/payload.SearchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/demo.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar productos
+      tags:
+      - Products
+  /usuario/createPostDemo:
+    post:
+      consumes:
+      - application/json
+      description: Crea un posteo asociado al usuario autenticado.
+      parameters:
+      - description: Datos del posteo
+        in: body
+        name: posteo
+        required: true
+        schema:
+          $ref: '#/definitions/demo.PostDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Posteo creado exitosamente
+          schema:
+            type: string
+        "400":
+          description: Error en los datos enviados
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: No autorizado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error al crear el posteo
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear un posteo
+      tags:
+      - Posts
+  /usuario/getPosteosDemo:
+    get:
+      description: Obtiene los posteos asociados a un producto.
+      parameters:
+      - description: Identificador del producto
+        in: query
+        name: productId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/demo.PostDTO'
+            type: array
+        "400":
+          description: productId requerido
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error al obtener los posteos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener posteos de un producto
+      tags:
+      - Posts
+  /usuario/getProduct:
+    get:
+      description: Busca un producto por nombre.
+      parameters:
+      - description: Nombre del producto
+        in: query
+        name: product
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/demo.Product'
+        "400":
+          description: Missing product parameter
+          schema:
+            type: string
+        "404":
+          description: Error fetching product
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Obtener un producto
+      tags:
+      - Products
+  /usuario/getProducts:
+    get:
+      description: Obtiene el catálogo de productos.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/demo.Product'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Obtener productos
+      tags:
+      - Products
+  /usuario/product/getRecommendations:
+    get:
+      description: Obtiene recomendaciones personalizadas para el usuario autenticado.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/demo.Product'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener recomendaciones de productos
+      tags:
+      - Products
+securityDefinitions:
+  BearerAuth:
+    description: Introduce el token con el prefijo Bearer.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
