@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/redis/model"
 )
@@ -17,7 +18,7 @@ type AuthCacheService struct {
 	log *logger.LoggerLogstash
 }
 
-func NewAuthCacheService(log *logger.LoggerLogstash, rdb *redis.Client) *AuthCacheService {
+func NewAuthCacheService(log *logger.LoggerLogstash, rdb *redis.Client) services.IAuthCacheService {
 	log.Info("Initializing AuthCacheService")
 	return &AuthCacheService{Rdb: rdb, log: log}
 }

@@ -45,6 +45,7 @@ services:
       - MONITOREO=${MONITOREO}
       - LOG_LEVEL=${LOG_LEVEL}
       - UploadImages=/app/bff-service/uploads
+      - PASSIVE_MODE=${PASSIVE_MODE}
     labels:
       - traefik.enable=true
       - traefik.http.routers.bff.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/bff`)
@@ -64,7 +65,6 @@ services:
       - ${NETWORK_APPLICATION:-application}
     depends_on:
       - db
-      - cache
   front:
     container_name: front
     profiles:

@@ -103,6 +103,13 @@ jobs:
           source "${ENVIRONMENTS}"
           set +a
           docker compose \
+            -f infra/docker/test/imagenes.yml \
+            -f infra/docker/test/services.yml \
+            -f infra/docker/test/common.yml \
+            -f infra/docker/test/test.yml \
+            -f infra/docker/test/hydra.yml \
+            -f infra/docker/test/redis.yml \
+            -f infra/docker/test/postgres.yml \
             --env-file ${ENVIRONMENTS} \
             --project-directory ${PWD} \
             --project-name marketplace \

@@ -1,7 +1,7 @@
 services:
   bff-service:
     working_dir: /app/bff-service
-    command: ["/app/main"]
+    command: ["air","-c",".air.test.toml"]
     volumes:
       - ./bff-service:/app/bff-service
       - ./config:/app/config
@@ -18,6 +18,10 @@ services:
       - seccomp:unconfined
     stdin_open: true
     tty: true
+    ports:
+      - 40001:40001
+    profiles:
+      - bff
     environment:
       - DNS_WRITE=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dmarketplace
       - DNS_READ=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable&options=-c%20search_path%3Dmarketplace
@@ -54,13 +58,14 @@ services:
       - ${NETWORK_APPLICATION:-application}
     depends_on:
       - db
-      - cache
   front:
     container_name: front
     working_dir: /app
     command: ["npm", "run", "dev"]
     tty: true
     stdin_open: true
+    profiles:
+      - front
     environment:
       - NEXT_PUBLIC_HOST=${PROTOCOL_EXTERNAL}://${HOST_EXTERNAL}
       - NEXT_PUBLIC_WS=${PROTOCOL_WS_EXTERNAL}://${HOST_EXTERNAL}
@@ -90,3 +95,9 @@ services:
       # - traefik.http.routers.front.tls.certresolver=le
       - traefik.http.routers.front.tls=true
       - traefik.http.services.front.loadbalancer.server.port=3000
+  beat-service:
+    container_name: beat
+    profiles: ["scrap"]
+  scrap-service:
+    container_name: scrap
+    profiles: ["scrap"]

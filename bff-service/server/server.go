@@ -5,22 +5,17 @@ import (
 	"os"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
-
-	_ "github.com/tcero76/marketplace/bff-service/docs"
-
 	formLLM "github.com/tcero76/marketplace/bff-service/bot/llm"
 	"github.com/tcero76/marketplace/bff-service/config"
 	"github.com/tcero76/marketplace/bff-service/controller"
+	_ "github.com/tcero76/marketplace/bff-service/docs"
+	"github.com/tcero76/marketplace/bff-service/oauth2/cor"
 	logConfig "github.com/tcero76/marketplace/config/log"
+
 	"github.com/tcero76/marketplace/config/metrics"
-	configRedis "github.com/tcero76/marketplace/redis/config"
+	modelServices "github.com/tcero76/marketplace/postgres/services"
 
 	"github.com/tcero76/marketplace/bff-service/oauth2"
-	"github.com/tcero76/marketplace/bff-service/oauth2/cor"
-	postgresConfig "github.com/tcero76/marketplace/postgres/config"
-	modelServices "github.com/tcero76/marketplace/postgres/services"
-	demoServices "github.com/tcero76/marketplace/postgres/services/demo"
-	redisServices "github.com/tcero76/marketplace/redis/services"
 
 	"github.com/labstack/echo/v4"
 	hydra "github.com/ory/hydra-client-go/v2"
@@ -29,7 +24,8 @@ import (
 var hydraAdminClient *hydra.APIClient
 
 var ctx = context.Background()
-func StartServer(validator oauth2.TokenValidator) *echo.Echo {
+
+func StartServer() (*echo.Echo, error) {
 
 	e := echo.New()
 
@@ -40,28 +36,35 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 	log := logConfig.NewLoggerLogstash("🗄️  BFF")
 	log.Info("Iniciando servidor...")
 
-	dbRead := postgresConfig.GetPostgresRead(log)
-	dbWrite := postgresConfig.GetPostgresWrite(log)
-	log.Info("Conectado a la base de datos Postgres")
+	// dbRead := postgresConfig.GetPostgresRead(log)
+	// dbWrite := postgresConfig.GetPostgresWrite(log)
+	// log.Info("Conectado a la base de datos Postgres")
 
-	rdb := configRedis.InitRedis()
-	authCacheService := redisServices.NewAuthCacheService(log, rdb)
-	userServices := modelServices.NewUserService(log, dbWrite, dbRead)
-	productService := demoServices.NewProductService(log, dbWrite, dbRead)
-	postsService := demoServices.NewPostsService(log, dbWrite, dbRead)
-	jwkService := modelServices.NewJWKService(log, dbWrite, dbRead)
+	// rdb := configRedis.InitRedis()
+	// authCacheService := redisServices.NewAuthCacheService(log, rdb)
+	// userServices := modelServices.NewUserService(log, dbWrite, dbRead)
+	// productService := demoServices.NewProductService(log, dbWrite, dbRead)
+	// postsService := demoServices.NewPostsService(log, dbWrite, dbRead)
+	// jwkService := modelServices.NewJWKService(log, dbWrite, dbRead)
 
-	cfg := hydra.NewConfiguration()
-	cfg.Servers = hydra.ServerConfigurations{{URL: os.Getenv("HYDRA_ADMIN_URL")}}
-	hydraAdminClient = hydra.NewAPIClient(cfg)
+	// cfg := hydra.NewConfiguration()
+	// cfg.Servers = hydra.ServerConfigurations{{URL: os.Getenv("HYDRA_ADMIN_URL")}}
+	// hydraAdminClient = hydra.NewAPIClient(cfg)
 	googleClient := config.InitGoogleAuth()
 
-	internalAuth := cor.NewInternalAuth(hydraAdminClient, userServices)
-	googleAuth := cor.NewGoogleAuth(googleClient, userServices)
-	loginHandler, consentHandler, callbackHandler := oauth2.InitOauth2Handlers(authCacheService, userServices, internalAuth, googleAuth)
+	d, err := InitDependencies()
+	if err != nil {
+		log.Error("Error de inicialización")
+		return nil, err
+	}
+
+	internalAuth := cor.NewInternalAuth(d.HydraClient, d.UserService)
+	googleAuth := cor.NewGoogleAuth(googleClient, d.UserService)
+	loginHandler, consentHandler, callbackHandler :=
+		oauth2.InitOauth2Handlers(d.AuthCacheService, d.UserService, internalAuth, googleAuth)
 
 	session := e.Group("")
-	session.Use(config.RedisSessionMiddleware(authCacheService, log))
+	session.Use(config.RedisSessionMiddleware(d.AuthCacheService, log))
 	session.Use(config.LoggerMiddleware(log))
 
 	authController := controller.NewAuthController(log)
@@ -70,19 +73,19 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 	session.GET("/consent", authController.HandleConsent(consentHandler))
 	session.GET("/callback", authController.HandleCallback(callbackHandler))
 	session.GET("/getAuthentication", authController.AuthHandler())
-	session.POST("/refresh", authController.RefreshTokenHandler(authCacheService))
-	session.GET("/logout", authController.LogoutHandler(authCacheService))
-	session.POST("/signup", authController.SignUpHandler(userServices))
+	session.POST("/refresh", authController.RefreshTokenHandler(d.AuthCacheService))
+	session.GET("/logout", authController.LogoutHandler(d.AuthCacheService))
+	session.POST("/signup", authController.SignUpHandler(d.UserService))
 	e.GET("/health", controller.HealthCheckHandler(log))
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	protegido := session.Group("/usuario")
-	protegido.Use(oauth2.JWTMiddleware(log, validator))
+	protegido.Use(oauth2.JWTMiddleware(log, d.Validator))
 
-	productController := controller.NewProductController(log, productService, postsService)
+	productController := controller.NewProductController(log, d.ProductService, d.PostsService)
 
 	fileController := controller.NewFileController(log)
-	jwkController := controller.NewJwksHandler(log, jwkService)
+	jwkController := controller.NewJwksHandler(log, d.JWKService)
 
 	protegido.GET("/getProduct", productController.GetProduct())
 	protegido.GET("/getProducts", productController.GetProducts())
@@ -95,8 +98,8 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
 	// b := bot.New(bot.NewMemoryStore(), bot.RuleBased{})
 	// protegido.POST("/chat", controller.ChatHandler(b))
-	chatboxServices := modelServices.NewService(dbWrite)
-	processorLLM := formLLM.NewBotLLM(authCacheService, chatboxServices)
+	chatboxServices := modelServices.NewService(d.DBWrite)
+	processorLLM := formLLM.NewBotLLM(d.AuthCacheService, chatboxServices)
 	protegido.POST("/chat", controller.ChatLLMHandler(processorLLM))
 
 	e.GET("/webhook", controller.WebhookHandler())
@@ -110,5 +113,5 @@ func StartServer(validator oauth2.TokenValidator) *echo.Echo {
 
 	e.GET("/embeded", controller.GetEmbeded(log))
 	log.Info("Servidor iniciado en el puerto: ", os.Getenv("PORT"))
-	return e
+	return e, nil
 }

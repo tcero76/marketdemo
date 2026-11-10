@@ -10,7 +10,6 @@ import (
 
 	"github.com/tcero76/marketplace/bff-service/services"
 	modelServices "github.com/tcero76/marketplace/postgres/services"
-	redisServices "github.com/tcero76/marketplace/redis/services"
 
 	"github.com/tcero76/marketplace/redis/model"
 )
@@ -99,7 +98,7 @@ func saveReservation(chatbotServices *modelServices.Service) Listener {
 	}
 }
 
-func NewBotLLM(authCacheService *redisServices.AuthCacheService, chatbotServices *modelServices.Service) *Processor {
+func NewBotLLM(authCacheService services.IAuthCacheService, chatbotServices *modelServices.Service) *Processor {
 	today := time.Now()
 	form := Form{ID: "reserva", Fields: []Field{
 		{Name: "nombre", Label: "Nombre", Prompt: "¿A nombre de quién es la reserva?",

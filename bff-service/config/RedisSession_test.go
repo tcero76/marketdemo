@@ -5,31 +5,43 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/labstack/echo/v4"
+	"github.com/tcero76/marketplace/bff-service/services"
 	logConfig "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/redis/model"
 )
 
 type mockAuthCacheService struct {
-    GetSessionFunc  func(string, context.Context) (*model.SessionData, error)
-    SaveSessionFunc func(string, model.SessionData, context.Context) error
+	// GetSessionFunc         func(string, context.Context) (*model.SessionData, error)
+	// SaveSessionFunc        func(string, model.SessionData, context.Context) error
+	// LoadTokenFromRedisFunc func(sessionID string, key string, ctx context.Context) (string, error)
+
+	GetSessionFunc         func(key string, ctx context.Context) (*model.SessionData, error)
+	SaveSessionFunc        func(key string, s model.SessionData, ctx context.Context) error
+	StoreTokenInRedisFunc  func(sessionID string, key string, s *model.FormSession, ctx context.Context) error
 	LoadTokenFromRedisFunc func(sessionID string, key string, ctx context.Context) (string, error)
 }
 
-func (m *mockAuthCacheService) GetSession(id string, ctx context.Context) (*model.SessionData, error) {
-    return m.GetSessionFunc(id, ctx)
+func (m *mockAuthCacheService) SaveSession(key string, s model.SessionData, ctx context.Context) error {
+	return m.SaveSessionFunc(key, s, ctx)
 }
 
-func (m *mockAuthCacheService) SaveSession(id string, s model.SessionData, ctx context.Context) error {
-    return m.SaveSessionFunc(id, s, ctx)
+func (m *mockAuthCacheService) GetSession(key string, ctx context.Context) (*model.SessionData, error) {
+	return m.GetSessionFunc(key, ctx)
+}
+
+func (m *mockAuthCacheService) StoreTokenInRedis(sessionID string, key string, s *model.FormSession, ctx context.Context) error {
+	return m.StoreTokenInRedisFunc(sessionID, key, s, ctx)
 }
 
 func (m *mockAuthCacheService) LoadTokenFromRedis(sessionID string, key string, ctx context.Context) (string, error) {
 	return m.LoadTokenFromRedisFunc(sessionID, key, ctx)
 }
+
+var _ services.IAuthCacheService = (*mockAuthCacheService)(nil)
 
 func TestRedisSessionMiddleware_NewSession(t *testing.T) {
 	e := echo.New()
@@ -38,17 +50,17 @@ func TestRedisSessionMiddleware_NewSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	saveCalled := false
 	mock := &mockAuthCacheService{
-		GetSessionFunc: func(id string, ctx context.Context) (*model.SessionData, error) {
+		GetSessionFunc: func(key string, ctx context.Context) (*model.SessionData, error) {
 			return nil, errors.New("not found")
 		},
-		SaveSessionFunc: func(id string, s model.SessionData, ctx context.Context) error {
+		SaveSessionFunc: func(key string, s model.SessionData, ctx context.Context) error {
 			saveCalled = true
 
-			if id == "" {
+			if key == "" {
 				t.Fatal("session id vacío")
 			}
 
-			if s.SessionID != id {
+			if s.SessionID != key {
 				t.Fatal("session id incorrecto")
 			}
 
@@ -216,7 +228,7 @@ func TestRedisSessionMiddleware_SaveSessionError(t *testing.T) {
 			http.StatusInternalServerError,
 			rec.Code)
 	}
-	expected :=  `{"error":"unable to create session"}`
+	expected := `{"error":"unable to create session"}`
 	if strings.TrimSpace(rec.Body.String()) != expected {
 		t.Fatalf("unexpected body: %s", rec.Body.String())
 	}

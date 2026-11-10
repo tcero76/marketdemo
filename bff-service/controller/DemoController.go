@@ -156,6 +156,7 @@ func (h *ProductController) GetCategories() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, categories)
 	}
 }
+
 // CreatePosteoDemo godoc
 //
 // @Summary      Crear un posteo
@@ -209,6 +210,7 @@ func (h *ProductController) CreatePosteoDemo() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, "Posteo creado exitosamente")
 	}
 }
+
 // GetPosteosDemo godoc
 //
 // @Summary      Obtener posteos de un producto

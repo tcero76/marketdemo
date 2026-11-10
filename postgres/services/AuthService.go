@@ -9,6 +9,7 @@ import (
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
 
+	"github.com/tcero76/marketplace/bff-service/services"
 	"github.com/tcero76/marketplace/postgres/model"
 	"github.com/tcero76/marketplace/rabbitmq/events"
 
@@ -22,7 +23,7 @@ type UserService struct {
 	log     *logger.LoggerLogstash
 }
 
-func NewUserService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) *UserService {
+func NewUserService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) services.IUserService {
 	log.Info("Initializing UserService")
 	return &UserService{dbWrite: dbWrite, dbRead: dbRead, log: log}
 }

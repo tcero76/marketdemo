@@ -8,24 +8,18 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/require"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/server"
 	"github.com/tcero76/marketplace/postgres/model"
 )
 
-type FakeValidator struct{}
-
-func (f *FakeValidator) Validate(token string) (jwt.MapClaims, error) {
-	return jwt.MapClaims{
-		"sub": "integration-user",
-	}, nil
-}
-
 func TestGetProducts(t *testing.T) {
-	validator := &FakeValidator{}
-	e := server.StartServer(validator)
+	e, err := server.StartServer()
+	if err != nil {
+		log.Error(err.Error())
+	}
 	req := httptest.NewRequest(http.MethodGet,
 		"/usuario/getProducts",
 		nil)
@@ -42,8 +36,10 @@ func TestGetProducts(t *testing.T) {
 }
 
 func TestGetProduct_Ok(t *testing.T) {
-	validator := &FakeValidator{}
-	e := server.StartServer(validator)
+	e, err := server.StartServer()
+	if err != nil {
+		log.Error(err.Error())
+	}
 	req := httptest.NewRequest(http.MethodGet,
 		"/usuario/getProduct?product=1",
 		nil)
@@ -58,8 +54,10 @@ func TestGetProduct_Ok(t *testing.T) {
 }
 
 func TestGetProduct_NotFound(t *testing.T) {
-	validator := &FakeValidator{}
-	e := server.StartServer(validator)
+	e, err := server.StartServer()
+	if err != nil {
+		log.Error(err.Error())
+	}
 	req := httptest.NewRequest(http.MethodGet,
 		"/usuario/getProduct?product=999",
 		nil)
@@ -70,8 +68,10 @@ func TestGetProduct_NotFound(t *testing.T) {
 }
 
 func TestGetSearchProduct_Ok(t *testing.T) {
-	validator := &FakeValidator{}
-	e := server.StartServer(validator)
+	e, err := server.StartServer()
+	if err != nil {
+		log.Error(err.Error())
+	}
 	body := `{"hashtag":"","mention":"","text":["perfect"]}`
 	req := httptest.NewRequest(http.MethodPost,
 		"/usuario/searchProducts",
@@ -87,8 +87,10 @@ func TestGetSearchProduct_Ok(t *testing.T) {
 }
 
 func TestGetSearchProduct_NotFound(t *testing.T) {
-	validator := &FakeValidator{}
-	e := server.StartServer(validator)
+	e, err := server.StartServer()
+	if err != nil {
+		log.Error(err.Error())
+	}
 	body := `{"hashtag":"","mention":"","text":["xxxxxxxx"]}`
 	req := httptest.NewRequest(http.MethodPost,
 		"/usuario/searchProducts",
@@ -104,8 +106,10 @@ func TestGetSearchProduct_NotFound(t *testing.T) {
 }
 
 func TestGetCategories_Ok(t *testing.T) {
-	validator := &FakeValidator{}
-	e := server.StartServer(validator)
+	e, err := server.StartServer()
+	if err != nil {
+		log.Error(err.Error())
+	}
 	req := httptest.NewRequest(
 		http.MethodGet,
 		"/usuario/getCategories",

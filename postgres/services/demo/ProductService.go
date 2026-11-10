@@ -5,6 +5,7 @@ import (
 
 	bffDemo "github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
+	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
 	model "github.com/tcero76/marketplace/postgres/model"
@@ -17,7 +18,7 @@ type ProductService struct {
 	log     *logger.LoggerLogstash
 }
 
-func NewProductService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) *ProductService {
+func NewProductService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) services.IDemoService {
 	return &ProductService{dbWrite: dbWrite, dbRead: dbRead, log: log}
 }
 

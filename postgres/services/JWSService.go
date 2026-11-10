@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"gorm.io/gorm"
 )
@@ -33,7 +34,7 @@ func (JWK) TableName() string {
 	return "marketplace.jwk_keys"
 }
 
-func NewJWKService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) *JWSService {
+func NewJWKService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) services.IJWKService {
 	return &JWSService{
 		dbWrite: dbWrite,
 		dbRead:  dbRead,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
+	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
 	"github.com/tcero76/marketplace/postgres/model"
@@ -17,7 +18,7 @@ type PostsService struct {
 	log     *logger.LoggerLogstash
 }
 
-func NewPostsService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) *PostsService {
+func NewPostsService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) services.IDemoPosts {
 	return &PostsService{dbWrite: dbWrite, dbRead: dbRead, log: log}
 }
 
