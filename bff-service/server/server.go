@@ -36,20 +36,6 @@ func StartServer() (*echo.Echo, error) {
 	log := logConfig.NewLoggerLogstash("🗄️  BFF")
 	log.Info("Iniciando servidor...")
 
-	// dbRead := postgresConfig.GetPostgresRead(log)
-	// dbWrite := postgresConfig.GetPostgresWrite(log)
-	// log.Info("Conectado a la base de datos Postgres")
-
-	// rdb := configRedis.InitRedis()
-	// authCacheService := redisServices.NewAuthCacheService(log, rdb)
-	// userServices := modelServices.NewUserService(log, dbWrite, dbRead)
-	// productService := demoServices.NewProductService(log, dbWrite, dbRead)
-	// postsService := demoServices.NewPostsService(log, dbWrite, dbRead)
-	// jwkService := modelServices.NewJWKService(log, dbWrite, dbRead)
-
-	// cfg := hydra.NewConfiguration()
-	// cfg.Servers = hydra.ServerConfigurations{{URL: os.Getenv("HYDRA_ADMIN_URL")}}
-	// hydraAdminClient = hydra.NewAPIClient(cfg)
 	googleClient := config.InitGoogleAuth()
 
 	d, err := InitDependencies()
