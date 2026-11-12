@@ -5,6 +5,7 @@ RUN go install github.com/swaggo/swag/cmd/swag@v1.16.4
 RUN go install github.com/air-verse/air@v1.65.3
 RUN go install golang.org/x/tools/gopls@v0.21.0
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.27.0
+RUN go install go.uber.org/mock/mockgen@latest
 
 FROM golang:1.25 AS builder 
 WORKDIR /app
