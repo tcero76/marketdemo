@@ -10,6 +10,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
+	"github.com/tcero76/marketplace/postgres/model"
 	"gorm.io/gorm"
 )
 
@@ -19,21 +20,6 @@ type JWSService struct {
 	log     *logger.LoggerLogstash
 }
 
-type JWK struct {
-	Kid            string    `gorm:"primaryKey;column:kid"`
-	Kty            string    `gorm:"column:kty;not null"`
-	Alg            string    `gorm:"column:alg;not null"`
-	Use            string    `gorm:"column:use;not null"`
-	PrivateJWKJSON []byte    `gorm:"column:private_jwk;type:jsonb;not null"`
-	PublicJWKJSON  []byte    `gorm:"column:public_jwk;type:jsonb;not null"`
-	CreatedAt      time.Time `gorm:"column:created_at;not null"`
-	ExpiresAt      time.Time `gorm:"column:expires_at"`
-}
-
-func (JWK) TableName() string {
-	return "marketplace.jwk_keys"
-}
-
 func NewJWKService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB) services.IJWKService {
 	return &JWSService{
 		dbWrite: dbWrite,
@@ -41,29 +27,8 @@ func NewJWKService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.DB
 		log:     log}
 }
 
-func (j *JWSService) createJWK() (JWK, error) {
-	j.log.Info("Creando nueva JWK...")
-	var privateJWKJSON, publicJWKJSON = createJWKSet(j.log)
-	now := time.Now()
-	var jwk = JWK{
-		Kid:            "mediamtx-demo-key",
-		Kty:            "RSA",
-		Alg:            "RS256",
-		Use:            "sig",
-		PrivateJWKJSON: privateJWKJSON,
-		PublicJWKJSON:  publicJWKJSON,
-		CreatedAt:      now,
-		ExpiresAt:      now.Add(365 * 24 * time.Hour),
-	}
-
-	if err := j.dbWrite.Create(&jwk).Error; err != nil {
-		return JWK{}, err
-	}
-	return jwk, nil
-}
-
 func (j *JWSService) GetKeys() (*rsa.PrivateKey, *jwk.Set, error) {
-	var jwkDB JWK
+	var jwkDB model.JWK
 
 	err := j.dbRead.First(&jwkDB, "kid = ?", "mediamtx-demo-key").Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -102,6 +67,27 @@ func (j *JWSService) GetKeys() (*rsa.PrivateKey, *jwk.Set, error) {
 	jwkSet.Add(publicKey)
 
 	return &rsaPrivateKey, &jwkSet, nil
+}
+
+func (j *JWSService) createJWK() (model.JWK, error) {
+	j.log.Info("Creando nueva JWK...")
+	var privateJWKJSON, publicJWKJSON = createJWKSet(j.log)
+	now := time.Now()
+	var jwk = model.JWK{
+		Kid:            "mediamtx-demo-key",
+		Kty:            "RSA",
+		Alg:            "RS256",
+		Use:            "sig",
+		PrivateJWKJSON: privateJWKJSON,
+		PublicJWKJSON:  publicJWKJSON,
+		CreatedAt:      now,
+		ExpiresAt:      now.Add(365 * 24 * time.Hour),
+	}
+
+	if err := j.dbWrite.Create(&jwk).Error; err != nil {
+		return model.JWK{}, err
+	}
+	return jwk, nil
 }
 
 func createJWKSet(log *logger.LoggerLogstash) ([]byte, []byte) {
