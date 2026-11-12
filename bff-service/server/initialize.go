@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/tcero76/marketplace/bff-service/config"
 	_ "github.com/tcero76/marketplace/bff-service/docs"
 	"github.com/tcero76/marketplace/bff-service/oauth2"
 	"github.com/tcero76/marketplace/bff-service/services"
@@ -57,6 +58,8 @@ func InitDependencies() (*Dependencies, error) {
 	}
 	hydraClient := hydra.NewAPIClient(cfg)
 
+	googleClient := config.InitGoogleAuth()
+
 	return &Dependencies{
 		Log:              log,
 		DBRead:           dbRead,
@@ -68,6 +71,7 @@ func InitDependencies() (*Dependencies, error) {
 		JWKService:       jwkService,
 		HydraClient:      hydraClient,
 		Validator:        validator,
+		GoogleClient:     googleClient,
 	}, nil
 }
 

@@ -22,7 +22,8 @@ type Dependencies struct {
 	ProductService services.IDemoService
 	PostsService   services.IDemoPosts
 
-	JWKService  services.IJWKService
-	HydraClient *hydra.APIClient
-	Validator   oauth2.TokenValidator
+	JWKService   services.IJWKService
+	HydraClient  *hydra.APIClient
+	Validator    oauth2.TokenValidator
+	GoogleClient *oauth2.Config
 }

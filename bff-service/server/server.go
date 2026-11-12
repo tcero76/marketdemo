@@ -36,8 +36,6 @@ func StartServer() (*echo.Echo, error) {
 	log := logConfig.NewLoggerLogstash("🗄️  BFF")
 	log.Info("Iniciando servidor...")
 
-	googleClient := config.InitGoogleAuth()
-
 	d, err := InitDependencies()
 	if err != nil {
 		log.Error("Error de inicialización")
@@ -45,9 +43,12 @@ func StartServer() (*echo.Echo, error) {
 	}
 
 	internalAuth := cor.NewInternalAuth(d.HydraClient, d.UserService)
-	googleAuth := cor.NewGoogleAuth(googleClient, d.UserService)
+	googleAuth := cor.NewGoogleAuth(d.GoogleClient, d.UserService)
 	loginHandler, consentHandler, callbackHandler :=
 		oauth2.InitOauth2Handlers(d.AuthCacheService, d.UserService, internalAuth, googleAuth)
+
+	e.GET("/health", controller.HealthCheckHandler(log))
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	session := e.Group("")
 	session.Use(config.RedisSessionMiddleware(d.AuthCacheService, log))
@@ -62,14 +63,11 @@ func StartServer() (*echo.Echo, error) {
 	session.POST("/refresh", authController.RefreshTokenHandler(d.AuthCacheService))
 	session.GET("/logout", authController.LogoutHandler(d.AuthCacheService))
 	session.POST("/signup", authController.SignUpHandler(d.UserService))
-	e.GET("/health", controller.HealthCheckHandler(log))
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	protegido := session.Group("/usuario")
 	protegido.Use(oauth2.JWTMiddleware(log, d.Validator))
 
 	productController := controller.NewProductController(log, d.ProductService, d.PostsService)
-
 	fileController := controller.NewFileController(log)
 	jwkController := controller.NewJwksHandler(log, d.JWKService)
 
@@ -82,8 +80,6 @@ func StartServer() (*echo.Echo, error) {
 	protegido.POST("/createPostDemo", productController.CreatePosteoDemo())
 	protegido.GET("/getPosteosDemo", productController.GetPosteosDemo())
 
-	// b := bot.New(bot.NewMemoryStore(), bot.RuleBased{})
-	// protegido.POST("/chat", controller.ChatHandler(b))
 	chatboxServices := modelServices.NewService(d.DBWrite)
 	processorLLM := formLLM.NewBotLLM(d.AuthCacheService, chatboxServices)
 	protegido.POST("/chat", controller.ChatLLMHandler(processorLLM))
