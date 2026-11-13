@@ -57,7 +57,6 @@ func InitDependencies() (*Dependencies, error) {
 		{URL: os.Getenv("HYDRA_ADMIN_URL")},
 	}
 	hydraClient := hydra.NewAPIClient(cfg)
-
 	googleClient := config.InitGoogleAuth()
 
 	return &Dependencies{
