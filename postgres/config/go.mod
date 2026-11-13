@@ -3,7 +3,7 @@ module github.com/tcero76/marketplace/postgres/config
 go 1.25.2
 
 require (
-	github.com/tcero76/marketplace/config v0.0.0
+	github.com/tcero76/marketplace/config/log v0.0.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.0
 )
@@ -17,10 +17,12 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/text v0.38.0 // indirect
 )
 
-replace github.com/tcero76/marketplace/config => ../../config
+replace github.com/tcero76/marketplace/config/log => ../../config/log
+
+replace github.com/tcero76/marketplace/config/metrics => ../../config/metrics

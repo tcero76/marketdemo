@@ -7,7 +7,8 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/gommon v0.4.2
-	github.com/tcero76/marketplace/config v0.0.0
+    github.com/tcero76/marketplace/config/log v0.0.0
+	github.com/tcero76/marketplace/config/metrics v0.0.0
 	github.com/tcero76/marketplace/redis/config v0.0.0
 	github.com/tcero76/marketplace/redis/model v0.0.0
 )
@@ -28,7 +29,10 @@ require (
 
 replace github.com/tcero76/marketplace/bff-service => ../../bff-service
 
-replace github.com/tcero76/marketplace/redis/config => ../config
+
+replace github.com/tcero76/marketplace/config/log => ../../config/log
+
+replace github.com/tcero76/marketplace/config/metrics => ../../config/metrics
 
 replace github.com/tcero76/marketplace/redis/model => ../model
 
