@@ -10,12 +10,17 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/securecookie v1.1.2
+	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/gommon v0.5.0
 	github.com/lestrrat-go/jwx v1.2.31
 	github.com/lestrrat-go/jwx/v2 v2.1.6
 	github.com/ory/hydra-client-go/v2 v2.2.1
+	github.com/shopspring/decimal v1.6.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.11.1
+	github.com/swaggo/echo-swagger v1.5.2
+	github.com/swaggo/swag v1.16.6
 	github.com/tcero76/marketplace/config/log v0.0.0
 	github.com/tcero76/marketplace/config/metrics v0.0.0
 	github.com/tcero76/marketplace/postgres/config v0.0.0
@@ -24,6 +29,7 @@ require (
 	github.com/tcero76/marketplace/redis/config v0.0.0
 	github.com/tcero76/marketplace/redis/model v0.0.0
 	github.com/tcero76/marketplace/redis/services v0.0.0
+	go.uber.org/mock v0.6.0
 	golang.org/x/oauth2 v0.30.0
 	gorm.io/gorm v1.31.0
 )
@@ -71,13 +77,11 @@ require (
 	github.com/invopop/jsonschema v0.14.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.6.0 // indirect
+	github.com/jackc/pgx/v5 v5.10.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.3 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
@@ -96,13 +100,11 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/rogpeppe/go-internal v1.16.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/standard-webhooks/standard-webhooks/libraries v0.0.1 // indirect
 	github.com/sv-tools/openapi v0.2.1 // indirect
-	github.com/swaggo/echo-swagger v1.5.2 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/swag v1.16.6 // indirect
 	github.com/swaggo/swag/v2 v2.0.0-rc4 // indirect
 	github.com/tcero76/marketplace/postgres/adapters v0.0.0 // indirect
 	github.com/tcero76/marketplace/rabbitmq/events v0.0.0 // indirect

@@ -32,10 +32,8 @@ replace github.com/tcero76/marketplace/redis/config => ../config
 
 replace github.com/tcero76/marketplace/redis/model => ../model
 
-replace github.com/tcero76/marketplace/config => ../../config
+replace github.com/tcero76/marketplace/config/log => ../../config/log
 
-replace github.com/tcero76/marketplace/clickhouse/config => ../../clickhouse/config
-
-replace github.com/tcero76/marketplace/clickhouse/model => ../../clickhouse/model
+replace github.com/tcero76/marketplace/config/metrics => ../../config/metrics
 
 replace github.com/tcero76/marketplace/postgres/model => ../../postgres/model
