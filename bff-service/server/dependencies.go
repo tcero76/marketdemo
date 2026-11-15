@@ -22,6 +22,7 @@ type Dependencies struct {
 	UserService    services.IUserService
 	ProductService services.IDemoService
 	PostsService   services.IDemoPosts
+	SalesService   services.ISales
 
 	JWKService   services.IJWKService
 	HydraClient  *hydra.APIClient

@@ -16,6 +16,7 @@ import (
 	postgresConfig "github.com/tcero76/marketplace/postgres/config"
 	modelServices "github.com/tcero76/marketplace/postgres/services"
 	demoServices "github.com/tcero76/marketplace/postgres/services/demo"
+	salesServices "github.com/tcero76/marketplace/postgres/services/sales"
 	configRedis "github.com/tcero76/marketplace/redis/config"
 	"github.com/tcero76/marketplace/redis/model"
 	redisServices "github.com/tcero76/marketplace/redis/services"
@@ -38,6 +39,7 @@ func InitDependencies() (*Dependencies, error) {
 	productService := demoServices.NewProductService(log, dbWrite, dbRead)
 	postsService := demoServices.NewPostsService(log, dbWrite, dbRead)
 	jwkService := modelServices.NewJWKService(log, dbWrite, dbRead)
+	salesService := salesServices.NewSalesService(dbRead)
 
 	// Redis
 	var authCacheService services.IAuthCacheService
@@ -68,6 +70,7 @@ func InitDependencies() (*Dependencies, error) {
 		ProductService:   productService,
 		PostsService:     postsService,
 		JWKService:       jwkService,
+		SalesService:     salesService,
 		HydraClient:      hydraClient,
 		Validator:        validator,
 		GoogleClient:     googleClient,

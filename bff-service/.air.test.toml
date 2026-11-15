@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 
 [build]
   cmd = "go vet ./${TEST_PACKAGE:-controller}/..."
-  full_bin = "go test -count=1 -v -run '^TestGetProduct$' ./${TEST_PACKAGE:-controller}/... controller.TestGetProduct" 
+  full_bin = "go test -count=1 -v -run ${TEST_PATTERN:-GetProduct} ./${TEST_PACKAGE:-controller}/..." 
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []

@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"fmt"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -8,7 +9,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/require"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
@@ -17,25 +17,23 @@ import (
 )
 
 func TestGetProduct(t *testing.T) {
-	err := godotenv.Load("/app/test.env")
-	require.NoError(t, err)
 	e, err := server.StartServer()
-	t.Run("Test GetProduct Ok", func(t *testing.T) {
+	require.NoError(t, err)
+	t.Run("Test GetProduct Success", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet,
-			"/usuario/getProduct?product=1",
+			"/usuario/getProduct?product=831ad86a-6956-475f-8a61-5a89d72b130d",
 			nil)
 		req.Header.Set("Authorization", "Bearer cualquier-cosa")
 		rec := httptest.NewRecorder()
-
 		e.ServeHTTP(rec, req)
 		require.Equal(t, http.StatusOK, rec.Code)
 		var product demo.Product
 		json.Unmarshal(rec.Body.Bytes(), &product)
-		require.Equal(t, "Essence Mascara Lash Princess", product.Title)
+		require.Equal(t, "Red Lipstick", product.Title)
 	})
 	t.Run("Test GetProduct NotFound", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet,
-			"/usuario/getProduct?product=999",
+			"/usuario/getProduct?product=45a78d3b-55f2-4d28-ba6a-d25e75749055",
 			nil)
 		req.Header.Set("Authorization", "Bearer cualquier-cosa")
 		rec := httptest.NewRecorder()
@@ -46,8 +44,6 @@ func TestGetProduct(t *testing.T) {
 }
 
 func TestGetProducts(t *testing.T) {
-	err := godotenv.Load("/app/test.env")
-	require.NoError(t, err)
 	e, err := server.StartServer()
 	if err != nil {
 		log.Error(err.Error())
@@ -63,13 +59,11 @@ func TestGetProducts(t *testing.T) {
 
 	var products []demo.Product
 	json.Unmarshal(rec.Body.Bytes(), &products)
-
+	fmt.Print("productos: ", products)
 	require.Len(t, products, 30)
 }
 
 func TestGetSearchProduct(t *testing.T) {
-	err := godotenv.Load("/app/test.env")
-	require.NoError(t, err)
 	e, err := server.StartServer()
 	if err != nil {
 		log.Error(err.Error())
@@ -105,8 +99,6 @@ func TestGetSearchProduct(t *testing.T) {
 }
 
 func TestGetCategories_Ok(t *testing.T) {
-	err := godotenv.Load("/app/test.env")
-	require.NoError(t, err)
 	e, err := server.StartServer()
 	if err != nil {
 		log.Error(err.Error())

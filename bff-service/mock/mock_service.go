@@ -307,17 +307,3 @@ func (mr *MockIDemoPostsMockRecorder) GetPosts(limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPosts", reflect.TypeOf((*MockIDemoPosts)(nil).GetPosts), limit, offset)
 }
-
-// GetTotalPosts mocks base method.
-func (m *MockIDemoPosts) GetTotalPosts() int64 {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTotalPosts")
-	ret0, _ := ret[0].(int64)
-	return ret0
-}
-
-// GetTotalPosts indicates an expected call of GetTotalPosts.
-func (mr *MockIDemoPostsMockRecorder) GetTotalPosts() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalPosts", reflect.TypeOf((*MockIDemoPosts)(nil).GetTotalPosts))
-}

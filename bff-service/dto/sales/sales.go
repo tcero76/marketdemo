@@ -8,7 +8,7 @@ import (
 )
 
 type GetOrderRequest struct {
-	OrderID uuid.UUID `json:"order_id"`
+	OrderID uuid.UUID `query:"order_id"`
 }
 
 type GetOrderResponse struct {

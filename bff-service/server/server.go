@@ -84,6 +84,9 @@ func StartServer() (*echo.Echo, error) {
 	processorLLM := formLLM.NewBotLLM(d.AuthCacheService, chatboxServices)
 	protegido.POST("/chat", controller.ChatLLMHandler(processorLLM))
 
+	salesController := controller.NewSalesController(d.SalesService, log)
+	protegido.GET("/getOrder", salesController.GetOrder())
+
 	e.GET("/webhook", controller.WebhookHandler())
 	e.POST("/webhook", controller.WebhookHandler())
 
