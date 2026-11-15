@@ -36,3 +36,4 @@
     USER app
     ENTRYPOINT ["/entrypoint.sh"]
     
+    FROM dev AS test
