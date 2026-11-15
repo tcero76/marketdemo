@@ -4,6 +4,7 @@ services:
     container_name: broker
     tty: true
     stdin_open: true
+    profiles: ["broker"]
     # volumes:
     #   - ${RABBITMQ_VOLUME}:/var/lib/rabbitmq
     ports:

@@ -41,6 +41,9 @@ services:
       - MONITOREO=${MONITOREO}
       - LOG_LEVEL=${LOG_LEVEL}
       - UploadImages=/app/bff-service/uploads
+      - TEST_PACKAGE=${TEST_PACKAGE}
+      - TEST_PATTERN=${TEST_PATTERN}
+      - PASSIVE_MODE=${PASSIVE_MODE}
     labels:
       - traefik.enable=true
       - traefik.http.routers.bff.rule=Host(`${HOST_EXTERNAL}`) && PathPrefix(`/bff`)
@@ -96,9 +99,64 @@ services:
       # - traefik.http.routers.front.tls.certresolver=le
       - traefik.http.routers.front.tls=true
       - traefik.http.services.front.loadbalancer.server.port=3000
-  beat-service:
-    container_name: beat
-    profiles: ["scrap"]
   scrap-service:
-    container_name: scrap
-    profiles: ["scrap"]
+    working_dir: /app/scrap-service/
+    profiles:
+      - scrap
+    command: ["/entrypoint.sh"]
+    container_name: scrap-service
+    tty: true
+    stdin_open: true
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      - BROKER=${BROKER}
+      - PORT=8000
+      - TOTAL_POSTS=${TOTAL_POSTS}
+      - USERNAME_INSTA=${USERNAME_INSTA}
+      - PASSWORD_INSTA=${PASSWORD_INSTA}
+      - CMD_SCRAPY_START_QUEUE=${CMD_SCRAPY_START_QUEUE}
+      - CMD_SCRAPY_START_EXCHANGE=${CMD_SCRAPY_START_EXCHANGE}
+      - PROFILE=${PROFILE}
+    volumes:
+      - ./scrap-service:/app/scrap-service
+      - ./rabbitmq:/app/rabbitmq
+    healthcheck:
+      test: ["CMD", "celery", "-A", "main", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ${NETWORK_APPLICATION:-application}
+  beat-service:
+    working_dir: /app/beat-service/
+    profiles:
+      - scrap
+    container_name: beat-service
+    tty: true
+    stdin_open: true
+    environment:
+      - BROKER=${BROKER}
+      - CRON_HOUR=${CRON_HOUR}
+      - CRON_MINUTE=${CRON_MINUTE}
+      - CMD_RECOMMENDER_CALCULATE_QUEUE=${CMD_RECOMMENDER_CALCULATE_QUEUE}
+      - CMD_RECOMMENDER_CALCULATE_EXCHANGE=${CMD_RECOMMENDER_CALCULATE_EXCHANGE}
+      - CMD_SCRAPY_START_QUEUE=${CMD_SCRAPY_START_QUEUE}
+      - CMD_SCRAPY_START_EXCHANGE=${CMD_SCRAPY_START_EXCHANGE}
+    volumes:
+      - ./beat-service:/app/beat-service
+      - ./rabbitmq:/app/rabbitmq
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/metrics')"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - scrap-service
+    networks:
+      - ${NETWORK_APPLICATION:-application}

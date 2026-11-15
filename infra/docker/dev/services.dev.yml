@@ -80,8 +80,6 @@ services:
       - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
       - NEXT_PUBLIC_MOCK=${VITE_MOCK}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
-    ports:
-     - 3000:3000
     volumes:
       - ./front:/app
       - ./.vscode:/app/.vscode
