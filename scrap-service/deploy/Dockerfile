@@ -47,3 +47,5 @@ FROM mcr.microsoft.com/playwright/python:v1.50.0-noble AS base
   USER app
   ENTRYPOINT ["/entrypoint.sh"]
   
+
+FROM dev AS test

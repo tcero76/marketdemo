@@ -3,12 +3,14 @@ package demo
 import (
 	"context"
 
+	"github.com/google/uuid"
 	bffDemo "github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/payload"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
-	model "github.com/tcero76/marketplace/postgres/model"
+	demo "github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/sales"
 	"gorm.io/gorm"
 )
 
@@ -48,11 +50,11 @@ func (h *ProductService) GetProducts() ([]bffDemo.Product, error) {
 func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) []bffDemo.Product {
 	h.log.Debug("Searching products with request: ", searchRequest)
 	var productIDs []int
-	var categoryIDs []int
+	var categoryIDs []uuid.UUID
 	if searchRequest.Hashtag != "" {
 		h.log.Debug("Searching by hashtag: %s", searchRequest.Hashtag)
 		idCategory, err := getCategoryIdByName(searchRequest.Hashtag, h.dbRead)
-		categoryIDs = []int{int(idCategory)}
+		categoryIDs = []uuid.UUID{idCategory}
 		if err != nil {
 			h.log.Error("No encontró la categoria", err.Error())
 		}
@@ -80,7 +82,7 @@ func (h *ProductService) GetRecomendationsProduct(ctx context.Context, userId st
 	var products []model.Product
 	err := h.dbRead.
 		WithContext(ctx).
-		Table("marketplacedemo.products").
+		Table("inventory.products").
 		Find(&products).Error
 	if err != nil {
 		h.log.Error("Error fetching products for recommendations: ", err)
@@ -94,7 +96,7 @@ func (h *ProductService) GetCategories() ([]string, error) {
 	h.log.Info("Fetching product categories")
 	var categories []string
 	err := h.dbRead.
-		Model(&model.Category{}).
+		Model(&demo.Category{}).
 		Pluck("name", &categories).Error
 	if err != nil {
 		h.log.Error("Error fetching categories: ", err)
@@ -104,13 +106,13 @@ func (h *ProductService) GetCategories() ([]string, error) {
 	return categories, nil
 }
 
-func getCategoryIdByName(name string, db *gorm.DB) (uint, error) {
-	var category model.Category
+func getCategoryIdByName(name string, db *gorm.DB) (uuid.UUID, error) {
+	var category demo.Category
 	err := db.
 		Where("name = ?", name).
 		First(&category).Error
 	if err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
 	return category.ID, nil
 }

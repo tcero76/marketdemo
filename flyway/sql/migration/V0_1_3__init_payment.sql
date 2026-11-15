@@ -1,4 +1,4 @@
-CREATE SCHEMA payment;
+CREATE SCHEMA IF NOT EXISTS payment;
 
 CREATE TABLE payment.payments (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -47,7 +47,7 @@ def ejecutar_funcion_items_postgres(_=None):
     conn = psycopg2.connect(url)
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT marketplacedemo.normalize_marketplace();")
+            cur.execute("SELECT scrap.normalize_marketplace();")
             conn.commit()
     finally:
         conn.close()

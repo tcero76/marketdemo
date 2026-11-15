@@ -4,50 +4,25 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type Category struct {
-	ID       uint      `gorm:"primaryKey;autoIncrement"`
-	Name     string    `gorm:"uniqueIndex;not null"`
-	Products []Product `gorm:"foreignKey:CategoryID"`
+	ID   uuid.UUID `gorm:"primaryKey"`
+	Name string    `gorm:"uniqueIndex;not null"`
 }
 
 func (Category) TableName() string {
-	return "marketplacedemo.category"
-}
-
-type Product struct {
-	ID                 int `gorm:"primaryKey"`
-	Title              string
-	Description        string
-	Price              float64 `gorm:"type:numeric"`
-	DiscountPercentage float64 `gorm:"column:discount_percentage;type:numeric"`
-	Rating             float64 `gorm:"type:numeric"`
-	Stock              int
-	Brand              *string
-	CategoryID         *uint     `gorm:"column:categoryid"`
-	Category           *Category `gorm:"foreignKey:CategoryID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Thumbnail          string
-	SearchVector       string         `gorm:"type:tsvector;->"`
-	DeletedAt          gorm.DeletedAt `gorm:"column:deleted_at;index"`
-	Images             []ProductImage `gorm:"foreignKey:ProductID"`
-}
-
-func (Product) TableName() string {
-	return "marketplacedemo.products"
+	return "inventory.category"
 }
 
 type ProductImage struct {
 	ID        uint `gorm:"primaryKey;autoIncrement"`
 	ProductID int  `gorm:"index"`
 	URL       string
-
-	Product Product `gorm:"constraint:OnDelete:CASCADE;"`
 }
 
 func (ProductImage) TableName() string {
-	return "marketplacedemo.product_images"
+	return "inventory.product_images"
 }
 
 type PostsDemo struct {
@@ -64,5 +39,5 @@ type PostsDemo struct {
 }
 
 func (PostsDemo) TableName() string {
-	return "marketplacedemo.posts"
+	return "posts.posts"
 }

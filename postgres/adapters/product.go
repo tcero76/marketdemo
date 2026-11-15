@@ -2,7 +2,7 @@ package adapters
 
 import (
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/sales"
 )
 
 func ToProductDTO(product *model.Product) *demo.Product {

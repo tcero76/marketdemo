@@ -1,4 +1,4 @@
-CREATE SCHEMA scheduling;
+CREATE SCHEMA IF NOT EXISTS scheduling;
 
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 

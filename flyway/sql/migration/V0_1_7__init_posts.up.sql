@@ -8,22 +8,19 @@ CREATE TABLE IF NOT EXISTS posts.posts (
     ) STORED,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    product_id      UUID NOT NULL,
     reply_to_id     UUID NULL,
-
+    user_id         UUID NOT NULL,
+    CONSTRAINT fk_post_product
+        FOREIGN KEY (product_id)
+        REFERENCES inventory.products(id)
+        ON DELETE CASCADE,
     CONSTRAINT fk_reply_post
         FOREIGN KEY (reply_to_id)
         REFERENCES posts.posts(id)
         ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS posts.post_modelos (
-    post_id     UUID NOT NULL,
-    modelos_id  integer NOT NULL,
+CREATE INDEX idx_posts_product_id ON posts.posts(product_id);
 
-    PRIMARY KEY (post_id, modelos_id),
-
-    CONSTRAINT fk_ps_post
-        FOREIGN KEY (post_id)
-        REFERENCES posts.posts(id)
-        ON DELETE CASCADE
-);
+CREATE INDEX idx_posts_content_tsv ON posts.posts USING GIN(content_tsv);

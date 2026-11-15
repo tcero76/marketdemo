@@ -13,5 +13,5 @@ type Posteo struct {
 }
 
 func (posts Posteo) TableName() string {
-	return "marketplace.posteos"
+	return "posts.posteos"
 }

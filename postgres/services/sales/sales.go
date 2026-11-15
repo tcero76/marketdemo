@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/services"
 	"github.com/tcero76/marketplace/postgres/model"
 	salesModel "github.com/tcero76/marketplace/postgres/model/sales"
 )
@@ -18,7 +19,7 @@ type SalesService struct {
 	db *gorm.DB
 }
 
-func NewSalesService(db *gorm.DB) *SalesService {
+func NewSalesService(db *gorm.DB) services.ISales {
 	return &SalesService{
 		db: db,
 	}

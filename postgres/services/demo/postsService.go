@@ -39,7 +39,7 @@ func (c *PostsService) GetPosts(limit int, offset int) []demo.PostDTO {
 func (c *PostsService) GetTotalPosts() int64 {
 	c.log.Info("GetTotalPosts Entrando al servicio")
 	var total int64
-	err := c.dbRead.Model(&model.Posts{}).
+	err := c.dbRead.Model(&model.Posteo{}).
 		Count(&total)
 	if err.Error != nil {
 		c.log.Error("Error al obtener el total de posts: ", err.Error)

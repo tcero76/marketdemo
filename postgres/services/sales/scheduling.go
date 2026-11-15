@@ -16,17 +16,19 @@ import (
 	IServices "github.com/tcero76/marketplace/bff-service/services"
 )
 
-type schedulingService struct {
+type SchedulingService struct {
 	db *gorm.DB
 }
 
-func NewSchedulingService(db *gorm.DB) IServices.Scheduling {
-	return &schedulingService{
+var _ IServices.IScheduling = (*SchedulingService)(nil)
+
+func NewSchedulingService(db *gorm.DB) IServices.IScheduling {
+	return &SchedulingService{
 		db: db,
 	}
 }
 
-func (s *schedulingService) GetSchedule(ctx context.Context, req dto.GetScheduleRequest) (dto.GetScheduleResponse, error) {
+func (s *SchedulingService) GetSchedule(ctx context.Context, req dto.GetScheduleRequest) (dto.GetScheduleResponse, error) {
 	if !req.From.Before(req.To) {
 		return dto.GetScheduleResponse{}, ErrInvalidPeriod
 	}
@@ -58,7 +60,7 @@ func (s *schedulingService) GetSchedule(ctx context.Context, req dto.GetSchedule
 	return response, nil
 }
 
-func (s *schedulingService) GetAppointment(ctx context.Context, req dto.GetAppointmentRequest) (dto.GetAppointmentResponse, error) {
+func (s *SchedulingService) GetAppointment(ctx context.Context, req dto.GetAppointmentRequest) (dto.GetAppointmentResponse, error) {
 	var appointment model.Appointment
 	err := s.db.WithContext(ctx).
 		First(&appointment, "id = ?", req.AppointmentID).
@@ -76,7 +78,7 @@ func (s *schedulingService) GetAppointment(ctx context.Context, req dto.GetAppoi
 		Appointment: appointmentToDTO(appointment),
 	}, nil
 }
-func (s *schedulingService) Schedule(ctx context.Context, req dto.ScheduleRequest) (dto.ScheduleResponse, error) {
+func (s *SchedulingService) Schedule(ctx context.Context, req dto.ScheduleRequest) (dto.ScheduleResponse, error) {
 	if !req.StartAt.Before(req.EndAt) {
 		return dto.ScheduleResponse{}, ErrInvalidPeriod
 	}
@@ -172,7 +174,7 @@ func (s *schedulingService) Schedule(ctx context.Context, req dto.ScheduleReques
 		Appointment: appointmentToDTO(appointment),
 	}, nil
 }
-func (s *schedulingService) Reschedule(
+func (s *SchedulingService) Reschedule(
 	ctx context.Context,
 	req dto.RescheduleRequest,
 ) (dto.RescheduleResponse, error) {
@@ -302,7 +304,7 @@ func (s *schedulingService) Reschedule(
 	}, nil
 }
 
-func (s *schedulingService) Cancel(
+func (s *SchedulingService) Cancel(
 	ctx context.Context,
 	req dto.CancelRequest,
 ) (dto.CancelResponse, error) {

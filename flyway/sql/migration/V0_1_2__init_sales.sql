@@ -1,4 +1,4 @@
-CREATE SCHEMA sales;
+CREATE SCHEMA IF NOT EXISTS sales;
 
 CREATE TABLE sales.orders (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),

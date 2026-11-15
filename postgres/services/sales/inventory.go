@@ -14,7 +14,7 @@ import (
 	"github.com/tcero76/marketplace/postgres/model/sales"
 )
 
-var _ services.Inventory = (*InventoryService)(nil)
+var _ services.IInventory = (*InventoryService)(nil)
 
 type InventoryService struct {
 	db *gorm.DB

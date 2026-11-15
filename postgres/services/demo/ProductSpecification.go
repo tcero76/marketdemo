@@ -3,6 +3,7 @@ package demo
 import (
 	"strings"
 
+	"github.com/google/uuid"
 	logger "github.com/tcero76/marketplace/config/log"
 	"gorm.io/gorm"
 )
@@ -40,7 +41,7 @@ func (s TextSpecProduct) Apply(db *gorm.DB) *gorm.DB {
 }
 
 type CategorySpecProduct struct {
-	CategoryIDs []int
+	CategoryIDs []uuid.UUID
 	Log         *logger.LoggerLogstash
 }
 

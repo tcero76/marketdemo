@@ -1,4 +1,5 @@
 import scrapy
+import uuid
 
 from marketdemo.itemsDemo import ProductItem, ProductImageItem
 
@@ -11,7 +12,9 @@ class DummySpider(scrapy.Spider):
         response_json = response.json()
         item = ProductItem()
         for product in response_json["products"]:
-            item["id"] = product["id"]
+            id = str(uuid.uuid4())
+            item["id"] = id
+            item["sku"] = product["sku"]
             item["title"] = product["title"]
             item["description"] = product["description"]
             item["price"] = product["price"]
@@ -24,6 +27,6 @@ class DummySpider(scrapy.Spider):
             yield item
             for image in product["images"]:
                 image_item = ProductImageItem()
-                image_item["product_id"] = product["id"]
+                image_item["product_id"] = id
                 image_item["url"] = image
                 yield image_item
