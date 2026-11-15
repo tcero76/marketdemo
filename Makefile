@@ -1,6 +1,3 @@
-ENVIRONMENTS=/home/leonardo/.environments/demo.env
-include ${ENVIRONMENTS}
-
 # MESSAGE={"userId" => "123e4567-e89b-12d3-a456-426614174000","current_user" => "550e8400-e29b-41d4-a716-446655440000", "body": "Hola mundo!"}
 msgCreateUser={"to": "leonardo.lastra@gmail.com","subject": "test","body": "Hola mundo!"}
 
@@ -15,15 +12,50 @@ ACCESS_TOKEN = $(shell \
 		-d "client_secret=$(CLIENT_SECRET)" \
 	| jq -r '.access_token' | tr -d '\n' \
 )
+# PROFILE
+# prod, dev, test
+PROFILE ?= dev
 
-.PHONY: config sendmsg queue up kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput e2e swagger
+ifeq ($(PROFILE),dev)
+    ENVIRONMENTS := $(HOME)/.environments/demo.env
+	VOLUME_DIR := /home/leonardo/demo/infra/volumes/dev
+else ifeq ($(PROFILE),test)
+    ENVIRONMENTS := /home/leonardo/demo/infra/test.env
+	TEST_PATTERN := ^TestGetProduct$
+	TEST_PACKAGE := integration
+	VOLUME_DIR := /home/leonardo/demo/infra/volumes/test
+else
+    $(error PROFILE inválido: $(PROFILE))
+endif
+
+# bff,back,broker,cache,clickhouse,front,hydra,job,media,monitoring,postgres,scrap,solana,ws,e2e
+COMPOSE_PROFILES=postgres,cache,hydra,bff,traefik,front,back
+# COMPOSE_PROFILES=postgres,cache,hydra,bff,traefik,front,back,monitoring,e2e
+# COMPOSE_PROFILES=postgres,cache,broker,hydra,bff,traefik,front,back,monitoring,scrap
+# COMPOSE_PROFILES=postgres,broker,monitoring
+# COMPOSE_PROFILES=postgres,scrap,broker
+# COMPOSE_PROFILES := postgres,bff
+# COMPOSE_PROFILES=front,traefik
+
+COMPOSE_DIR := infra/docker/$(PROFILE)
+COMPOSE_FILE := $(COMPOSE_DIR)/monitoring.yml:$(COMPOSE_DIR)/hydra.yml:$(COMPOSE_DIR)/rabbitmq.yml:$(COMPOSE_DIR)/mediamtx.yml:$(COMPOSE_DIR)/redis.yml:$(COMPOSE_DIR)/elastic.yml:$(COMPOSE_DIR)/common.yml:$(COMPOSE_DIR)/traefik.yml:$(COMPOSE_DIR)/envoy.yml:$(COMPOSE_DIR)/postgres.yml:$(COMPOSE_DIR)/portainer.yml:$(COMPOSE_DIR)/test.yml:infra/docker/services.yml:$(COMPOSE_DIR)/services.$(PROFILE).yml
+
+export COMPOSE_PROFILES
+export COMPOSE_FILE
+export VOLUME_DIR
+export TEST_PATTERN
+export TEST_PACKAGE
+# ENVIRONMENTS=/home/leonardo/.environments/demo.env
+include ${ENVIRONMENTS}
+
+.PHONY: config sendmsg queue up restart kill down build exec migra scrap delay clean recomender ps tfapply tfdestroy tfssh redis dump trans token test test-unit sshManager sshWorker brokerMigra dumpHydra tfoutput e2e swagger
 
 up:
 	@docker compose \
 		--env-file ${ENVIRONMENTS} \
 		--project-directory ${PWD} \
 		--project-name marketplace \
-		up -d $(filter-out $@,$(MAKECMDGOALS))
+		up -d --force-recreate $(filter-out $@,$(MAKECMDGOALS))
 
 ps:
 	@watch docker compose \
@@ -84,7 +116,7 @@ migra:
 	  -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
 	  -user=${POSTGRES_USER} \
 	  -password=${POSTGRES_PASSWORD} \
-	  -schemas=marketplace,scrap,hydra,marketplacedemo,chat,extension \
+	  -schemas=marketplace,scrap,hydra,marketplacedemo,chat,extension,posts,inventory,scheduling,sales,payment \
 	  -cleanDisabled=false \
 	  -locations=filesystem:/flyway/sql/migration,filesystem:/flyway/sql/seed \
 	  -placeholders.URL_EXTERNAL=${URL_EXTERNAL} \
@@ -95,7 +127,7 @@ clean:
 	  -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
 	  -user=${POSTGRES_USER} \
 	  -password=${POSTGRES_PASSWORD} \
-	  -schemas=marketplace,scrap,hydra,marketplacedemo,chat,extension \
+	  -schemas=marketplace,scrap,hydra,marketplacedemo,chat,extension,posts,inventory,scheduling,sales,payment \
 	  -cleanDisabled=false \
 	  -locations=filesystem:/flyway/sql/migration,filesystem:/flyway/sql/seed \
 	  -placeholders.URL_EXTERNAL=${URL_EXTERNAL} \
