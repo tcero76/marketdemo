@@ -3,6 +3,8 @@ package sales
 import (
 	"context"
 	"errors"
+	"sort"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -12,6 +14,7 @@ import (
 	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
 	"github.com/tcero76/marketplace/bff-service/services"
 	"github.com/tcero76/marketplace/postgres/model"
+	"github.com/tcero76/marketplace/postgres/model/sales"
 	salesModel "github.com/tcero76/marketplace/postgres/model/sales"
 )
 
@@ -60,37 +63,177 @@ func (s *SalesService) GetOrder(ctx context.Context, req dto.GetOrderRequest) (d
 	}, nil
 }
 
-func (s *SalesService) CreateOrder(ctx context.Context, req dto.CreateOrderRequest) (dto.CreateOrderResponse, error) {
+func (s *SalesService) CreateOrder(
+	ctx context.Context,
+	req dto.CreateOrderRequest,
+) (dto.CreateOrderResponse, error) {
 	if req.UserID == uuid.Nil {
 		return dto.CreateOrderResponse{}, ErrInvalidUser
 	}
 	if err := validateCurrency(req.Currency); err != nil {
 		return dto.CreateOrderResponse{}, err
 	}
-	var user model.User
-	err := s.db.WithContext(ctx).
-		Where("id = ?", req.UserID).
-		First(&user).
-		Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return dto.CreateOrderResponse{}, ErrUserNotFound
+	if len(req.Items) == 0 {
+		return dto.CreateOrderResponse{}, ErrEmptyOrder
 	}
+	quantities := make(map[uuid.UUID]int)
+	for _, item := range req.Items {
+		if item.ProductID == uuid.Nil {
+			return dto.CreateOrderResponse{}, ErrInvalidProduct
+		}
+		if item.Quantity <= 0 {
+			return dto.CreateOrderResponse{}, ErrInvalidQuantity
+		}
+		if quantities[item.ProductID] > int(^uint(0)>>1)-item.Quantity {
+			return dto.CreateOrderResponse{}, ErrInvalidQuantity
+		}
+		quantities[item.ProductID] += item.Quantity
+	}
+	productIDs := make([]uuid.UUID, 0, len(quantities))
+	for id := range quantities {
+		productIDs = append(productIDs, id)
+	}
+	sort.Slice(productIDs, func(i, j int) bool {
+		return productIDs[i].String() < productIDs[j].String()
+	})
+	var response dto.CreateOrderResponse
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var user model.User
+		err := tx.
+			Where("user_id = ?", req.UserID).
+			First(&user).
+			Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrUserNotFound
+		}
+		if err != nil {
+			return err
+		}
+		var products []salesModel.Product
+		if err := tx.
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("id IN ?", productIDs).
+			Find(&products).
+			Error; err != nil {
+			return err
+		}
+		productMap := make(map[uuid.UUID]salesModel.Product)
+		for _, product := range products {
+
+			if product.Quantity < quantities[product.ID] {
+				return ErrInsufficientStock
+			}
+
+			productMap[product.ID] = product
+
+		}
+		for _, id := range productIDs {
+			product, exists := productMap[id]
+			if !exists {
+				return ErrProductNotFound
+			}
+
+			if !product.Active {
+				return ErrProductDisabled
+			}
+		}
+		for _, id := range productIDs {
+
+			quantity := quantities[id]
+
+			result := tx.
+				Model(&sales.Product{}).
+				Where(
+					"id = ? AND quantity >= ?",
+					id,
+					quantity,
+				).
+				Updates(map[string]interface{}{
+					"quantity":   gorm.Expr("quantity - ?", quantity),
+					"updated_at": time.Now(),
+				})
+
+			if result.Error != nil {
+				return result.Error
+			}
+
+			if result.RowsAffected != 1 {
+				return ErrInsufficientStock
+			}
+		}
+		order := salesModel.Order{
+			UserID:      req.UserID,
+			Status:      salesModel.OrderPending,
+			TotalAmount: decimal.Zero,
+			Currency:    req.Currency,
+		}
+		if err := tx.Create(&order).Error; err != nil {
+			return err
+		}
+		responseItems := make(
+			[]dto.CreateOrderItemResponse,
+			0,
+			len(req.Items),
+		)
+		for _, requestedItem := range req.Items {
+			product := productMap[requestedItem.ProductID]
+			total := product.Price.Mul(
+				decimal.NewFromInt(int64(requestedItem.Quantity)),
+			)
+			item := salesModel.OrderItem{
+				OrderID:     order.ID,
+				ProductID:   &product.ID,
+				Quantity:    requestedItem.Quantity,
+				UnitPrice:   product.Price,
+				TotalAmount: total,
+			}
+			if err := tx.Create(&item).Error; err != nil {
+				return err
+			}
+			order.TotalAmount = order.TotalAmount.Add(total)
+			responseItems = append(
+				responseItems,
+				dto.CreateOrderItemResponse{
+					OrderItemID: item.ID,
+					ProductID:   product.ID,
+					Quantity:    item.Quantity,
+					UnitPrice:   item.UnitPrice,
+					TotalAmount: item.TotalAmount,
+				},
+			)
+		}
+		if err := tx.Save(&order).Error; err != nil {
+			return err
+		}
+
+		movements := make([]salesModel.InventoryMovement, 0, len(productIDs))
+
+		for _, id := range productIDs {
+			movements = append(movements, salesModel.InventoryMovement{
+				ProductID:    id,
+				UserID:       req.UserID,
+				OrderID:      &order.ID,
+				MovementType: "SALE",
+				Quantity:     quantities[id],
+			})
+		}
+
+		if err := tx.Create(&movements).Error; err != nil {
+			return err
+		}
+
+		response = dto.CreateOrderResponse{
+			OrderID:     order.ID,
+			Status:      string(order.Status),
+			TotalAmount: order.TotalAmount,
+			Items:       responseItems,
+		}
+		return nil
+	})
 	if err != nil {
 		return dto.CreateOrderResponse{}, err
 	}
-	order := salesModel.Order{
-		UserID:      req.UserID,
-		Status:      salesModel.OrderPending,
-		TotalAmount: decimal.Zero,
-		Currency:    req.Currency,
-	}
-	if err := s.db.WithContext(ctx).Create(&order).Error; err != nil {
-		return dto.CreateOrderResponse{}, err
-	}
-	return dto.CreateOrderResponse{
-		OrderID: order.ID,
-		Status:  string(order.Status),
-	}, nil
+	return response, nil
 }
 
 func validateCurrency(currency string) error {

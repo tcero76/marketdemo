@@ -21,7 +21,7 @@ func ToProductDTO(product *model.Product) *demo.Product {
 		Price:              product.Price,
 		DiscountPercentage: product.DiscountPercentage,
 		Rating:             product.Rating,
-		Stock:              product.Stock,
+		Quantity:           product.Quantity,
 		Brand:              brand,
 		Category:           category,
 		Thumbnail:          product.Thumbnail,

@@ -3,7 +3,7 @@ package model
 import "github.com/google/uuid"
 
 type User struct {
-	UserID     uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	UserID     uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4();column:user_id;"`
 	Nombre     string    `gorm:"type:text"`
 	Password   string    `gorm:"type:text"`
 	Roles      string    `gorm:"type:text"`

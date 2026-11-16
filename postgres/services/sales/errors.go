@@ -9,6 +9,8 @@ var (
 	ErrProductNotFound   = errors.New("product not found")
 	ErrProductDisabled   = errors.New("product is disabled")
 	ErrInsufficientStock = errors.New("insufficient stock")
+	ErrEmptyOrder        = errors.New("order cannot be empty")
+	ErrInvalidProduct    = errors.New("invalid product")
 
 	// Sales
 	ErrOrderNotFound         = errors.New("order not found")

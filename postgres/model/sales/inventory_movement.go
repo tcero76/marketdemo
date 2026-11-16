@@ -19,6 +19,7 @@ type InventoryMovement struct {
 	ID           uuid.UUID    `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	ProductID    uuid.UUID    `gorm:"type:uuid;not null"`
 	UserID       uuid.UUID    `gorm:"type:uuid;not null"`
+	OrderID      *uuid.UUID   `gorm:"type:uuid;not null"`
 	MovementType MovementType `gorm:"type:varchar(20);not null"`
 	Quantity     int          `gorm:"not null"`
 	CreatedAt    time.Time    `gorm:"not null;default:now()"`

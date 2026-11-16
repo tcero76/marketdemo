@@ -18,8 +18,8 @@ const (
 )
 
 type Order struct {
-	ID          uuid.UUID       `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	UserID      uuid.UUID       `gorm:"type:uuid;not null"`
+	ID          uuid.UUID       `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
+	UserID      uuid.UUID       `gorm:"type:uuid;not null;column:user_id"`
 	Status      OrderStatus     `gorm:"type:varchar(20);not null;default:'PENDING'"`
 	TotalAmount decimal.Decimal `gorm:"type:numeric(12,2);not null"`
 	Currency    string          `gorm:"type:char(3);not null"`
