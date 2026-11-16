@@ -42,6 +42,7 @@ jobs:
           mkdir -p /home/runner/work/marketplace/marketplace/infra/volumes/{timescaleDB/data,rabbitmq/data,redis/data,grafana/data,prometheus/data}
       - name: Set up test environment
         run: |
+          VOLUME_DIR=/home/runner/work/marketplace/marketplace/infra/volumes
           set -a
           source "${ENVIRONMENTS}"
           set +a
