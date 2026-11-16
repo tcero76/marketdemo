@@ -30,6 +30,11 @@ CREATE TABLE sales.orders (
         )
 );
 
+ALTER TABLE inventory.inventory_movements
+ADD CONSTRAINT fk_inventory_movements_order
+FOREIGN KEY (order_id)
+REFERENCES sales.orders(id);
+
 CREATE INDEX idx_orders_user_id
     ON sales.orders (user_id);
 
@@ -41,19 +46,13 @@ CREATE INDEX idx_orders_created_at
 
 CREATE TABLE sales.order_items (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     order_id        UUID NOT NULL REFERENCES sales.orders(id),
-
     appointment_id UUID REFERENCES scheduling.appointments(id),
     product_id     UUID REFERENCES inventory.products(id),
-
     quantity        INTEGER NOT NULL DEFAULT 1,
-
     unit_price      NUMERIC(12, 2) NOT NULL,
     total_amount    NUMERIC(12, 2) NOT NULL,
-
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
     CONSTRAINT order_items_quantity_positive
         CHECK (quantity > 0),
 
