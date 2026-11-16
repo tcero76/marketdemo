@@ -11,7 +11,7 @@ services:
       - ./redis:/app/redis
       - ./infra/volumes/uploads:/app/bff-service/uploads
       - ./.vscode:/app/.vscode
-      - ./infra/test.env:/app/test.env
+      - ./infra/test.env:/app/bff-service/test.env
     container_name: bff
     cap_add:
       - SYS_PTRACE
@@ -112,8 +112,6 @@ services:
       - BROKER=${BROKER}
       - PORT=8000
       - TOTAL_POSTS=${TOTAL_POSTS}
-      - USERNAME_INSTA=${USERNAME_INSTA}
-      - PASSWORD_INSTA=${PASSWORD_INSTA}
       - CMD_SCRAPY_START_QUEUE=${CMD_SCRAPY_START_QUEUE}
       - CMD_SCRAPY_START_EXCHANGE=${CMD_SCRAPY_START_EXCHANGE}
       - PROFILE=${PROFILE}
