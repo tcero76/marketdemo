@@ -33,13 +33,29 @@ type OrderItemResponse struct {
 }
 
 type CreateOrderRequest struct {
-	UserID   uuid.UUID `json:"user_id"`
-	Currency string    `json:"currency"`
+	UserID   uuid.UUID                `json:"user_id"`
+	Currency string                   `json:"currency"`
+	Items    []CreateOrderItemRequest `json:"items"`
+}
+
+type CreateOrderItemRequest struct {
+	ProductID uuid.UUID `json:"product_id"`
+	Quantity  int       `json:"quantity"`
 }
 
 type CreateOrderResponse struct {
-	OrderID uuid.UUID `json:"order_id"`
-	Status  string    `json:"status"`
+	OrderID     uuid.UUID                 `json:"order_id"`
+	Status      string                    `json:"status"`
+	TotalAmount decimal.Decimal           `json:"total_amount"`
+	Items       []CreateOrderItemResponse `json:"items"`
+}
+
+type CreateOrderItemResponse struct {
+	OrderItemID uuid.UUID       `json:"order_item_id"`
+	ProductID   uuid.UUID       `json:"product_id"`
+	Quantity    int             `json:"quantity"`
+	UnitPrice   decimal.Decimal `json:"unit_price"`
+	TotalAmount decimal.Decimal `json:"total_amount"`
 }
 
 type AddProductRequest struct {

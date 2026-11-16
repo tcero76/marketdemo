@@ -5,9 +5,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/tcero76/marketplace/bff-service/dto/sales"
+	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
+	"github.com/tcero76/marketplace/postgres/services/sales"
 )
 
 type SalesController struct {
@@ -22,7 +23,7 @@ func NewSalesController(salesService services.ISales, log *logger.LoggerLogstash
 func (h *SalesController) GetOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Entrando a GetOrder")
-		var req sales.GetOrderRequest
+		var req dto.GetOrderRequest
 		if err := c.Bind(&req); err != nil {
 			h.log.Error("Error al parsear JSON: ", err)
 			return c.JSON(http.StatusBadRequest, map[string]string{
@@ -36,10 +37,33 @@ func (h *SalesController) GetOrder() echo.HandlerFunc {
 		}
 		res, err := h.SalesService.GetOrder(c.Request().Context(), req)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
-			return err
+			if err == sales.ErrInvalidUser {
+				c.JSON(http.StatusForbidden, err.Error())
+				return err
+			} else {
+				c.JSON(http.StatusBadRequest, err.Error())
+				return err
+			}
 		}
 		c.JSON(http.StatusOK, res)
+		return nil
+	}
+}
+
+func (h *SalesController) CreateOrder() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		h.log.Info("Entra a CreateOrder")
+		var req dto.CreateOrderRequest
+		if err := c.Bind(&req); err != nil {
+			h.log.Error("Error al parsear JSON: ", err)
+			return c.JSON(http.StatusBadRequest, err)
+		}
+		res, err := h.SalesService.CreateOrder(c.Request().Context(), req)
+		if err != nil {
+			h.log.Error("Error al crear: ", err)
+			return c.JSON(http.StatusBadRequest, err)
+		}
+		c.JSON(http.StatusCreated, res)
 		return nil
 	}
 }

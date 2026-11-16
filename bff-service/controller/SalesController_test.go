@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -21,7 +22,7 @@ func TestGetOrder(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockSales := mock.NewMockISales(ctrl)
 	e := echo.New()
-	log := logConfig.NewLoggerLogstash("🗄️ BFF")
+	log := logConfig.NewLoggerLogstash("🗄️ BFFTesting")
 	controller := &SalesController{
 		log:          log,
 		SalesService: mockSales,
@@ -75,6 +76,64 @@ func TestGetOrder(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 		controller.GetOrder()(c)
+		assert.Equal(t, http.StatusBadRequest, rec.Code)
+	})
+}
+
+func TestCreateOrder(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockSales := mock.NewMockISales(ctrl)
+	e := echo.New()
+	log := logConfig.NewLoggerLogstash("🗄️ BFFTesting")
+	controller := &SalesController{
+		log:          log,
+		SalesService: mockSales,
+	}
+	userID, err := uuid.NewRandom()
+	assert.NoError(t, err)
+	orderID, err := uuid.NewRandom()
+	assert.NoError(t, err)
+	reqDTO := dto.CreateOrderRequest{
+		UserID:   userID,
+		Currency: "CL",
+	}
+	expected := dto.CreateOrderResponse{
+		OrderID: orderID,
+		Status:  "Ok",
+	}
+	t.Run("Test CreateOrder Success", func(t *testing.T) {
+		body := `{
+			"user_id": "` + userID.String() + `",
+			"currency": "CL"
+		}`
+		mockSales.EXPECT().
+			CreateOrder(gomock.Any(), gomock.Eq(reqDTO)).
+			Return(expected, nil).
+			Times(1)
+		req := httptest.NewRequest(
+			http.MethodPost,
+			"/createOrder",
+			strings.NewReader(body))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		controller.CreateOrder()(c)
+		assert.Equal(t, http.StatusCreated, rec.Code)
+		var res dto.CreateOrderResponse
+		err := json.Unmarshal(rec.Body.Bytes(), &res)
+		assert.NoError(t, err)
+		assert.Equal(t, res.OrderID, expected.OrderID)
+	})
+	t.Run("Test CreateOrder BadRequest", func(t *testing.T) {
+		body := "{"
+		req := httptest.NewRequest(
+			http.MethodPost,
+			"/createOrder",
+			strings.NewReader(body))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		controller.CreateOrder()(c)
 		assert.Equal(t, http.StatusBadRequest, rec.Code)
 	})
 }

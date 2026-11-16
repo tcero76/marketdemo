@@ -12,7 +12,7 @@ type Product struct {
 	Price              decimal.Decimal `json:"price",omitempty`
 	DiscountPercentage float64         `json:"discountPercentage",omitempty`
 	Rating             float64         `json:"rating",omitempty`
-	Stock              int             `json:"stock",omitempty`
+	Quantity           int             `json:"quantity",omitempty`
 	Brand              string          `json:"brand",omitempty`
 	Category           string          `json:"category",omitempty`
 	Thumbnail          string          `json:"thumbnail",omitempty`

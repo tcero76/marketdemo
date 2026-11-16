@@ -3,8 +3,8 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go vet ./${TEST_PACKAGE:-controller}/..."
-  full_bin = "go test -count=1 -v -run ${TEST_PATTERN:-GetProduct} ./${TEST_PACKAGE:-controller}/..." 
+  cmd = "sh ./script/vet-tests.sh"
+  full_bin = "sh ./script/run-tests.sh"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
@@ -12,7 +12,7 @@ tmp_dir = "tmp"
   exclude_unchanged = false
   follow_symlink = false
   include_ext = ["go"]
-  include_file = []
+  include_file = ["test.env"]
   kill_delay = "0s"
   log = "test-errors.log"
   poll = false

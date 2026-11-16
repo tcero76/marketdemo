@@ -86,6 +86,7 @@ func StartServer() (*echo.Echo, error) {
 
 	salesController := controller.NewSalesController(d.SalesService, log)
 	protegido.GET("/getOrder", salesController.GetOrder())
+	protegido.POST("/createOrder", salesController.CreateOrder())
 
 	e.GET("/webhook", controller.WebhookHandler())
 	e.POST("/webhook", controller.WebhookHandler())

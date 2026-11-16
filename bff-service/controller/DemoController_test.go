@@ -80,7 +80,6 @@ func newTestBodyContext(
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	return e.NewContext(req, rec), rec
 }
-
 func TestGetProduct(t *testing.T) {
 	t.Run("Testing GetProduct Ok", func(t *testing.T) {
 		c, rec := newTestContext(
