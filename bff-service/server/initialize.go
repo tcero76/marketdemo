@@ -31,8 +31,14 @@ func InitDependencies() (*Dependencies, error) {
 	log := logConfig.NewLoggerLogstash("🗄️ BFF")
 
 	// PostgreSQL
-	dbRead := postgresConfig.GetPostgresRead(log)
-	dbWrite := postgresConfig.GetPostgresWrite(log)
+	dbRead, err := postgresConfig.GetPostgresRead(log)
+	if err != nil {
+		return nil, err
+	}
+	dbWrite, err := postgresConfig.GetPostgresWrite(log)
+	if err != nil {
+		return nil, err
+	}
 
 	// Servicios de negocio
 	userServices := modelServices.NewUserService(log, dbWrite, dbRead)
