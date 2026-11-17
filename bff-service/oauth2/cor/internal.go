@@ -8,7 +8,7 @@ import (
 
 	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/services"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 
 	oauthModel "github.com/tcero76/marketplace/bff-service/model"
 
@@ -93,7 +93,7 @@ func (b *InternalAuth) Consent(ctx context.Context, consentChallenge string) (st
 	return resp.GetRedirectTo(), nil
 }
 
-func (b *InternalAuth) Callback(code string, ctx context.Context) (*oauth2.Token, error)  {
+func (b *InternalAuth) Callback(code string, ctx context.Context) (*oauth2.Token, error) {
 	log.Println("Callback Internal")
 	conf := &oauth2.Config{
 		ClientID:     os.Getenv("CLIENT_ID"),
@@ -108,7 +108,7 @@ func (b *InternalAuth) Callback(code string, ctx context.Context) (*oauth2.Token
 	log.Println("Conf.ClientID: ", conf.ClientID)
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
-        return nil, fmt.Errorf("intercambiando código OAuth2: %w", err)
+		return nil, fmt.Errorf("intercambiando código OAuth2: %w", err)
 	}
 	return token, nil
 }

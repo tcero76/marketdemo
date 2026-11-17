@@ -3,7 +3,7 @@ package cor
 import (
 	"context"
 
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 
 	"github.com/tcero76/marketplace/bff-service/services"
 
