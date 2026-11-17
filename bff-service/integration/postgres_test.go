@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
 	"github.com/tcero76/marketplace/bff-service/server"
-	"github.com/tcero76/marketplace/postgres/model"
+	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
 )
 
 func TestGetProduct(t *testing.T) {
@@ -112,7 +112,7 @@ func TestGetCategories_Ok(t *testing.T) {
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 	require.Equal(t, http.StatusOK, rec.Code)
-	var categories []model.Category
+	var categories []inventoryModel.Category
 	json.Unmarshal(rec.Body.Bytes(), &categories)
 	require.Len(t, categories, 4)
 }
