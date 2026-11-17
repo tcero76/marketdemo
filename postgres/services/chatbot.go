@@ -18,7 +18,7 @@ import (
 
 const (
 	MinPersonas = 1
-	MaxPersonas = 10 // debe coincidir con reservas_personas_chk y con el formulario
+	MaxPersonas = 10
 )
 
 var (
@@ -26,9 +26,8 @@ var (
 	ErrNoEncontrada   = errors.New("reserva no encontrada")
 )
 
-var emailRe = regexp.MustCompile(`^[^@\s]+@[^@\s]+\.[^@\s]+$`) // igual que reservas_email_chk
+var emailRe = regexp.MustCompile(`^[^@\s]+@[^@\s]+\.[^@\s]+$`)
 
-// NuevaReserva son los datos de entrada del service, ya tipados y sin depender del chatbot.
 type NuevaReserva struct {
 	SessionID string
 	Nombre    string
@@ -37,7 +36,6 @@ type NuevaReserva struct {
 	Personas  int
 }
 
-// FromAnswers convierte las respuestas del formulario (todas texto) en datos tipados.
 func FromAnswers(sessionID string, a map[string]string) (NuevaReserva, error) {
 	fecha, err := time.Parse("2006-01-02", strings.TrimSpace(a["fecha"]))
 	if err != nil {
@@ -60,8 +58,6 @@ func invalid(format string, args ...any) error {
 	return fmt.Errorf("%w: %s", ErrDatosInvalidos, fmt.Sprintf(format, args...))
 }
 
-// normalize limpia y valida. Replica los CHECK de la base: la BD es la última defensa,
-// pero aquí el error es legible y no depende del texto de Postgres.
 func (n *NuevaReserva) normalize() error {
 	n.SessionID = strings.TrimSpace(n.SessionID)
 	n.Nombre = strings.TrimSpace(n.Nombre)
@@ -84,7 +80,6 @@ func (n *NuevaReserva) normalize() error {
 	return nil
 }
 
-// Service guarda y consulta reservas.
 type Service struct{ db *gorm.DB }
 
 func NewService(db *gorm.DB) *Service {
@@ -118,7 +113,6 @@ func (s *Service) Create(ctx context.Context, answers map[string]string, session
 	return &r, nil
 }
 
-// GetBySession devuelve la reserva de una conversación (ErrNoEncontrada si no hay).
 func (s *Service) GetBySession(ctx context.Context, sessionID string) (*model.Reserva, error) {
 	var r model.Reserva
 	err := s.db.WithContext(ctx).Where("session_id = ?", sessionID).First(&r).Error

@@ -1,4 +1,4 @@
-package sales
+package services
 
 import "errors"
 
