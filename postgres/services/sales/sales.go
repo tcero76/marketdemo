@@ -13,9 +13,10 @@ import (
 
 	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
 	"github.com/tcero76/marketplace/bff-service/services"
-	"github.com/tcero76/marketplace/postgres/model"
-	"github.com/tcero76/marketplace/postgres/model/sales"
+	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 	salesModel "github.com/tcero76/marketplace/postgres/model/sales"
+	schedulingModel "github.com/tcero76/marketplace/postgres/model/scheduling"
 )
 
 type SalesService struct {
@@ -109,7 +110,7 @@ func (s *SalesService) CreateOrder(
 		if err != nil {
 			return err
 		}
-		var products []salesModel.Product
+		var products []inventoryModel.Product
 		if err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
 			Where("id IN ?", productIDs).
@@ -117,7 +118,7 @@ func (s *SalesService) CreateOrder(
 			Error; err != nil {
 			return err
 		}
-		productMap := make(map[uuid.UUID]salesModel.Product)
+		productMap := make(map[uuid.UUID]inventoryModel.Product)
 		for _, product := range products {
 
 			if product.Quantity < quantities[product.ID] {
@@ -142,7 +143,7 @@ func (s *SalesService) CreateOrder(
 			quantity := quantities[id]
 
 			result := tx.
-				Model(&sales.Product{}).
+				Model(&inventoryModel.Product{}).
 				Where(
 					"id = ? AND quantity >= ?",
 					id,
@@ -206,10 +207,10 @@ func (s *SalesService) CreateOrder(
 			return err
 		}
 
-		movements := make([]salesModel.InventoryMovement, 0, len(productIDs))
+		movements := make([]inventoryModel.InventoryMovement, 0, len(productIDs))
 
 		for _, id := range productIDs {
-			movements = append(movements, salesModel.InventoryMovement{
+			movements = append(movements, inventoryModel.InventoryMovement{
 				ProductID:    id,
 				UserID:       req.UserID,
 				OrderID:      &order.ID,
@@ -277,7 +278,7 @@ func (s *SalesService) AddProduct(ctx context.Context, req dto.AddProductRequest
 			return ErrOrderNotPending
 		}
 
-		var product salesModel.Product
+		var product inventoryModel.Product
 
 		err = tx.
 			First(&product, "id = ?", req.ProductID).
@@ -351,7 +352,7 @@ func (s *SalesService) AddAppointment(ctx context.Context, req dto.AddAppointmen
 		if order.Status != salesModel.OrderPending {
 			return ErrOrderNotPending
 		}
-		var appointment salesModel.Appointment
+		var appointment schedulingModel.Appointment
 		err = tx.
 			Preload("Resource").
 			First(&appointment, "id = ?", req.AppointmentID).
@@ -365,7 +366,7 @@ func (s *SalesService) AddAppointment(ctx context.Context, req dto.AddAppointmen
 		if appointment.UserID != order.UserID {
 			return ErrAppointmentUserMismatch
 		}
-		if appointment.Status != salesModel.AppointmentConfirmed {
+		if appointment.Status != schedulingModel.AppointmentConfirmed {
 			return ErrAppointmentNotAvailable
 		}
 		price := appointment.Resource.Price

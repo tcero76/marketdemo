@@ -9,7 +9,8 @@ import (
 
 	"github.com/shopspring/decimal"
 	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
-	model "github.com/tcero76/marketplace/postgres/model/sales"
+	paymentModel "github.com/tcero76/marketplace/postgres/model/payment"
+	salesModel "github.com/tcero76/marketplace/postgres/model/sales"
 )
 
 type PaymentService struct {
@@ -26,7 +27,7 @@ func (s *PaymentService) GetPayment(
 	ctx context.Context,
 	req dto.GetPaymentRequest,
 ) (dto.GetPaymentResponse, error) {
-	var payment model.Payment
+	var payment paymentModel.Payment
 
 	err := s.db.WithContext(ctx).
 		First(&payment, "id = ?", req.PaymentID).
@@ -60,7 +61,7 @@ func (s *PaymentService) Pay(
 	var response dto.PayResponse
 
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var order model.Order
+		var order salesModel.Order
 
 		err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
@@ -75,7 +76,7 @@ func (s *PaymentService) Pay(
 			return err
 		}
 
-		if order.Status != model.OrderPending {
+		if order.Status != salesModel.OrderPending {
 			return ErrOrderNotPending
 		}
 
@@ -83,18 +84,18 @@ func (s *PaymentService) Pay(
 			return ErrInvalidOrder
 		}
 
-		payment := model.Payment{
+		payment := paymentModel.Payment{
 			OrderID:  order.ID,
 			Amount:   order.TotalAmount,
 			Currency: order.Currency,
-			Status:   model.PaymentCompleted,
+			Status:   paymentModel.PaymentCompleted,
 		}
 
 		if err := tx.Create(&payment).Error; err != nil {
 			return err
 		}
 
-		order.Status = model.OrderPaid
+		order.Status = salesModel.OrderPaid
 
 		if err := tx.Save(&order).Error; err != nil {
 			return err
@@ -129,7 +130,7 @@ func (s *PaymentService) Refund(
 	var response dto.RefundResponse
 
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var payment model.Payment
+		var payment paymentModel.Payment
 
 		err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
@@ -144,11 +145,11 @@ func (s *PaymentService) Refund(
 			return err
 		}
 
-		if payment.Status != model.PaymentCompleted {
+		if payment.Status != paymentModel.PaymentCompleted {
 			return ErrPaymentNotRefundable
 		}
 
-		payment.Status = model.PaymentRefunded
+		payment.Status = paymentModel.PaymentRefunded
 
 		if err := tx.Save(&payment).Error; err != nil {
 			return err

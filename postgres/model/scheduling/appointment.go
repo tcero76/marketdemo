@@ -1,10 +1,10 @@
-package sales
+package scheduling
 
 import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 )
 
 type AppointmentStatus string

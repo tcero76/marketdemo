@@ -8,7 +8,7 @@ import (
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
-	"github.com/tcero76/marketplace/postgres/model"
+	postsModel "github.com/tcero76/marketplace/postgres/model/posts"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +24,7 @@ func NewPostsService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.
 
 func (c *PostsService) GetPosts(limit int, offset int) []demo.PostDTO {
 	c.log.Info("GetPosts Entrando al servicio")
-	var posts []model.PostsDemo
+	var posts []postsModel.Posts
 	err := c.dbRead.Limit(limit).
 		Offset(offset).
 		Find(&posts)
@@ -39,7 +39,7 @@ func (c *PostsService) GetPosts(limit int, offset int) []demo.PostDTO {
 func (c *PostsService) GetTotalPosts() int64 {
 	c.log.Info("GetTotalPosts Entrando al servicio")
 	var total int64
-	err := c.dbRead.Model(&model.Posteo{}).
+	err := c.dbRead.Model(&postsModel.Posts{}).
 		Count(&total)
 	if err.Error != nil {
 		c.log.Error("Error al obtener el total de posts: ", err.Error)
@@ -72,7 +72,7 @@ func (c *PostsService) CreatePosteo(posteoDTO *demo.PostDTO, userId string) erro
 
 func (c *PostsService) GetPosteos(productId string) ([]demo.PostDTO, error) {
 	c.log.Info("GetPosteos Entrando al servicio modelo: ", productId)
-	posteos := []model.PostsDemo{}
+	posteos := []postsModel.Posts{}
 	err := c.dbRead.Where("product_id = ?", productId).Find(&posteos)
 	if err.Error != nil {
 		c.log.Error("Error al obtener los posteos: ", err.Error)

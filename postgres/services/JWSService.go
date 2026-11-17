@@ -10,7 +10,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 	"gorm.io/gorm"
 )
 

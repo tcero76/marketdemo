@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 )
 
 type ReturnOrderStatus string

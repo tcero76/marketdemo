@@ -1,10 +1,11 @@
-package sales
+package payment
 
 import (
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+	salesModel "github.com/tcero76/marketplace/postgres/model/sales"
 )
 
 type PaymentStatus string
@@ -26,7 +27,7 @@ type Payment struct {
 	CreatedAt time.Time       `gorm:"not null;default:now()"`
 	UpdatedAt time.Time       `gorm:"not null;default:now()"`
 
-	Order Order `gorm:"foreignKey:OrderID;references:ID"`
+	Order salesModel.Order `gorm:"foreignKey:OrderID;references:ID"`
 }
 
 func (Payment) TableName() string {

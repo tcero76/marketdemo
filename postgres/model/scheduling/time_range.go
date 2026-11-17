@@ -1,4 +1,4 @@
-package sales
+package scheduling
 
 import (
 	"database/sql/driver"

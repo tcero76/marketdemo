@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/chatbot"
 )
 
 const (

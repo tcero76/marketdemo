@@ -1,4 +1,4 @@
-package model
+package marketplace
 
 import "github.com/google/uuid"
 

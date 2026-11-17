@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/tcero76/marketplace/bff-service/dto"
-	"github.com/tcero76/marketplace/postgres/model"
+	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 )
 
 func ToUserDTO(user model.User) dto.UserDTO {

@@ -5,6 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
+	schedulingModel "github.com/tcero76/marketplace/postgres/model/scheduling"
 )
 
 type OrderItem struct {
@@ -18,9 +20,9 @@ type OrderItem struct {
 	TotalAmount decimal.Decimal `gorm:"type:numeric(12,2);not null"`
 	CreatedAt   time.Time       `gorm:"not null;default:now()"`
 
-	Order       Order        `gorm:"foreignKey:OrderID;references:ID"`
-	Appointment *Appointment `gorm:"foreignKey:AppointmentID;references:ID"`
-	Product     *Product     `gorm:"foreignKey:ProductID;references:ID"`
+	Order       Order                        `gorm:"foreignKey:OrderID;references:ID"`
+	Appointment *schedulingModel.Appointment `gorm:"foreignKey:AppointmentID;references:ID"`
+	Product     *inventoryModel.Product      `gorm:"foreignKey:ProductID;references:ID"`
 }
 
 func (OrderItem) TableName() string {

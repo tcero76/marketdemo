@@ -9,8 +9,7 @@ import (
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
-	demo "github.com/tcero76/marketplace/postgres/model"
-	model "github.com/tcero76/marketplace/postgres/model/sales"
+	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +25,7 @@ func NewProductService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gor
 
 func (h *ProductService) GetProduct(query string) (*bffDemo.Product, error) {
 	h.log.Infof("Fetching product with query: %s", query)
-	var product model.Product
+	var product inventoryModel.Product
 	err := h.dbRead.
 		Preload("Category").Where("id = ?", query).First(&product).Error
 	if err != nil {
@@ -38,7 +37,7 @@ func (h *ProductService) GetProduct(query string) (*bffDemo.Product, error) {
 
 func (h *ProductService) GetProducts() ([]bffDemo.Product, error) {
 	h.log.Infof("Fetching all products")
-	var products []model.Product
+	var products []inventoryModel.Product
 	err := h.dbRead.Find(&products).Error
 	if err != nil {
 		h.log.Error("Error fetching products: ", err)
@@ -67,8 +66,8 @@ func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) [
 		TextSpecProduct{Words: searchRequest.Text, Log: h.log},
 		CategorySpecProduct{CategoryIDs: categoryIDs, Log: h.log},
 	}
-	var products []model.Product
-	err := ApplySpecifications(h.dbRead.Model(&model.Product{}), specs...).Find(&products).Error
+	var products []inventoryModel.Product
+	err := ApplySpecifications(h.dbRead.Model(&inventoryModel.Product{}), specs...).Find(&products).Error
 	if err != nil {
 		h.log.Error("Error executing product search: %v", err)
 		return nil
@@ -79,7 +78,7 @@ func (h *ProductService) GetSearchProduct(searchRequest payload.SearchRequest) [
 
 func (h *ProductService) GetRecomendationsProduct(ctx context.Context, userId string) []bffDemo.Product {
 	h.log.Info("Fetching product recommendations for user IDs: ", userId)
-	var products []model.Product
+	var products []inventoryModel.Product
 	err := h.dbRead.
 		WithContext(ctx).
 		Table("inventory.products").
@@ -96,7 +95,7 @@ func (h *ProductService) GetCategories() ([]string, error) {
 	h.log.Info("Fetching product categories")
 	var categories []string
 	err := h.dbRead.
-		Model(&demo.Category{}).
+		Model(&inventoryModel.Category{}).
 		Pluck("name", &categories).Error
 	if err != nil {
 		h.log.Error("Error fetching categories: ", err)
@@ -107,7 +106,7 @@ func (h *ProductService) GetCategories() ([]string, error) {
 }
 
 func getCategoryIdByName(name string, db *gorm.DB) (uuid.UUID, error) {
-	var category demo.Category
+	var category inventoryModel.Category
 	err := db.
 		Where("name = ?", name).
 		First(&category).Error

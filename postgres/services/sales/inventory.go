@@ -11,7 +11,7 @@ import (
 
 	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
 	"github.com/tcero76/marketplace/bff-service/services"
-	"github.com/tcero76/marketplace/postgres/model/sales"
+	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
 )
 
 var _ services.IInventory = (*InventoryService)(nil)
@@ -68,7 +68,7 @@ func (s *InventoryService) DisableProduct(
 	productID uuid.UUID,
 ) error {
 	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var product sales.Product
+		var product inventoryModel.Product
 
 		err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
@@ -98,7 +98,7 @@ func (s *InventoryService) EnableProduct(
 	productID uuid.UUID,
 ) error {
 	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var product sales.Product
+		var product inventoryModel.Product
 
 		err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).

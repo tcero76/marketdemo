@@ -2,10 +2,10 @@ package adapters
 
 import (
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
-	"github.com/tcero76/marketplace/postgres/model"
+	postsModel "github.com/tcero76/marketplace/postgres/model/posts"
 )
 
-func ToPostDTO(post model.PostsDemo) demo.PostDTO {
+func ToPostDTO(post postsModel.Posts) demo.PostDTO {
 	result := demo.PostDTO{
 		ID:        post.ID,
 		Texto:     post.Content,
@@ -31,7 +31,7 @@ func ToPostDTO(post model.PostsDemo) demo.PostDTO {
 	return result
 }
 
-func ToPostDTOS(posts []model.PostsDemo) []demo.PostDTO {
+func ToPostDTOS(posts []postsModel.Posts) []demo.PostDTO {
 	result := make([]demo.PostDTO, 0, len(posts))
 	for _, post := range posts {
 		result = append(result, ToPostDTO(post))
@@ -39,8 +39,8 @@ func ToPostDTOS(posts []model.PostsDemo) []demo.PostDTO {
 	return result
 }
 
-func ToPosteoModel(posteoDTO *demo.PostDTO) model.PostsDemo {
-	return model.PostsDemo{
+func ToPosteoModel(posteoDTO *demo.PostDTO) postsModel.Posts {
+	return postsModel.Posts{
 		ID:        posteoDTO.ID,
 		Content:   posteoDTO.Texto,
 		ReplyToID: posteoDTO.ReplyToID,

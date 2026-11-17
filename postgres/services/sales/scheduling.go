@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	model "github.com/tcero76/marketplace/postgres/model/sales"
+	schedulingModel "github.com/tcero76/marketplace/postgres/model/scheduling"
 
 	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
 	IServices "github.com/tcero76/marketplace/bff-service/services"
@@ -32,7 +32,7 @@ func (s *SchedulingService) GetSchedule(ctx context.Context, req dto.GetSchedule
 	if !req.From.Before(req.To) {
 		return dto.GetScheduleResponse{}, ErrInvalidPeriod
 	}
-	var appointments []model.Appointment
+	var appointments []schedulingModel.Appointment
 	err := s.db.WithContext(ctx).
 		Where(
 			"appointment_period && tstzrange(?, ?, '[)')",
@@ -61,7 +61,7 @@ func (s *SchedulingService) GetSchedule(ctx context.Context, req dto.GetSchedule
 }
 
 func (s *SchedulingService) GetAppointment(ctx context.Context, req dto.GetAppointmentRequest) (dto.GetAppointmentResponse, error) {
-	var appointment model.Appointment
+	var appointment schedulingModel.Appointment
 	err := s.db.WithContext(ctx).
 		First(&appointment, "id = ?", req.AppointmentID).
 		Error
@@ -82,11 +82,11 @@ func (s *SchedulingService) Schedule(ctx context.Context, req dto.ScheduleReques
 	if !req.StartAt.Before(req.EndAt) {
 		return dto.ScheduleResponse{}, ErrInvalidPeriod
 	}
-	var appointment model.Appointment
+	var appointment schedulingModel.Appointment
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// Lock the resource so concurrent scheduling operations
 		// against the same resource are serialized.
-		var resource model.Resource
+		var resource schedulingModel.Resource
 		err := tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
 			First(&resource, "id = ?", req.ResourceID).
@@ -100,14 +100,14 @@ func (s *SchedulingService) Schedule(ctx context.Context, req dto.ScheduleReques
 		if !resource.Active {
 			return ErrResourceInactive
 		}
-		period := model.TimeRange{
+		period := schedulingModel.TimeRange{
 			Lower: req.StartAt,
 			Upper: req.EndAt,
 			Valid: true,
 		}
 		// The requested period must be completely contained
 		// inside one availability period.
-		var availability model.Availability
+		var availability schedulingModel.Availability
 		err = tx.
 			Where("resource_id = ?", req.ResourceID).
 			Where(
@@ -129,9 +129,9 @@ func (s *SchedulingService) Schedule(ctx context.Context, req dto.ScheduleReques
 		// protection against concurrent inserts.
 		var conflict int64
 		err = tx.
-			Model(&model.Appointment{}).
+			Model(&schedulingModel.Appointment{}).
 			Where("resource_id = ?", req.ResourceID).
-			Where("status = ?", model.AppointmentConfirmed).
+			Where("status = ?", schedulingModel.AppointmentConfirmed).
 			Where(
 				"appointment_period && tstzrange(?, ?, '[)')",
 				req.StartAt,
@@ -148,11 +148,11 @@ func (s *SchedulingService) Schedule(ctx context.Context, req dto.ScheduleReques
 			return ErrAppointmentConflict
 		}
 
-		appointment = model.Appointment{
+		appointment = schedulingModel.Appointment{
 			ResourceID:        req.ResourceID,
 			UserID:            req.CustomerID,
 			AppointmentPeriod: period,
-			Status:            model.AppointmentConfirmed,
+			Status:            schedulingModel.AppointmentConfirmed,
 		}
 
 		if err := tx.Create(&appointment).Error; err != nil {
@@ -179,7 +179,7 @@ func (s *SchedulingService) Reschedule(
 	req dto.RescheduleRequest,
 ) (dto.RescheduleResponse, error) {
 
-	var appointment model.Appointment
+	var appointment schedulingModel.Appointment
 
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 
@@ -196,7 +196,7 @@ func (s *SchedulingService) Reschedule(
 			return fmt.Errorf("get appointment: %w", err)
 		}
 
-		if appointment.Status != model.AppointmentConfirmed {
+		if appointment.Status != schedulingModel.AppointmentConfirmed {
 			return ErrInvalidStatus
 		}
 
@@ -214,7 +214,7 @@ func (s *SchedulingService) Reschedule(
 			return ErrInvalidPeriod
 		}
 
-		var resource model.Resource
+		var resource schedulingModel.Resource
 
 		err = tx.
 			Clauses(clause.Locking{Strength: "UPDATE"}).
@@ -234,7 +234,7 @@ func (s *SchedulingService) Reschedule(
 		}
 
 		// New period must be available.
-		var availability model.Availability
+		var availability schedulingModel.Availability
 
 		err = tx.
 			Where("resource_id = ?", appointment.ResourceID).
@@ -258,10 +258,10 @@ func (s *SchedulingService) Reschedule(
 		var conflict int64
 
 		err = tx.
-			Model(&model.Appointment{}).
+			Model(&schedulingModel.Appointment{}).
 			Where("resource_id = ?", appointment.ResourceID).
 			Where("id <> ?", appointment.ID).
-			Where("status = ?", model.AppointmentConfirmed).
+			Where("status = ?", schedulingModel.AppointmentConfirmed).
 			Where(
 				"appointment_period && tstzrange(?, ?, '[)')",
 				req.StartAt,
@@ -278,7 +278,7 @@ func (s *SchedulingService) Reschedule(
 			return ErrAppointmentConflict
 		}
 
-		appointment.AppointmentPeriod = model.TimeRange{
+		appointment.AppointmentPeriod = schedulingModel.TimeRange{
 			Lower: req.StartAt,
 			Upper: newEnd,
 			Valid: true,
@@ -309,7 +309,7 @@ func (s *SchedulingService) Cancel(
 	req dto.CancelRequest,
 ) (dto.CancelResponse, error) {
 
-	var appointment model.Appointment
+	var appointment schedulingModel.Appointment
 
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 
@@ -326,11 +326,11 @@ func (s *SchedulingService) Cancel(
 			return fmt.Errorf("get appointment: %w", err)
 		}
 
-		if appointment.Status != model.AppointmentConfirmed {
+		if appointment.Status != schedulingModel.AppointmentConfirmed {
 			return ErrInvalidStatus
 		}
 
-		appointment.Status = model.AppointmentCancelled
+		appointment.Status = schedulingModel.AppointmentCancelled
 
 		if err := tx.Save(&appointment).Error; err != nil {
 			return fmt.Errorf("cancel appointment: %w", err)
@@ -349,7 +349,7 @@ func (s *SchedulingService) Cancel(
 }
 
 func appointmentToDTO(
-	appointment model.Appointment,
+	appointment schedulingModel.Appointment,
 ) dto.AppointmentDTO {
 
 	startAt := time.Time{}
@@ -371,7 +371,7 @@ func appointmentToDTO(
 }
 
 func appointmentPeriod(
-	appointment model.Appointment,
+	appointment schedulingModel.Appointment,
 ) (time.Time, time.Time, error) {
 	if !appointment.AppointmentPeriod.Valid {
 		return time.Time{}, time.Time{}, ErrInvalidPeriod
