@@ -50,6 +50,12 @@ func (h *SalesController) GetOrder() echo.HandlerFunc {
 	}
 }
 
+func (h *SalesController) GetOrdersLastMonth() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return nil
+	}
+}
+
 func (h *SalesController) CreateOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Entra a CreateOrder")

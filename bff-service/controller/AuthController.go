@@ -18,7 +18,6 @@ import (
 
 	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/oauth2/cor"
-	"github.com/tcero76/marketplace/bff-service/payload"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logConfig "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/redis/model"
@@ -185,7 +184,7 @@ func (h *AuthController) RefreshTokenHandler(authCacheService services.IAuthCach
 func (h *AuthController) SignUpHandler(userService services.IUserService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("SignUpHandler called")
-		var req payload.SignUpRequest
+		var req dto.SignUpRequest
 		if err := c.Bind(&req); err != nil {
 			h.log.Error("Error binding request: ", err)
 			return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")

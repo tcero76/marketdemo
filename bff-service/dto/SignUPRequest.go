@@ -1,4 +1,4 @@
-package payload
+package dto
 
 type SignUpRequest struct {
 	Username string `json:"username" form:"username"`

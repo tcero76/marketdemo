@@ -1,4 +1,4 @@
-package payload
+package dto
 
 type SearchRequest struct {
 	Mention string   `json:"mention"`

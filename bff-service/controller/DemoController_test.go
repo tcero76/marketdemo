@@ -14,8 +14,8 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/labstack/echo/v4"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
-	"github.com/tcero76/marketplace/bff-service/payload"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logConfig "github.com/tcero76/marketplace/config/log"
 )
@@ -23,7 +23,7 @@ import (
 type mockProductService struct {
 	GetProductFunc               func(string) (*demo.Product, error)
 	GetProductsFunc              func() ([]demo.Product, error)
-	GetSearchProductFunc         func(payload.SearchRequest) []demo.Product
+	GetSearchProductFunc         func(dto.SearchRequest) []demo.Product
 	GetRecomendationsProductFunc func(context.Context, string) []demo.Product
 	GetCategoriesFunc            func() ([]string, error)
 }
@@ -36,7 +36,7 @@ func (m *mockProductService) GetProducts() ([]demo.Product, error) {
 	return m.GetProductsFunc()
 }
 
-func (m *mockProductService) GetSearchProduct(req payload.SearchRequest) []demo.Product {
+func (m *mockProductService) GetSearchProduct(req dto.SearchRequest) []demo.Product {
 	return m.GetSearchProductFunc(req)
 }
 
@@ -266,7 +266,7 @@ func TestGetSearchProduct(t *testing.T) {
 			strings.NewReader(body),
 		)
 		mockSvc := &mockProductService{
-			GetSearchProductFunc: func(req payload.SearchRequest) []demo.Product {
+			GetSearchProductFunc: func(req dto.SearchRequest) []demo.Product {
 				return []demo.Product{
 					{
 						Description: "Televisor",
@@ -316,9 +316,9 @@ func TestGetSearchProduct(t *testing.T) {
 			"/products/search",
 			strings.NewReader(body),
 		)
-		var received payload.SearchRequest
+		var received dto.SearchRequest
 		mockSvc := &mockProductService{
-			GetSearchProductFunc: func(r payload.SearchRequest) []demo.Product {
+			GetSearchProductFunc: func(r dto.SearchRequest) []demo.Product {
 				received = r
 				return []demo.Product{}
 			},

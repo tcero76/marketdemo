@@ -1,4 +1,4 @@
-package payload
+package dto
 
 type User struct {
 	User     string `json:"user"`

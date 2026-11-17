@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/dto/demo"
-	"github.com/tcero76/marketplace/bff-service/payload"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 
@@ -92,7 +92,7 @@ func (h *ProductController) GetProducts() echo.HandlerFunc {
 func (h *ProductController) GetSearchProduct() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		h.log.Info("Entrando a search Products")
-		var req payload.SearchRequest
+		var req dto.SearchRequest
 		if err := c.Bind(&req); err != nil {
 			h.log.Error("Error al parsear JSON: ", err)
 			return c.JSON(http.StatusBadRequest, map[string]string{
