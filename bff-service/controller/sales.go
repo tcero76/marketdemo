@@ -5,10 +5,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
-	"github.com/tcero76/marketplace/postgres/services/sales"
+	postgreServices "github.com/tcero76/marketplace/postgres/services"
 )
 
 type SalesController struct {
@@ -37,7 +37,7 @@ func (h *SalesController) GetOrder() echo.HandlerFunc {
 		}
 		res, err := h.SalesService.GetOrder(c.Request().Context(), req)
 		if err != nil {
-			if err == sales.ErrInvalidUser {
+			if err == postgreServices.ErrInvalidUser {
 				c.JSON(http.StatusForbidden, err.Error())
 				return err
 			} else {

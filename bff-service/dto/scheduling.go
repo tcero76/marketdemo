@@ -1,4 +1,4 @@
-package sales
+package dto
 
 import (
 	"time"

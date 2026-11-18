@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 )
 
 type IScheduling interface {

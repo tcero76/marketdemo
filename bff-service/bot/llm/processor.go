@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/tcero76/marketplace/bff-service/services"
-	modelServices "github.com/tcero76/marketplace/postgres/services"
+	postgresServices "github.com/tcero76/marketplace/postgres/services"
 
 	"github.com/tcero76/marketplace/redis/model"
 )
@@ -27,12 +27,10 @@ type Event struct {
 	SessionID string
 	FormID    string
 	Field     string
-	Old, New  string // valores anterior y nuevo (útil para auditoría)
+	Old, New  string
 	Answers   model.Answers
 }
 
-// Listener (Observer): reacciona a eventos sin que el motor sepa qué hace
-// (guardar en BD, llamar un webhook, métricas, enviar correo...).
 type Listener func(ctx context.Context, e Event)
 
 type Processor struct {
@@ -85,7 +83,7 @@ func between(min, max int) Validator {
 
 // ---- Observer: persiste cada reserva completada ----
 
-func saveReservation(chatbotServices *modelServices.Service) Listener {
+func saveReservation(chatbotServices *postgresServices.Service) Listener {
 	return func(ctx context.Context, e Event) {
 		if e.Type != FormCompleted {
 			return
@@ -98,7 +96,7 @@ func saveReservation(chatbotServices *modelServices.Service) Listener {
 	}
 }
 
-func NewBotLLM(authCacheService services.IAuthCacheService, chatbotServices *modelServices.Service) *Processor {
+func NewBotLLM(authCacheService services.IAuthCacheService, chatbotServices *postgresServices.Service) *Processor {
 	today := time.Now()
 	form := Form{ID: "reserva", Fields: []Field{
 		{Name: "nombre", Label: "Nombre", Prompt: "¿A nombre de quién es la reserva?",

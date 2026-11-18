@@ -16,8 +16,6 @@ import (
 
 	jwk "github.com/lestrrat-go/jwx/jwk"
 	dto "github.com/tcero76/marketplace/bff-service/dto"
-	demo "github.com/tcero76/marketplace/bff-service/dto/demo"
-	payload "github.com/tcero76/marketplace/bff-service/payload"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -46,7 +44,7 @@ func (m *MockIUserService) EXPECT() *MockIUserServiceMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockIUserService) CreateUser(userDTO *dto.UserDTO) error {
+func (m *MockIUserService) CreateUser(userDTO *dto.UserRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", userDTO)
 	ret0, _ := ret[0].(error)
@@ -60,10 +58,10 @@ func (mr *MockIUserServiceMockRecorder) CreateUser(userDTO any) *gomock.Call {
 }
 
 // GetUser mocks base method.
-func (m *MockIUserService) GetUser(username string) (*dto.UserDTO, error) {
+func (m *MockIUserService) GetUser(username string) (*dto.UserResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUser", username)
-	ret0, _ := ret[0].(*dto.UserDTO)
+	ret0, _ := ret[0].(*dto.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -75,10 +73,10 @@ func (mr *MockIUserServiceMockRecorder) GetUser(username any) *gomock.Call {
 }
 
 // GetUserByEmail mocks base method.
-func (m *MockIUserService) GetUserByEmail(email string) (*dto.UserDTO, error) {
+func (m *MockIUserService) GetUserByEmail(email string) (*dto.UserResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByEmail", email)
-	ret0, _ := ret[0].(*dto.UserDTO)
+	ret0, _ := ret[0].(*dto.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -90,10 +88,10 @@ func (mr *MockIUserServiceMockRecorder) GetUserByEmail(email any) *gomock.Call {
 }
 
 // GetUserById mocks base method.
-func (m *MockIUserService) GetUserById(userId string) (*dto.UserDTO, error) {
+func (m *MockIUserService) GetUserById(userId string) (*dto.UserResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserById", userId)
-	ret0, _ := ret[0].(*dto.UserDTO)
+	ret0, _ := ret[0].(*dto.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -184,10 +182,10 @@ func (mr *MockIDemoServiceMockRecorder) GetCategories() *gomock.Call {
 }
 
 // GetProduct mocks base method.
-func (m *MockIDemoService) GetProduct(query string) (*demo.Product, error) {
+func (m *MockIDemoService) GetProduct(query string) (*dto.ProductResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProduct", query)
-	ret0, _ := ret[0].(*demo.Product)
+	ret0, _ := ret[0].(*dto.ProductResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -199,10 +197,10 @@ func (mr *MockIDemoServiceMockRecorder) GetProduct(query any) *gomock.Call {
 }
 
 // GetProducts mocks base method.
-func (m *MockIDemoService) GetProducts() ([]demo.Product, error) {
+func (m *MockIDemoService) GetProducts() ([]dto.ProductResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProducts")
-	ret0, _ := ret[0].([]demo.Product)
+	ret0, _ := ret[0].([]dto.ProductResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -214,10 +212,10 @@ func (mr *MockIDemoServiceMockRecorder) GetProducts() *gomock.Call {
 }
 
 // GetRecomendationsProduct mocks base method.
-func (m *MockIDemoService) GetRecomendationsProduct(ctx context.Context, userId string) []demo.Product {
+func (m *MockIDemoService) GetRecomendationsProduct(ctx context.Context, userId string) []dto.ProductResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRecomendationsProduct", ctx, userId)
-	ret0, _ := ret[0].([]demo.Product)
+	ret0, _ := ret[0].([]dto.ProductResponse)
 	return ret0
 }
 
@@ -228,10 +226,10 @@ func (mr *MockIDemoServiceMockRecorder) GetRecomendationsProduct(ctx, userId any
 }
 
 // GetSearchProduct mocks base method.
-func (m *MockIDemoService) GetSearchProduct(searchRequest payload.SearchRequest) []demo.Product {
+func (m *MockIDemoService) GetSearchProduct(searchRequest dto.SearchRequest) []dto.ProductResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSearchProduct", searchRequest)
-	ret0, _ := ret[0].([]demo.Product)
+	ret0, _ := ret[0].([]dto.ProductResponse)
 	return ret0
 }
 
@@ -239,71 +237,4 @@ func (m *MockIDemoService) GetSearchProduct(searchRequest payload.SearchRequest)
 func (mr *MockIDemoServiceMockRecorder) GetSearchProduct(searchRequest any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSearchProduct", reflect.TypeOf((*MockIDemoService)(nil).GetSearchProduct), searchRequest)
-}
-
-// MockIDemoPosts is a mock of IDemoPosts interface.
-type MockIDemoPosts struct {
-	ctrl     *gomock.Controller
-	recorder *MockIDemoPostsMockRecorder
-	isgomock struct{}
-}
-
-// MockIDemoPostsMockRecorder is the mock recorder for MockIDemoPosts.
-type MockIDemoPostsMockRecorder struct {
-	mock *MockIDemoPosts
-}
-
-// NewMockIDemoPosts creates a new mock instance.
-func NewMockIDemoPosts(ctrl *gomock.Controller) *MockIDemoPosts {
-	mock := &MockIDemoPosts{ctrl: ctrl}
-	mock.recorder = &MockIDemoPostsMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockIDemoPosts) EXPECT() *MockIDemoPostsMockRecorder {
-	return m.recorder
-}
-
-// CreatePosteo mocks base method.
-func (m *MockIDemoPosts) CreatePosteo(posteo *demo.PostDTO, userId string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatePosteo", posteo, userId)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreatePosteo indicates an expected call of CreatePosteo.
-func (mr *MockIDemoPostsMockRecorder) CreatePosteo(posteo, userId any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePosteo", reflect.TypeOf((*MockIDemoPosts)(nil).CreatePosteo), posteo, userId)
-}
-
-// GetPosteos mocks base method.
-func (m *MockIDemoPosts) GetPosteos(productId string) ([]demo.PostDTO, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPosteos", productId)
-	ret0, _ := ret[0].([]demo.PostDTO)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPosteos indicates an expected call of GetPosteos.
-func (mr *MockIDemoPostsMockRecorder) GetPosteos(productId any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPosteos", reflect.TypeOf((*MockIDemoPosts)(nil).GetPosteos), productId)
-}
-
-// GetPosts mocks base method.
-func (m *MockIDemoPosts) GetPosts(limit, offset int) []demo.PostDTO {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPosts", limit, offset)
-	ret0, _ := ret[0].([]demo.PostDTO)
-	return ret0
-}
-
-// GetPosts indicates an expected call of GetPosts.
-func (mr *MockIDemoPostsMockRecorder) GetPosts(limit, offset any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPosts", reflect.TypeOf((*MockIDemoPosts)(nil).GetPosts), limit, offset)
 }

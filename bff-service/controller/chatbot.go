@@ -12,23 +12,15 @@ import (
 	echo "github.com/labstack/echo/v4"
 	basicBot "github.com/tcero76/marketplace/bff-service/bot/basic"
 	llmBot "github.com/tcero76/marketplace/bff-service/bot/llm"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/redis/model"
 )
-
-type chatRequest struct {
-	ConversationID string `json:"conversationId"`
-	Message        string `json:"message"`
-}
-
-type chatResponse struct {
-	Reply string `json:"reply"`
-}
 
 func ChatHandler(b *basicBot.Bot) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log.Print("Entró a ChatHandler")
 		c.Request().Body = http.MaxBytesReader(c.Response(), c.Request().Body, 16<<10)
-		var req chatRequest
+		var req dto.ChatRequest
 		if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil ||
 			req.ConversationID == "" {
 			return c.JSON(http.StatusBadRequest,
@@ -44,7 +36,7 @@ func ChatHandler(b *basicBot.Bot) echo.HandlerFunc {
 				map[string]string{"error": "Error procesando el mensaje"})
 
 		}
-		return c.JSON(http.StatusOK, chatResponse{Reply: reply.Text})
+		return c.JSON(http.StatusOK, dto.ChatResponse{Reply: reply.Text})
 	}
 }
 
@@ -58,7 +50,7 @@ func ChatLLMHandler(b *llmBot.Processor) echo.HandlerFunc {
 		}
 		token := strings.TrimPrefix(auth, "Bearer ")
 		c.Request().Body = http.MaxBytesReader(c.Response(), c.Request().Body, 16<<10)
-		var req chatRequest
+		var req dto.ChatRequest
 		if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil ||
 			req.ConversationID == "" {
 			return c.JSON(http.StatusBadRequest,
@@ -70,12 +62,12 @@ func ChatLLMHandler(b *llmBot.Processor) echo.HandlerFunc {
 		reply, err := b.Handle(ctx, token, req.Message, sessionData.BotSession, b.ProcessFirst)
 		if err != nil {
 			log.Println("error:", err)
-			return c.JSON(http.StatusBadRequest, chatResponse{Reply: err.Error()})
+			return c.JSON(http.StatusBadRequest, dto.ChatResponse{Reply: err.Error()})
 		}
 		if !reply.Done {
-			return c.JSON(http.StatusOK, chatResponse{Reply: reply.Text})
+			return c.JSON(http.StatusOK, dto.ChatResponse{Reply: reply.Text})
 		}
-		return c.JSON(http.StatusOK, chatResponse{Reply: "Registro almacenadas"})
+		return c.JSON(http.StatusOK, dto.ChatResponse{Reply: "Registro almacenadas"})
 	}
 }
 

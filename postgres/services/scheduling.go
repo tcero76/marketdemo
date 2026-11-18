@@ -12,7 +12,7 @@ import (
 
 	schedulingModel "github.com/tcero76/marketplace/postgres/model/scheduling"
 
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	IServices "github.com/tcero76/marketplace/bff-service/services"
 )
 

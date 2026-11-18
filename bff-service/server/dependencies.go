@@ -19,10 +19,10 @@ type Dependencies struct {
 
 	AuthCacheService services.IAuthCacheService
 
-	UserService    services.IUserService
-	ProductService services.IDemoService
-	PostsService   services.IDemoPosts
-	SalesService   services.ISales
+	UserService      services.IUserService
+	InventoryService services.IInventory
+	PostsService     services.IDemoPosts
+	SalesService     services.ISales
 
 	JWKService   services.IJWKService
 	HydraClient  *hydra.APIClient

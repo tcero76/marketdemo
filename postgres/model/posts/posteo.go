@@ -26,7 +26,7 @@ type Posts struct {
 	ReplyToID  *uuid.UUID `gorm:"type:uuid"`
 	ReplyTo    *Posts     `gorm:"foreignKey:ReplyToID;constraint:OnDelete:SET NULL"`
 	Replies    []Posts    `gorm:"foreignKey:ReplyToID"`
-	ProductId  int        `gorm:"index"`
+	ProductId  uuid.UUID  `gorm:"index"`
 	UserID     uuid.UUID  `gorm:"type:uuid;index"`
 }
 

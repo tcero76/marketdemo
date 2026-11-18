@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/mock"
 	logConfig "github.com/tcero76/marketplace/config/log"
 	"go.uber.org/mock/gomock"

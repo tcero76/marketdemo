@@ -5,8 +5,8 @@ import (
 )
 
 type IUserService interface {
-	GetUser(username string) (*dto.UserDTO, error)
-	GetUserById(userId string) (*dto.UserDTO, error)
-	CreateUser(userDTO *dto.UserDTO) error
-	GetUserByEmail(email string) (*dto.UserDTO, error)
+	GetUser(username string) (*dto.UserResponse, error)
+	GetUserById(userId string) (*dto.UserResponse, error)
+	CreateUser(userDTO *dto.UserRequest) error
+	GetUserByEmail(email string) (*dto.UserResponse, error)
 }

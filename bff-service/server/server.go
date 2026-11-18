@@ -13,7 +13,7 @@ import (
 	logConfig "github.com/tcero76/marketplace/config/log"
 
 	"github.com/tcero76/marketplace/config/metrics"
-	modelServices "github.com/tcero76/marketplace/postgres/services"
+	postgresServices "github.com/tcero76/marketplace/postgres/services"
 
 	"github.com/tcero76/marketplace/bff-service/oauth2"
 
@@ -67,7 +67,8 @@ func StartServer() (*echo.Echo, error) {
 	protegido := session.Group("/usuario")
 	protegido.Use(oauth2.JWTMiddleware(log, d.Validator))
 
-	productController := controller.NewProductController(log, d.ProductService, d.PostsService)
+	postController := controller.NewPostController(log, d.InventoryService, d.PostsService)
+	productController := controller.NewProductController(log, d.InventoryService, d.PostsService)
 	fileController := controller.NewFileController(log)
 	jwkController := controller.NewJwksHandler(log, d.JWKService)
 
@@ -77,10 +78,10 @@ func StartServer() (*echo.Echo, error) {
 	protegido.GET("/getCategories", productController.GetCategories())
 	protegido.GET("/product/getRecommendations", productController.GetRecomendationsProduct())
 
-	protegido.POST("/createPostDemo", productController.CreatePosteoDemo())
-	protegido.GET("/getPosteosDemo", productController.GetPosteosDemo())
+	protegido.POST("/createPost", postController.CreatePost())
+	protegido.GET("/getPosteos", postController.GetPosts())
 
-	chatboxServices := modelServices.NewService(d.DBWrite)
+	chatboxServices := postgresServices.NewService(d.DBWrite)
 	processorLLM := formLLM.NewBotLLM(d.AuthCacheService, chatboxServices)
 	protegido.POST("/chat", controller.ChatLLMHandler(processorLLM))
 

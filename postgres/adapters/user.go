@@ -7,7 +7,7 @@ import (
 	model "github.com/tcero76/marketplace/postgres/model/marketplace"
 )
 
-func ToUserDTO(user model.User) dto.UserDTO {
+func ToUserDTO(user model.User) dto.UserResponse {
 	var provider string
 	switch user.Provider {
 	case model.ProviderGoogle:
@@ -17,7 +17,7 @@ func ToUserDTO(user model.User) dto.UserDTO {
 	default:
 		fmt.Println("provider inválido: %s", user.Provider)
 	}
-	return dto.UserDTO{
+	return dto.UserResponse{
 		UserID:     user.UserID,
 		Nombre:     user.Nombre,
 		Email:      user.Email,
@@ -29,24 +29,24 @@ func ToUserDTO(user model.User) dto.UserDTO {
 	}
 }
 
-func ToUser(userDTO dto.UserDTO) model.User {
+func ToUser(userRequest dto.UserRequest) model.User {
 	var provider model.Provider
-	switch userDTO.Provider {
+	switch userRequest.Provider {
 	case "google":
 		provider = model.ProviderGoogle
 	case "internal":
 		provider = model.ProviderInternal
 	default:
-		fmt.Println("provider inválido: %s", userDTO.Provider)
+		fmt.Println("provider inválido: %s", userRequest.Provider)
 	}
 	return model.User{
-		UserID:     userDTO.UserID,
-		Nombre:     userDTO.Nombre,
-		Email:      userDTO.Email,
-		Password:   userDTO.Password,
-		Roles:      userDTO.Roles,
-		Avatar:     userDTO.Avatar,
+		UserID:     userRequest.UserID,
+		Nombre:     userRequest.Nombre,
+		Email:      userRequest.Email,
+		Password:   userRequest.Password,
+		Roles:      userRequest.Roles,
+		Avatar:     userRequest.Avatar,
 		Provider:   provider,
-		IDProvider: userDTO.IDProvider,
+		IDProvider: userRequest.IDProvider,
 	}
 }

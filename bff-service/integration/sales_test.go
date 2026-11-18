@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/server"
 	logConfig "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/config"

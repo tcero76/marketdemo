@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/shopspring/decimal"
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	paymentModel "github.com/tcero76/marketplace/postgres/model/payment"
 	salesModel "github.com/tcero76/marketplace/postgres/model/sales"
 )

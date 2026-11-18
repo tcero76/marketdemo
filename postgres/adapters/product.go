@@ -1,11 +1,11 @@
 package adapters
 
 import (
-	"github.com/tcero76/marketplace/bff-service/dto/demo"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	model "github.com/tcero76/marketplace/postgres/model/inventory"
 )
 
-func ToProductDTO(product *model.Product) *demo.Product {
+func ToProductDTO(product *model.Product) *dto.ProductResponse {
 	var brand string
 	if product.Brand != nil {
 		brand = *product.Brand
@@ -14,7 +14,7 @@ func ToProductDTO(product *model.Product) *demo.Product {
 	if product.Category != nil {
 		category = product.Category.Name
 	}
-	return &demo.Product{
+	return &dto.ProductResponse{
 		ID:                 product.ID,
 		Title:              product.Title,
 		Description:        product.Description,
@@ -28,8 +28,8 @@ func ToProductDTO(product *model.Product) *demo.Product {
 	}
 }
 
-func ToProductDTOs(products []model.Product) []demo.Product {
-	var dtos []demo.Product
+func ToProductDTOs(products []model.Product) []dto.ProductResponse {
+	var dtos []dto.ProductResponse
 	for _, product := range products {
 		dtos = append(dtos, *ToProductDTO(&product))
 	}

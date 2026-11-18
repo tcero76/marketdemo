@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	uuid "github.com/google/uuid"
-	sales "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -43,7 +43,7 @@ func (m *MockIInventory) EXPECT() *MockIInventoryMockRecorder {
 }
 
 // AdjustStock mocks base method.
-func (m *MockIInventory) AdjustStock(ctx context.Context, request sales.AdjustStockRequest) error {
+func (m *MockIInventory) AdjustStock(ctx context.Context, request dto.AdjustStockRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AdjustStock", ctx, request)
 	ret0, _ := ret[0].(error)
@@ -85,10 +85,10 @@ func (mr *MockIInventoryMockRecorder) EnableProduct(ctx, productID any) *gomock.
 }
 
 // GetStock mocks base method.
-func (m *MockIInventory) GetStock(ctx context.Context, productID uuid.UUID) (sales.StockResponse, error) {
+func (m *MockIInventory) GetStock(ctx context.Context, productID uuid.UUID) (dto.StockResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStock", ctx, productID)
-	ret0, _ := ret[0].(sales.StockResponse)
+	ret0, _ := ret[0].(dto.StockResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -100,7 +100,7 @@ func (mr *MockIInventoryMockRecorder) GetStock(ctx, productID any) *gomock.Call 
 }
 
 // Purchase mocks base method.
-func (m *MockIInventory) Purchase(ctx context.Context, request sales.PurchaseRequest) error {
+func (m *MockIInventory) Purchase(ctx context.Context, request dto.PurchaseRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Purchase", ctx, request)
 	ret0, _ := ret[0].(error)
@@ -114,7 +114,7 @@ func (mr *MockIInventoryMockRecorder) Purchase(ctx, request any) *gomock.Call {
 }
 
 // Sell mocks base method.
-func (m *MockIInventory) Sell(ctx context.Context, request sales.SellRequest) error {
+func (m *MockIInventory) Sell(ctx context.Context, request dto.SellRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Sell", ctx, request)
 	ret0, _ := ret[0].(error)
@@ -152,10 +152,10 @@ func (m *MockIScheduling) EXPECT() *MockISchedulingMockRecorder {
 }
 
 // Cancel mocks base method.
-func (m *MockIScheduling) Cancel(ctx context.Context, req sales.CancelRequest) (sales.CancelResponse, error) {
+func (m *MockIScheduling) Cancel(ctx context.Context, req dto.CancelRequest) (dto.CancelResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Cancel", ctx, req)
-	ret0, _ := ret[0].(sales.CancelResponse)
+	ret0, _ := ret[0].(dto.CancelResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -167,10 +167,10 @@ func (mr *MockISchedulingMockRecorder) Cancel(ctx, req any) *gomock.Call {
 }
 
 // GetAppointment mocks base method.
-func (m *MockIScheduling) GetAppointment(ctx context.Context, req sales.GetAppointmentRequest) (sales.GetAppointmentResponse, error) {
+func (m *MockIScheduling) GetAppointment(ctx context.Context, req dto.GetAppointmentRequest) (dto.GetAppointmentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAppointment", ctx, req)
-	ret0, _ := ret[0].(sales.GetAppointmentResponse)
+	ret0, _ := ret[0].(dto.GetAppointmentResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -182,10 +182,10 @@ func (mr *MockISchedulingMockRecorder) GetAppointment(ctx, req any) *gomock.Call
 }
 
 // GetSchedule mocks base method.
-func (m *MockIScheduling) GetSchedule(ctx context.Context, req sales.GetScheduleRequest) (sales.GetScheduleResponse, error) {
+func (m *MockIScheduling) GetSchedule(ctx context.Context, req dto.GetScheduleRequest) (dto.GetScheduleResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSchedule", ctx, req)
-	ret0, _ := ret[0].(sales.GetScheduleResponse)
+	ret0, _ := ret[0].(dto.GetScheduleResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -197,10 +197,10 @@ func (mr *MockISchedulingMockRecorder) GetSchedule(ctx, req any) *gomock.Call {
 }
 
 // Reschedule mocks base method.
-func (m *MockIScheduling) Reschedule(ctx context.Context, req sales.RescheduleRequest) (sales.RescheduleResponse, error) {
+func (m *MockIScheduling) Reschedule(ctx context.Context, req dto.RescheduleRequest) (dto.RescheduleResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reschedule", ctx, req)
-	ret0, _ := ret[0].(sales.RescheduleResponse)
+	ret0, _ := ret[0].(dto.RescheduleResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -212,10 +212,10 @@ func (mr *MockISchedulingMockRecorder) Reschedule(ctx, req any) *gomock.Call {
 }
 
 // Schedule mocks base method.
-func (m *MockIScheduling) Schedule(ctx context.Context, req sales.ScheduleRequest) (sales.ScheduleResponse, error) {
+func (m *MockIScheduling) Schedule(ctx context.Context, req dto.ScheduleRequest) (dto.ScheduleResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Schedule", ctx, req)
-	ret0, _ := ret[0].(sales.ScheduleResponse)
+	ret0, _ := ret[0].(dto.ScheduleResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -251,10 +251,10 @@ func (m *MockIPayment) EXPECT() *MockIPaymentMockRecorder {
 }
 
 // GetPayment mocks base method.
-func (m *MockIPayment) GetPayment(ctx context.Context, req sales.GetPaymentRequest) (sales.GetPaymentResponse, error) {
+func (m *MockIPayment) GetPayment(ctx context.Context, req dto.GetPaymentRequest) (dto.GetPaymentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPayment", ctx, req)
-	ret0, _ := ret[0].(sales.GetPaymentResponse)
+	ret0, _ := ret[0].(dto.GetPaymentResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -266,10 +266,10 @@ func (mr *MockIPaymentMockRecorder) GetPayment(ctx, req any) *gomock.Call {
 }
 
 // Pay mocks base method.
-func (m *MockIPayment) Pay(ctx context.Context, req sales.PayRequest) (sales.PayResponse, error) {
+func (m *MockIPayment) Pay(ctx context.Context, req dto.PayRequest) (dto.PayResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Pay", ctx, req)
-	ret0, _ := ret[0].(sales.PayResponse)
+	ret0, _ := ret[0].(dto.PayResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -281,10 +281,10 @@ func (mr *MockIPaymentMockRecorder) Pay(ctx, req any) *gomock.Call {
 }
 
 // Refund mocks base method.
-func (m *MockIPayment) Refund(ctx context.Context, req sales.RefundRequest) (sales.RefundResponse, error) {
+func (m *MockIPayment) Refund(ctx context.Context, req dto.RefundRequest) (dto.RefundResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Refund", ctx, req)
-	ret0, _ := ret[0].(sales.RefundResponse)
+	ret0, _ := ret[0].(dto.RefundResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -320,10 +320,10 @@ func (m *MockISales) EXPECT() *MockISalesMockRecorder {
 }
 
 // AddAppointment mocks base method.
-func (m *MockISales) AddAppointment(ctx context.Context, req sales.AddAppointmentRequest) (sales.AddAppointmentResponse, error) {
+func (m *MockISales) AddAppointment(ctx context.Context, req dto.AddAppointmentRequest) (dto.AddAppointmentResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddAppointment", ctx, req)
-	ret0, _ := ret[0].(sales.AddAppointmentResponse)
+	ret0, _ := ret[0].(dto.AddAppointmentResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -335,10 +335,10 @@ func (mr *MockISalesMockRecorder) AddAppointment(ctx, req any) *gomock.Call {
 }
 
 // AddProduct mocks base method.
-func (m *MockISales) AddProduct(ctx context.Context, req sales.AddProductRequest) (sales.AddProductResponse, error) {
+func (m *MockISales) AddProduct(ctx context.Context, req dto.AddProductRequest) (dto.AddProductResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddProduct", ctx, req)
-	ret0, _ := ret[0].(sales.AddProductResponse)
+	ret0, _ := ret[0].(dto.AddProductResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -350,10 +350,10 @@ func (mr *MockISalesMockRecorder) AddProduct(ctx, req any) *gomock.Call {
 }
 
 // CancelOrder mocks base method.
-func (m *MockISales) CancelOrder(ctx context.Context, req sales.CancelOrderRequest) (sales.CancelOrderResponse, error) {
+func (m *MockISales) CancelOrder(ctx context.Context, req dto.CancelOrderRequest) (dto.CancelOrderResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CancelOrder", ctx, req)
-	ret0, _ := ret[0].(sales.CancelOrderResponse)
+	ret0, _ := ret[0].(dto.CancelOrderResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -365,10 +365,10 @@ func (mr *MockISalesMockRecorder) CancelOrder(ctx, req any) *gomock.Call {
 }
 
 // CreateOrder mocks base method.
-func (m *MockISales) CreateOrder(ctx context.Context, req sales.CreateOrderRequest) (sales.CreateOrderResponse, error) {
+func (m *MockISales) CreateOrder(ctx context.Context, req dto.CreateOrderRequest) (dto.CreateOrderResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrder", ctx, req)
-	ret0, _ := ret[0].(sales.CreateOrderResponse)
+	ret0, _ := ret[0].(dto.CreateOrderResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -380,10 +380,10 @@ func (mr *MockISalesMockRecorder) CreateOrder(ctx, req any) *gomock.Call {
 }
 
 // CreateReturn mocks base method.
-func (m *MockISales) CreateReturn(ctx context.Context, req sales.CreateReturnRequest) (sales.CreateReturnResponse, error) {
+func (m *MockISales) CreateReturn(ctx context.Context, req dto.CreateReturnRequest) (dto.CreateReturnResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateReturn", ctx, req)
-	ret0, _ := ret[0].(sales.CreateReturnResponse)
+	ret0, _ := ret[0].(dto.CreateReturnResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -395,10 +395,10 @@ func (mr *MockISalesMockRecorder) CreateReturn(ctx, req any) *gomock.Call {
 }
 
 // GetOrder mocks base method.
-func (m *MockISales) GetOrder(ctx context.Context, req sales.GetOrderRequest) (sales.GetOrderResponse, error) {
+func (m *MockISales) GetOrder(ctx context.Context, req dto.GetOrderRequest) (dto.GetOrderResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOrder", ctx, req)
-	ret0, _ := ret[0].(sales.GetOrderResponse)
+	ret0, _ := ret[0].(dto.GetOrderResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -410,10 +410,10 @@ func (mr *MockISalesMockRecorder) GetOrder(ctx, req any) *gomock.Call {
 }
 
 // PayOrder mocks base method.
-func (m *MockISales) PayOrder(ctx context.Context, req sales.PayOrderRequest) (sales.PayOrderResponse, error) {
+func (m *MockISales) PayOrder(ctx context.Context, req dto.PayOrderRequest) (dto.PayOrderResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PayOrder", ctx, req)
-	ret0, _ := ret[0].(sales.PayOrderResponse)
+	ret0, _ := ret[0].(dto.PayOrderResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

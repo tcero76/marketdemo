@@ -195,15 +195,15 @@ func (h *AuthController) SignUpHandler(userService services.IUserService) echo.H
 			h.log.Error("Email already in use: ", req.Email)
 			return echo.NewHTTPError(http.StatusConflict, "Email already in use")
 		}
-		newUser := dto.UserDTO{
+		userRequest := dto.UserRequest{
 			UserID:   uuid.New(),
 			Nombre:   req.Email,
 			Email:    req.Email,
 			Password: req.Password,
 			Provider: "internal",
 		}
-		h.log.Debug("Creating user: ", newUser)
-		if err := userService.CreateUser(&newUser); err != nil {
+		h.log.Debug("Creating user: ", userRequest)
+		if err := userService.CreateUser(&userRequest); err != nil {
 			h.log.Error("Error creating user: ", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create user")
 		}

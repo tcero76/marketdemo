@@ -11,7 +11,7 @@ import (
 
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/require"
-	"github.com/tcero76/marketplace/bff-service/dto/demo"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/server"
 	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
 )
@@ -27,7 +27,7 @@ func TestGetProduct(t *testing.T) {
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
 		require.Equal(t, http.StatusOK, rec.Code)
-		var product demo.Product
+		var product dto.ProductResponse
 		json.Unmarshal(rec.Body.Bytes(), &product)
 		require.Equal(t, "Red Lipstick", product.Title)
 	})
@@ -57,7 +57,7 @@ func TestGetProducts(t *testing.T) {
 	e.ServeHTTP(rec, req)
 	require.Equal(t, http.StatusOK, rec.Code)
 
-	var products []demo.Product
+	var products []dto.ProductResponse
 	json.Unmarshal(rec.Body.Bytes(), &products)
 	fmt.Print("productos: ", products)
 	require.Len(t, products, 30)
@@ -78,7 +78,7 @@ func TestGetSearchProduct(t *testing.T) {
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
 		require.Equal(t, http.StatusOK, rec.Code)
-		var products []demo.Product
+		var products []dto.ProductResponse
 		json.Unmarshal(rec.Body.Bytes(), &products)
 		require.Len(t, products, 6)
 	})
@@ -92,7 +92,7 @@ func TestGetSearchProduct(t *testing.T) {
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
 		require.Equal(t, http.StatusOK, rec.Code)
-		var products []demo.Product
+		var products []dto.ProductResponse
 		json.Unmarshal(rec.Body.Bytes(), &products)
 		require.Len(t, products, 0)
 	})

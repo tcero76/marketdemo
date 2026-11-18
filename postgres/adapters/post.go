@@ -1,12 +1,12 @@
 package adapters
 
 import (
-	"github.com/tcero76/marketplace/bff-service/dto/demo"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	postsModel "github.com/tcero76/marketplace/postgres/model/posts"
 )
 
-func ToPostDTO(post postsModel.Posts) demo.PostDTO {
-	result := demo.PostDTO{
+func ToPostDTO(post postsModel.Posts) dto.PostResponse {
+	result := dto.PostResponse{
 		ID:        post.ID,
 		Texto:     post.Content,
 		ReplyToID: post.ReplyToID,
@@ -19,7 +19,7 @@ func ToPostDTO(post postsModel.Posts) demo.PostDTO {
 	}
 
 	if len(post.Replies) > 0 {
-		replies := make([]demo.PostDTO, 0, len(post.Replies))
+		replies := make([]dto.PostResponse, 0, len(post.Replies))
 
 		for _, r := range post.Replies {
 			replies = append(replies, ToPostDTO(r))
@@ -31,15 +31,15 @@ func ToPostDTO(post postsModel.Posts) demo.PostDTO {
 	return result
 }
 
-func ToPostDTOS(posts []postsModel.Posts) []demo.PostDTO {
-	result := make([]demo.PostDTO, 0, len(posts))
+func ToPostDTOS(posts []postsModel.Posts) []dto.PostResponse {
+	result := make([]dto.PostResponse, 0, len(posts))
 	for _, post := range posts {
 		result = append(result, ToPostDTO(post))
 	}
 	return result
 }
 
-func ToPosteoModel(posteoDTO *demo.PostDTO) postsModel.Posts {
+func ToPosteoModel(posteoDTO *dto.PostRequest) postsModel.Posts {
 	return postsModel.Posts{
 		ID:        posteoDTO.ID,
 		Content:   posteoDTO.Texto,

@@ -1,11 +1,17 @@
-package demo
+package dto
 
 import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
-type Product struct {
+type SearchRequest struct {
+	Mention string   `json:"mention"`
+	Hashtag string   `json:"hashtag"`
+	Text    []string `json:"text"`
+}
+
+type ProductResponse struct {
 	ID                 uuid.UUID       `json:"id",omitempty`
 	Title              string          `json:"title",omitempty`
 	Description        string          `json:"description",omitempty`

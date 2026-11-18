@@ -39,9 +39,9 @@ func NewInternalAuth(hydraAdminClient *hydra.APIClient, userServices services.IU
 	}
 }
 
-func (b *InternalAuth) Login(loginChallenge string, user *dto.UserDTO, ctx context.Context) (string, error) {
+func (b *InternalAuth) Login(loginChallenge string, userResponse *dto.UserResponse, ctx context.Context) (string, error) {
 	acceptBody := hydra.AcceptOAuth2LoginRequest{
-		Subject: user.UserID.String(),
+		Subject: userResponse.UserID.String(),
 	}
 	resp, _, err := b.hydraAdminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 		LoginChallenge(loginChallenge).

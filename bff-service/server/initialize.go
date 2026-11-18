@@ -14,9 +14,7 @@ import (
 	logConfig "github.com/tcero76/marketplace/config/log"
 
 	postgresConfig "github.com/tcero76/marketplace/postgres/config"
-	modelServices "github.com/tcero76/marketplace/postgres/services"
-	demoServices "github.com/tcero76/marketplace/postgres/services/demo"
-	salesServices "github.com/tcero76/marketplace/postgres/services/sales"
+	postgresServices "github.com/tcero76/marketplace/postgres/services"
 	configRedis "github.com/tcero76/marketplace/redis/config"
 	"github.com/tcero76/marketplace/redis/model"
 	redisServices "github.com/tcero76/marketplace/redis/services"
@@ -41,11 +39,11 @@ func InitDependencies() (*Dependencies, error) {
 	}
 
 	// Servicios de negocio
-	userServices := modelServices.NewUserService(log, dbWrite, dbRead)
-	productService := demoServices.NewProductService(log, dbWrite, dbRead)
-	postsService := demoServices.NewPostsService(log, dbWrite, dbRead)
-	jwkService := modelServices.NewJWKService(log, dbWrite, dbRead)
-	salesService := salesServices.NewSalesService(dbRead)
+	userServices := postgresServices.NewUserService(log, dbWrite, dbRead)
+	InventoryService := postgresServices.NewInventoryService(log, dbWrite, dbRead)
+	postsService := postgresServices.NewPostsService(log, dbWrite, dbRead)
+	jwkService := postgresServices.NewJWKService(log, dbWrite, dbRead)
+	salesService := postgresServices.NewSalesService(dbRead)
 
 	// Redis
 	var authCacheService services.IAuthCacheService
@@ -73,7 +71,7 @@ func InitDependencies() (*Dependencies, error) {
 		DBWrite:          dbWrite,
 		AuthCacheService: authCacheService,
 		UserService:      userServices,
-		ProductService:   productService,
+		InventoryService: InventoryService,
 		PostsService:     postsService,
 		JWKService:       jwkService,
 		SalesService:     salesService,
@@ -87,7 +85,7 @@ type NullTokenValidator struct{}
 
 func (v *NullTokenValidator) Validate(token string) (jwt.MapClaims, error) {
 	return jwt.MapClaims{
-		"sub": "integration-user",
+		"sub": "123e4567-e89b-12d3-a456-426614174000",
 	}, nil
 }
 

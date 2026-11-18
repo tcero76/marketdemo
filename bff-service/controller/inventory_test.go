@@ -15,40 +15,61 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/tcero76/marketplace/bff-service/dto"
-	"github.com/tcero76/marketplace/bff-service/dto/demo"
-	"github.com/tcero76/marketplace/bff-service/services"
 	logConfig "github.com/tcero76/marketplace/config/log"
 )
 
 type mockProductService struct {
-	GetProductFunc               func(string) (*demo.Product, error)
-	GetProductsFunc              func() ([]demo.Product, error)
-	GetSearchProductFunc         func(dto.SearchRequest) []demo.Product
-	GetRecomendationsProductFunc func(context.Context, string) []demo.Product
+	GetStockFunc                 func(context.Context, uuid.UUID) (dto.StockResponse, error)
+	PurchaseFunc                 func(context.Context, dto.PurchaseRequest) error
+	SellFunc                     func(context.Context, dto.SellRequest) error
+	AdjustStockFunc              func(context.Context, dto.AdjustStockRequest) error
+	DisableProductFunc           func(context.Context, uuid.UUID) error
+	EnableProductFunc            func(context.Context, uuid.UUID) error
+	GetProductFunc               func(string) (*dto.ProductResponse, error)
+	GetProductsFunc              func() ([]dto.ProductResponse, error)
+	GetSearchProductFunc         func(dto.SearchRequest) []dto.ProductResponse
+	GetRecomendationsProductFunc func(context.Context, string) []dto.ProductResponse
 	GetCategoriesFunc            func() ([]string, error)
 }
 
-func (m *mockProductService) GetProduct(q string) (*demo.Product, error) {
+func (m *mockProductService) GetStock(ctx context.Context, productID uuid.UUID) (dto.StockResponse, error) {
+	return m.GetStockFunc(ctx, productID)
+}
+func (m *mockProductService) Purchase(ctx context.Context, request dto.PurchaseRequest) error {
+	return m.PurchaseFunc(ctx, request)
+}
+func (m *mockProductService) Sell(ctx context.Context, request dto.SellRequest) error {
+	return m.SellFunc(ctx, request)
+}
+func (m *mockProductService) AdjustStock(ctx context.Context, request dto.AdjustStockRequest) error {
+	return m.AdjustStockFunc(ctx, request)
+}
+func (m *mockProductService) DisableProduct(ctx context.Context, productID uuid.UUID) error {
+	return m.DisableProductFunc(ctx, productID)
+}
+func (m *mockProductService) EnableProduct(ctx context.Context, productID uuid.UUID) error {
+	return m.EnableProductFunc(ctx, productID)
+}
+
+func (m *mockProductService) GetProduct(q string) (*dto.ProductResponse, error) {
 	return m.GetProductFunc(q)
 }
 
-func (m *mockProductService) GetProducts() ([]demo.Product, error) {
+func (m *mockProductService) GetProducts() ([]dto.ProductResponse, error) {
 	return m.GetProductsFunc()
 }
 
-func (m *mockProductService) GetSearchProduct(req dto.SearchRequest) []demo.Product {
+func (m *mockProductService) GetSearchProduct(req dto.SearchRequest) []dto.ProductResponse {
 	return m.GetSearchProductFunc(req)
 }
 
-func (m *mockProductService) GetRecomendationsProduct(ctx context.Context, userId string) []demo.Product {
+func (m *mockProductService) GetRecomendationsProduct(ctx context.Context, userId string) []dto.ProductResponse {
 	return m.GetRecomendationsProductFunc(ctx, userId)
 }
 
 func (m *mockProductService) GetCategories() ([]string, error) {
 	return m.GetCategoriesFunc()
 }
-
-var _ services.IDemoService = (*mockProductService)(nil)
 
 func newTestContext(
 	method string,
@@ -88,11 +109,11 @@ func TestGetProduct(t *testing.T) {
 			nil,
 		)
 		mockSvc := &mockProductService{
-			GetProductFunc: func(q string) (*demo.Product, error) {
+			GetProductFunc: func(q string) (*dto.ProductResponse, error) {
 				if q != "tv" {
 					t.Fatalf("expected query %q, got %q", "tv", q)
 				}
-				return &demo.Product{
+				return &dto.ProductResponse{
 					Description: "Televisor",
 				}, nil
 			},
@@ -109,7 +130,7 @@ func TestGetProduct(t *testing.T) {
 		if rec.Code != http.StatusOK {
 			t.Fatalf("expected %d, got %d", http.StatusOK, rec.Code)
 		}
-		var got demo.Product
+		var got dto.ProductResponse
 
 		if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
 			t.Fatalf("invalid json: %v", err)
@@ -125,7 +146,7 @@ func TestGetProduct(t *testing.T) {
 			nil,
 		)
 		mockSvc := &mockProductService{
-			GetProductFunc: func(string) (*demo.Product, error) {
+			GetProductFunc: func(string) (*dto.ProductResponse, error) {
 				return nil, errors.New("db error")
 			},
 		}
@@ -153,7 +174,7 @@ func TestGetProduct(t *testing.T) {
 			nil,
 		)
 		mockSvc := &mockProductService{
-			GetProductFunc: func(string) (*demo.Product, error) {
+			GetProductFunc: func(string) (*dto.ProductResponse, error) {
 				t.Fatal("GetProduct should not have been called")
 				return nil, nil
 			},
@@ -186,8 +207,8 @@ func TestGetProducts(t *testing.T) {
 			nil,
 		)
 		mockSvc := &mockProductService{
-			GetProductsFunc: func() ([]demo.Product, error) {
-				return []demo.Product{
+			GetProductsFunc: func() ([]dto.ProductResponse, error) {
+				return []dto.ProductResponse{
 					{Description: "Televisor"},
 					{Description: "Notebook"},
 				}, nil
@@ -205,7 +226,7 @@ func TestGetProducts(t *testing.T) {
 		if rec.Code != http.StatusOK {
 			t.Fatalf("expected %d, got %d", http.StatusOK, rec.Code)
 		}
-		var products []demo.Product
+		var products []dto.ProductResponse
 		err = json.Unmarshal(rec.Body.Bytes(), &products)
 		if err != nil {
 			t.Fatalf("invalid json: %v", err)
@@ -227,7 +248,7 @@ func TestGetProducts(t *testing.T) {
 			nil,
 		)
 		mockSvc := &mockProductService{
-			GetProductsFunc: func() ([]demo.Product, error) {
+			GetProductsFunc: func() ([]dto.ProductResponse, error) {
 				return nil, errors.New("db error")
 			},
 		}
@@ -266,8 +287,8 @@ func TestGetSearchProduct(t *testing.T) {
 			strings.NewReader(body),
 		)
 		mockSvc := &mockProductService{
-			GetSearchProductFunc: func(req dto.SearchRequest) []demo.Product {
-				return []demo.Product{
+			GetSearchProductFunc: func(req dto.SearchRequest) []dto.ProductResponse {
+				return []dto.ProductResponse{
 					{
 						Description: "Televisor",
 					},
@@ -318,9 +339,9 @@ func TestGetSearchProduct(t *testing.T) {
 		)
 		var received dto.SearchRequest
 		mockSvc := &mockProductService{
-			GetSearchProductFunc: func(r dto.SearchRequest) []demo.Product {
+			GetSearchProductFunc: func(r dto.SearchRequest) []dto.ProductResponse {
 				received = r
-				return []demo.Product{}
+				return []dto.ProductResponse{}
 			},
 		}
 		ctrl := NewProductController(
@@ -349,7 +370,7 @@ func TestGetRecomendationsProduct(t *testing.T) {
 			nil,
 		)
 		mockSvc := &mockProductService{
-			GetRecomendationsProductFunc: func(ctx context.Context, userID string) []demo.Product {
+			GetRecomendationsProductFunc: func(ctx context.Context, userID string) []dto.ProductResponse {
 				t.Fatal("service should not be called")
 				return nil
 			},
@@ -381,7 +402,7 @@ func TestGetRecomendationsProduct(t *testing.T) {
 			"email": "test@test.cl",
 		})
 		mockSvc := &mockProductService{
-			GetRecomendationsProductFunc: func(ctx context.Context, userID string) []demo.Product {
+			GetRecomendationsProductFunc: func(ctx context.Context, userID string) []dto.ProductResponse {
 				t.Fatal("service should not be called")
 				return nil
 			},
@@ -469,11 +490,11 @@ func TestGetCategories(t *testing.T) {
 }
 
 type mockPostsService struct {
-	CreatePosteoFunc func(*demo.PostDTO, string) error
-	GetPosteosFunc   func(string) ([]demo.PostDTO, error)
+	CreatePosteoFunc func(*dto.PostRequest, string) error
+	GetPosteosFunc   func(string) ([]dto.PostResponse, error)
 }
 
-func (m *mockPostsService) GetPosts(limit int, offset int) []demo.PostDTO {
+func (m *mockPostsService) GetPosts(limit int, offset int) []dto.PostResponse {
 	return nil
 }
 
@@ -481,11 +502,11 @@ func (m *mockPostsService) GetTotalPosts() int64 {
 	return 0
 }
 
-func (m *mockPostsService) CreatePosteo(posteo *demo.PostDTO, userId string) error {
+func (m *mockPostsService) CreatePosteo(posteo *dto.PostRequest, userId string) error {
 	return m.CreatePosteoFunc(posteo, userId)
 }
 
-func (m *mockPostsService) GetPosteos(productId string) ([]demo.PostDTO, error) {
+func (m *mockPostsService) GetPosteos(productId string) ([]dto.PostResponse, error) {
 	return m.GetPosteosFunc(productId)
 }
 func TestCreatePostDemo(t *testing.T) {
@@ -496,17 +517,17 @@ func TestCreatePostDemo(t *testing.T) {
 			strings.NewReader("{"),
 		)
 		mockPosts := &mockPostsService{
-			CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
+			CreatePosteoFunc: func(posteo *dto.PostRequest, userId string) error {
 				t.Fatal("service should not be called")
 				return nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.CreatePosteoDemo()(c)
+		err := ctrl.CreatePost()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}
@@ -525,17 +546,17 @@ func TestCreatePostDemo(t *testing.T) {
 			strings.NewReader(body),
 		)
 		mockPosts := &mockPostsService{
-			CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
+			CreatePosteoFunc: func(posteo *dto.PostRequest, userId string) error {
 				t.Fatal("service should not be called")
 				return nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.CreatePosteoDemo()(c)
+		err := ctrl.CreatePost()(c)
 		httpErr, ok := err.(*echo.HTTPError)
 		if !ok {
 			t.Fatalf("expected HTTPError, got %T", err)
@@ -554,17 +575,17 @@ func TestCreatePostDemo(t *testing.T) {
 			"email": "test@test.com",
 		})
 		mockPosts := &mockPostsService{
-			CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
+			CreatePosteoFunc: func(posteo *dto.PostRequest, userId string) error {
 				t.Fatal("service should not be called")
 				return nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.CreatePosteoDemo()(c)
+		err := ctrl.CreatePost()(c)
 		httpErr, ok := err.(*echo.HTTPError)
 		if !ok {
 			t.Fatalf("expected HTTPError, got %T", err)
@@ -583,17 +604,17 @@ func TestCreatePostDemo(t *testing.T) {
 			"sub": "no-es-un-uuid",
 		})
 		mockPosts := &mockPostsService{
-			CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
+			CreatePosteoFunc: func(posteo *dto.PostRequest, userId string) error {
 				t.Fatal("service should not be called")
 				return nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.CreatePosteoDemo()(c)
+		err := ctrl.CreatePost()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}
@@ -612,16 +633,16 @@ func TestCreatePostDemo(t *testing.T) {
 			"sub": userID,
 		})
 		mockPosts := &mockPostsService{
-			CreatePosteoFunc: func(posteo *demo.PostDTO, userId string) error {
+			CreatePosteoFunc: func(posteo *dto.PostRequest, userId string) error {
 				return errors.New("database error")
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.CreatePosteoDemo()(c)
+		err := ctrl.CreatePost()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}
@@ -641,7 +662,7 @@ func TestCreatePostDemo(t *testing.T) {
 		})
 		called := false
 		mockPosts := &mockPostsService{
-			CreatePosteoFunc: func(posteo *demo.PostDTO, id string) error {
+			CreatePosteoFunc: func(posteo *dto.PostRequest, id string) error {
 				called = true
 				if id != userID {
 					t.Fatalf("expected user %s, got %s", userID, id)
@@ -649,12 +670,12 @@ func TestCreatePostDemo(t *testing.T) {
 				return nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.CreatePosteoDemo()(c)
+		err := ctrl.CreatePost()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}
@@ -675,21 +696,21 @@ func TestGetPosteosDemo(t *testing.T) {
 			nil,
 		)
 		mockPosts := &mockPostsService{
-			GetPosteosFunc: func(productId string) ([]demo.PostDTO, error) {
+			GetPosteosFunc: func(productId string) ([]dto.PostResponse, error) {
 				if productId != "123" {
 					t.Fatalf("expected productId 123, got %s", productId)
 				}
-				return []demo.PostDTO{
+				return []dto.PostResponse{
 					{},
 				}, nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.GetPosteosDemo()(c)
+		err := ctrl.GetPosts()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}
@@ -704,17 +725,17 @@ func TestGetPosteosDemo(t *testing.T) {
 			nil,
 		)
 		mockPosts := &mockPostsService{
-			GetPosteosFunc: func(productId string) ([]demo.PostDTO, error) {
+			GetPosteosFunc: func(productId string) ([]dto.PostResponse, error) {
 				t.Fatal("service should not be called")
 				return nil, nil
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.GetPosteosDemo()(c)
+		err := ctrl.GetPosts()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}
@@ -730,16 +751,16 @@ func TestGetPosteosDemo(t *testing.T) {
 			nil,
 		)
 		mockPosts := &mockPostsService{
-			GetPosteosFunc: func(productId string) ([]demo.PostDTO, error) {
+			GetPosteosFunc: func(productId string) ([]dto.PostResponse, error) {
 				return nil, errors.New("database error")
 			},
 		}
-		ctrl := NewProductController(
+		ctrl := NewPostController(
 			logConfig.NewLoggerLogstash("test"),
 			nil,
 			mockPosts,
 		)
-		err := ctrl.GetPosteosDemo()(c)
+		err := ctrl.GetPosts()(c)
 		if err != nil {
 			t.Fatalf("handler returned error: %v", err)
 		}

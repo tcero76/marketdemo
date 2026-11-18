@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	dto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/services"
 	inventoryModel "github.com/tcero76/marketplace/postgres/model/inventory"
 	model "github.com/tcero76/marketplace/postgres/model/marketplace"

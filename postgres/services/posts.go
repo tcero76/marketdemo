@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/tcero76/marketplace/bff-service/dto/demo"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
@@ -22,7 +22,7 @@ func NewPostsService(log *logger.LoggerLogstash, dbWrite *gorm.DB, dbRead *gorm.
 	return &PostsService{dbWrite: dbWrite, dbRead: dbRead, log: log}
 }
 
-func (c *PostsService) GetPosts(limit int, offset int) []demo.PostDTO {
+func (c *PostsService) GetPosts(limit int, offset int) []dto.PostResponse {
 	c.log.Info("GetPosts Entrando al servicio")
 	var posts []postsModel.Posts
 	err := c.dbRead.Limit(limit).
@@ -30,7 +30,7 @@ func (c *PostsService) GetPosts(limit int, offset int) []demo.PostDTO {
 		Find(&posts)
 	if err.Error != nil {
 		c.log.Error("Error al obtener los posts: ", err.Error)
-		return []demo.PostDTO{}
+		return []dto.PostResponse{}
 	}
 	postsDTO := adapters.ToPostDTOS(posts)
 	return postsDTO
@@ -48,9 +48,9 @@ func (c *PostsService) GetTotalPosts() int64 {
 	return total
 }
 
-func (c *PostsService) CreatePosteo(posteoDTO *demo.PostDTO, userId string) error {
+func (c *PostsService) CreatePosteo(postRequest *dto.PostRequest, userId string) error {
 	c.log.Info("CreatePosteo Entrando al servicio")
-	posteo := adapters.ToPosteoModel(posteoDTO)
+	posteo := adapters.ToPosteoModel(postRequest)
 	c.log.Debug("Posteo a crear: ", posteo)
 	id, err := uuid.Parse(userId)
 	if err != nil {
@@ -70,13 +70,13 @@ func (c *PostsService) CreatePosteo(posteoDTO *demo.PostDTO, userId string) erro
 	return result.Error
 }
 
-func (c *PostsService) GetPosteos(productId string) ([]demo.PostDTO, error) {
+func (c *PostsService) GetPosteos(productId string) ([]dto.PostResponse, error) {
 	c.log.Info("GetPosteos Entrando al servicio modelo: ", productId)
 	posteos := []postsModel.Posts{}
 	err := c.dbRead.Where("product_id = ?", productId).Find(&posteos)
 	if err.Error != nil {
 		c.log.Error("Error al obtener los posteos: ", err.Error)
-		return []demo.PostDTO{}, err.Error
+		return []dto.PostResponse{}, err.Error
 	}
 	return adapters.ToPostDTOS(posteos), nil
 }

@@ -77,7 +77,7 @@ func (h *CallbackGoogleHandler) Handle(c echo.Context) error {
 		user, err := h.GoogleAuth.userServices.GetUserByEmail(googleUser.Email)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				var userDTO = dto.UserDTO{
+				var userRequest = dto.UserRequest{
 					UserID:     uuid.New(),
 					Password:   password,
 					Provider:   "google",
@@ -86,7 +86,7 @@ func (h *CallbackGoogleHandler) Handle(c echo.Context) error {
 					Nombre:     googleUser.Name,
 					IDProvider: googleUser.ID,
 				}
-				err = h.GoogleAuth.userServices.CreateUser(&userDTO)
+				err = h.GoogleAuth.userServices.CreateUser(&userRequest)
 			}
 			log.Error("Error retrieving user by email: ", err.Error())
 		}

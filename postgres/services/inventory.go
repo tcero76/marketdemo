@@ -9,9 +9,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	dto "github.com/tcero76/marketplace/bff-service/dto"
-	bffDemo "github.com/tcero76/marketplace/bff-service/dto/demo"
-	salesDto "github.com/tcero76/marketplace/bff-service/dto/sales"
+	"github.com/tcero76/marketplace/bff-service/dto"
 	"github.com/tcero76/marketplace/bff-service/services"
 	logger "github.com/tcero76/marketplace/config/log"
 	"github.com/tcero76/marketplace/postgres/adapters"
@@ -33,19 +31,19 @@ func NewInventoryService(log *logger.LoggerLogstash, dbRead *gorm.DB, dbWrite *g
 		log:     log,
 	}
 }
-func (s *InventoryService) GetStock(ctx context.Context, productID uuid.UUID) (salesDto.StockResponse, error) {
-	return salesDto.StockResponse{}, nil
+func (s *InventoryService) GetStock(ctx context.Context, productID uuid.UUID) (dto.StockResponse, error) {
+	return dto.StockResponse{}, nil
 }
 
-func (s *InventoryService) Purchase(ctx context.Context, request salesDto.PurchaseRequest) error {
+func (s *InventoryService) Purchase(ctx context.Context, request dto.PurchaseRequest) error {
 	return nil
 }
 
-func (s *InventoryService) Sell(ctx context.Context, request salesDto.SellRequest) error {
+func (s *InventoryService) Sell(ctx context.Context, request dto.SellRequest) error {
 	return nil
 }
 
-func (s *InventoryService) AdjustStock(ctx context.Context, request salesDto.AdjustStockRequest) error {
+func (s *InventoryService) AdjustStock(ctx context.Context, request dto.AdjustStockRequest) error {
 	return nil
 }
 
@@ -136,7 +134,7 @@ func getCategoryIdByName(name string, db *gorm.DB) (uuid.UUID, error) {
 	return category.ID, nil
 }
 
-func (h *InventoryService) GetProduct(query string) (*bffDemo.Product, error) {
+func (h *InventoryService) GetProduct(query string) (*dto.ProductResponse, error) {
 	h.log.Infof("Fetching product with query: %s", query)
 	var product inventoryModel.Product
 	err := h.dbRead.
@@ -148,7 +146,7 @@ func (h *InventoryService) GetProduct(query string) (*bffDemo.Product, error) {
 	return adapters.ToProductDTO(&product), nil
 }
 
-func (h *InventoryService) GetProducts() ([]bffDemo.Product, error) {
+func (h *InventoryService) GetProducts() ([]dto.ProductResponse, error) {
 	h.log.Infof("Fetching all products")
 	var products []inventoryModel.Product
 	err := h.dbRead.Find(&products).Error
@@ -159,7 +157,7 @@ func (h *InventoryService) GetProducts() ([]bffDemo.Product, error) {
 	return adapters.ToProductDTOs(products), nil
 }
 
-func (h *InventoryService) GetSearchProduct(searchRequest dto.SearchRequest) []bffDemo.Product {
+func (h *InventoryService) GetSearchProduct(searchRequest dto.SearchRequest) []dto.ProductResponse {
 	h.log.Debug("Searching products with request: ", searchRequest)
 	var productIDs []int
 	var categoryIDs []uuid.UUID
@@ -189,7 +187,7 @@ func (h *InventoryService) GetSearchProduct(searchRequest dto.SearchRequest) []b
 	return adapters.ToProductDTOs(products)
 }
 
-func (h *InventoryService) GetRecomendationsProduct(ctx context.Context, userId string) []bffDemo.Product {
+func (h *InventoryService) GetRecomendationsProduct(ctx context.Context, userId string) []dto.ProductResponse {
 	h.log.Info("Fetching product recommendations for user IDs: ", userId)
 	var products []inventoryModel.Product
 	err := h.dbRead.
